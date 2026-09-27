@@ -198,7 +198,7 @@ class vmmCreateVM(vmmGObjectUI):
         self._netlist = None
 
         self._addstorage = vmmAddStorage(self.conn, self.builder, self.topwin)
-        self.widget("storage-align").add(self._addstorage.top_box)
+        self.widget("storage-align").append(self._addstorage.top_box)
 
         def _browse_file_cb(ignore, widget):
             self._browse_file(widget)
@@ -209,35 +209,33 @@ class vmmCreateVM(vmmGObjectUI):
         self._mediacombo.connect("changed", self._iso_changed_cb)
         self._mediacombo.connect("activate", self._iso_activated_cb)
         self._mediacombo.set_mnemonic_label(self.widget("install-iso-label"))
-        self.widget("install-iso-align").add(self._mediacombo.top_box)
+        self.widget("install-iso-align").append(self._mediacombo.top_box)
 
-        self.builder.connect_signals(
-            {
-                "on_vmm_newcreate_delete_event": self._close_requested,
-                "on_create_cancel_clicked": self._close_requested,
-                "on_create_back_clicked": self._back_clicked,
-                "on_create_forward_clicked": self._forward_clicked,
-                "on_create_finish_clicked": self._finish_clicked,
-                "on_create_pages_switch_page": self._page_changed,
-                "on_create_conn_changed": self._conn_changed,
-                "on_method_changed": self._method_changed,
-                "on_xen_type_changed": self._xen_type_changed,
-                "on_arch_changed": self._arch_changed,
-                "on_virt_type_changed": self._virt_type_changed,
-                "on_machine_changed": self._machine_changed,
-                "on_vz_virt_type_changed": self._vz_virt_type_changed,
-                "on_install_iso_browse_clicked": self._browse_iso,
-                "on_install_url_entry_changed": self._url_changed,
-                "on_install_url_entry_activate": self._url_activated,
-                "on_install_import_browse_clicked": self._browse_import,
-                "on_install_app_browse_clicked": self._browse_app,
-                "on_install_oscontainer_browse_clicked": self._browse_oscontainer,
-                "on_install_container_source_toggle": self._container_source_toggle,
-                "on_install_detect_os_toggled": self._detect_os_toggled_cb,
-                "on_enable_storage_toggled": self._toggle_enable_storage,
-                "on_create_vm_name_changed": self._name_changed,
-            }
-        )
+        self.connect_signals({
+            "on_vmm_newcreate_delete_event": self._close_requested,
+            "on_create_cancel_clicked": self._close_requested,
+            "on_create_back_clicked": self._back_clicked,
+            "on_create_forward_clicked": self._forward_clicked,
+            "on_create_finish_clicked": self._finish_clicked,
+            "on_create_pages_switch_page": self._page_changed,
+            "on_create_conn_changed": self._conn_changed,
+            "on_method_changed": self._method_changed,
+            "on_xen_type_changed": self._xen_type_changed,
+            "on_arch_changed": self._arch_changed,
+            "on_virt_type_changed": self._virt_type_changed,
+            "on_machine_changed": self._machine_changed,
+            "on_vz_virt_type_changed": self._vz_virt_type_changed,
+            "on_install_iso_browse_clicked": self._browse_iso,
+            "on_install_url_entry_changed": self._url_changed,
+            "on_install_url_entry_activate": self._url_activated,
+            "on_install_import_browse_clicked": self._browse_import,
+            "on_install_app_browse_clicked": self._browse_app,
+            "on_install_oscontainer_browse_clicked": self._browse_oscontainer,
+            "on_install_container_source_toggle": self._container_source_toggle,
+            "on_install_detect_os_toggled": self._detect_os_toggled_cb,
+            "on_enable_storage_toggled": self._toggle_enable_storage,
+            "on_create_vm_name_changed": self._name_changed,
+        })
         self.bind_escape_key_close()
 
         self._init_state()
@@ -366,7 +364,7 @@ class vmmCreateVM(vmmGObjectUI):
 
         # OS distro list
         self._os_list = vmmOSList()
-        self.widget("install-os-align").add(self._os_list.search_entry)
+        self.widget("install-os-align").append(self._os_list.search_entry)
         self.widget("os-label").set_mnemonic_widget(self._os_list.search_entry)
 
     def _reset_state(self, urihint=None):
@@ -645,7 +643,7 @@ class vmmCreateVM(vmmGObjectUI):
         self.widget("advanced-expander").set_expanded(False)
 
         self._netlist = vmmNetworkList(self.conn, self.builder, self.topwin)
-        self.widget("netdev-ui-align").add(self._netlist.top_box)
+        self.widget("netdev-ui-align").append(self._netlist.top_box)
         self._netlist.reset_state()
 
     def _conn_state_changed(self, conn):

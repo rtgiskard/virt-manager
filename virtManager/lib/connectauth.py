@@ -18,6 +18,7 @@ import libvirt
 from virtinst import log
 
 from ..baseclass import vmmGObjectUI
+from ..error import run_dialog
 from . import uiutil
 
 
@@ -53,14 +54,12 @@ class _vmmConnectAuth(vmmGObjectUI):
         self.creds = creds
         self.topwin.set_title(_("Authentication required"))
 
-        self.builder.connect_signals(
-            {
-                "on_connectauth_cancel_clicked": self._cancel_cb,
-                "on_connectauth_ok_clicked": self._ok_cb,
-                "on_entry1_activate": self._entry_cb,
-                "on_entry2_activate": self._entry_cb,
-            }
-        )
+        self.connect_signals({
+            "on_connectauth_cancel_clicked": self._cancel_cb,
+            "on_connectauth_ok_clicked": self._ok_cb,
+            "on_entry1_activate": self._entry_cb,
+            "on_entry2_activate": self._entry_cb,
+        })
 
         self.entry1 = self.widget("entry1")
         self.entry2 = self.widget("entry2")
@@ -86,11 +85,11 @@ class _vmmConnectAuth(vmmGObjectUI):
             uiutil.set_grid_row_visible(label, True)
             label.set_text(prompt)
             entry.set_visibility(not noecho)
-            entry.get_accessible().set_name(prompt + " entry")
+            entry.update_property([Gtk.AccessibleProperty.LABEL], [prompt + " entry"])
 
     def run(self):
-        self.topwin.show()
-        res = self.topwin.run()
+        self.topwin.get_content_area().set_visible(True)
+        res = run_dialog(self.topwin)
         self.topwin.hide()
 
         if res != Gtk.ResponseType.OK:

@@ -1,136 +1,71 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.38.2 -->
+<?xml version='1.0' encoding='UTF-8'?>
 <interface>
-  <requires lib="gtk+" version="3.22"/>
+  <requires lib="gtk" version="4.0"/>
   <object class="GtkSearchEntry" id="os-name">
-    <property name="visible">True</property>
-    <property name="can-focus">True</property>
-    <property name="hexpand">True</property>
-    <property name="primary-icon-name">edit-find-symbolic</property>
-    <property name="primary-icon-activatable">False</property>
-    <property name="primary-icon-sensitive">False</property>
+    <property name="focusable">1</property>
+    <property name="hexpand">1</property>
     <signal name="activate" handler="on_os_name_activate" swapped="no"/>
-    <signal name="key-press-event" handler="on_os_name_key_press_event" swapped="no"/>
     <signal name="search-changed" handler="on_os_name_search_changed" swapped="no"/>
     <signal name="stop-search" handler="on_os_name_stop_search" swapped="no"/>
-    <child internal-child="accessible">
-      <object class="AtkObject" id="os-name-atkobject">
-        <property name="AtkObject::accessible-name">oslist-entry</property>
-      </object>
-    </child>
-  </object>
+    </object>
   <object class="GtkPopover" id="vmm-oslist">
-    <property name="can-focus">False</property>
-    <property name="border-width">6</property>
-    <property name="modal">False</property>
-    <child>
+    <property name="autohide">0</property>
+    <property name="child">
       <object class="GtkBox">
-        <property name="visible">True</property>
-        <property name="can-focus">False</property>
         <property name="orientation">vertical</property>
         <property name="spacing">6</property>
         <child>
           <object class="GtkBox">
-            <property name="visible">True</property>
-            <property name="can-focus">False</property>
             <property name="spacing">6</property>
             <child>
               <object class="GtkImage">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
                 <property name="valign">start</property>
                 <property name="icon-name">dialog-information</property>
-                <property name="icon_size">3</property>
+                <property name="pixel-size">24</property>
               </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">0</property>
-              </packing>
             </child>
             <child>
               <object class="GtkLabel" id="eol-warn">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
+                <property name="hexpand">1</property>
                 <property name="halign">start</property>
-                <property name="label" translatable="yes">Can't find the operating system you are looking for?
+                <property name="label" translatable="1">Can't find the operating system you are looking for?
 Try selecting a similar distro or version, or use one of the 'Generic' options.</property>
-                <property name="wrap">True</property>
+                <property name="wrap">1</property>
                 <property name="max-width-chars">40</property>
               </object>
-              <packing>
-                <property name="expand">True</property>
-                <property name="fill">True</property>
-                <property name="position">1</property>
-              </packing>
             </child>
           </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="position">0</property>
-          </packing>
         </child>
         <child>
           <object class="GtkScrolledWindow" id="os-scroll">
-            <property name="visible">True</property>
-            <property name="can-focus">True</property>
+            <property name="vexpand">1</property>
+            <property name="focusable">1</property>
             <property name="vscrollbar-policy">always</property>
-            <property name="shadow-type">in</property>
-            <child>
+            <property name="child">
               <object class="GtkTreeView" id="os-list">
-                <property name="visible">True</property>
-                <property name="can-focus">True</property>
-                <property name="headers-visible">False</property>
-                <property name="enable-search">False</property>
-                <property name="hover-selection">True</property>
+                <property name="focusable">1</property>
+                <property name="headers-visible">0</property>
+                <property name="enable-search">0</property>
+                <property name="hover-selection">1</property>
                 <property name="enable-grid-lines">horizontal</property>
-                <property name="activate-on-single-click">True</property>
+                <property name="activate-on-single-click">1</property>
                 <signal name="row-activated" handler="on_os_list_row_activated" swapped="no"/>
                 <child internal-child="selection">
                   <object class="GtkTreeSelection"/>
                 </child>
-                <child internal-child="accessible">
-                  <object class="AtkObject" id="os-list-atkobject">
-                    <property name="AtkObject::accessible-name">os-list</property>
-                  </object>
-                </child>
-              </object>
-            </child>
+                </object>
+            </property>
           </object>
-          <packing>
-            <property name="expand">True</property>
-            <property name="fill">True</property>
-            <property name="position">1</property>
-          </packing>
         </child>
         <child>
           <object class="GtkCheckButton" id="include-eol">
-            <property name="label" translatable="yes">Include end of life operating systems</property>
-            <property name="visible">True</property>
-            <property name="can-focus">True</property>
-            <property name="receives-default">False</property>
+            <property name="label" translatable="1">Include end of life operating systems</property>
+            <property name="focusable">1</property>
             <property name="halign">start</property>
-            <property name="draw-indicator">True</property>
             <signal name="toggled" handler="on_include_eol_toggled" swapped="no"/>
-            <child internal-child="accessible">
-              <object class="AtkObject" id="include-eol-atkobject">
-                <property name="AtkObject::accessible-name">include-eol</property>
-              </object>
-            </child>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="position">2</property>
-          </packing>
+            </object>
         </child>
       </object>
-    </child>
-    <child internal-child="accessible">
-      <object class="AtkObject" id="vmm-oslist-atkobject">
-        <property name="AtkObject::accessible-name">oslist-popover</property>
-      </object>
-    </child>
-  </object>
+    </property>
+    <property name="margin-start">6</property><property name="margin-end">6</property><property name="margin-top">6</property><property name="margin-bottom">6</property></object>
 </interface>

@@ -194,21 +194,19 @@ class vmmCloneVM(vmmGObjectUI):
         self._storage_dialog = self.widget("vmm-change-storage")
         self._storage_dialog.set_transient_for(self.topwin)
 
-        self.builder.connect_signals(
-            {
-                "on_clone_delete_event": self._close_cb,
-                "on_clone_cancel_clicked": self._close_cb,
-                "on_clone_ok_clicked": self._finish_clicked_cb,
-                "on_storage_selection_changed": self._storage_selection_changed_cb,
-                "on_storage_details_clicked": self._storage_details_clicked_cb,
-                # Storage subdialog signals
-                "on_vmm_change_storage_delete_event": self._storage_dialog_close_cb,
-                "on_change_storage_cancel_clicked": self._storage_dialog_close_cb,
-                "on_change_storage_ok_clicked": self._storage_dialog_finish_cb,
-                "on_change_storage_doclone_toggled": self._storage_dialog_doclone_toggled_cb,
-                "on_change_storage_browse_clicked": self._storage_dialog_browse_cb,
-            }
-        )
+        self.connect_signals({
+            "on_clone_delete_event": self._close_cb,
+            "on_clone_cancel_clicked": self._close_cb,
+            "on_clone_ok_clicked": self._finish_clicked_cb,
+            "on_storage_selection_changed": self._storage_selection_changed_cb,
+            "on_storage_details_clicked": self._storage_details_clicked_cb,
+            # Storage subdialog signals
+            "on_vmm_change_storage_delete_event": self._storage_dialog_close_cb,
+            "on_change_storage_cancel_clicked": self._storage_dialog_close_cb,
+            "on_change_storage_ok_clicked": self._storage_dialog_finish_cb,
+            "on_change_storage_doclone_toggled": self._storage_dialog_doclone_toggled_cb,
+            "on_change_storage_browse_clicked": self._storage_dialog_browse_cb,
+        })
         self.bind_escape_key_close()
         self._cleanup_on_app_close()
 
@@ -227,7 +225,7 @@ class vmmCloneVM(vmmGObjectUI):
         self._set_vm(vm)
         self._reset_state()
         self.topwin.set_transient_for(parent)
-        self.topwin.resize(1, 1)
+        self.topwin.set_default_size(1, 1)
         self.topwin.present()
 
     def _storage_dialog_close(self):
@@ -291,7 +289,7 @@ class vmmCloneVM(vmmGObjectUI):
         chkbox = Gtk.CellRendererToggle()
         chkbox.connect("toggled", self._storage_clone_toggled_cb)
         chkimg = Gtk.CellRendererPixbuf()
-        chkimg.set_property("stock-size", Gtk.IconSize.MENU)
+        chkimg.set_property("icon-size", Gtk.IconSize.NORMAL)
         cloneCol.pack_start(chkimg, False)
         cloneCol.pack_start(chkbox, False)
 
@@ -323,7 +321,7 @@ class vmmCloneVM(vmmGObjectUI):
         pathtxt.set_property("width-chars", 30)
         pathtxt.set_property("ellipsize", Pango.EllipsizeMode.MIDDLE)
         pathimg = Gtk.CellRendererPixbuf()
-        pathimg.set_property("stock-size", Gtk.IconSize.MENU)
+        pathimg.set_property("icon-size", Gtk.IconSize.NORMAL)
         pathimg.set_padding(3, 0)
         pathCol.pack_start(pathimg, False)
         pathCol.pack_start(pathtxt, True)
@@ -424,7 +422,7 @@ class vmmCloneVM(vmmGObjectUI):
         do_clone = sinfo.is_clone_requested()
 
         self.widget("change-storage-doclone").set_active(True)
-        self.widget("change-storage-doclone").toggled()
+        self.widget("change-storage-doclone").emit("toggled")
         self.widget("change-storage-orig").set_text(orig)
         self.widget("change-storage-target").set_text(tgt)
         self.widget("change-storage-size").set_text(size or "-")
@@ -433,7 +431,7 @@ class vmmCloneVM(vmmGObjectUI):
         self.widget("change-storage-new").set_text(new or "")
         self.widget("change-storage-doclone").set_sensitive(can_clone)
 
-        self.widget("vmm-change-storage").show_all()
+        self.widget("vmm-change-storage").show()
 
     def _storage_dialog_finish(self):
         target = self.widget("change-storage-target").get_text()

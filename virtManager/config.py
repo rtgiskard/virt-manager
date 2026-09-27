@@ -17,22 +17,27 @@ from .lib.inspection import vmmInspection
 CSSDATA = """
 /* Lighter colored text in some wizard summary fields */
 .vmm-lighter {
-    color: @insensitive_fg_color
+    color: @insensitive_fg_color;
 }
 
 /* Text on the blue header in our wizards */
 .vmm-header-text {
-    color: white
+    color: white;
 }
 
 /* Subtext on the blue header in our wizards */
 .vmm-header-subtext {
-    color: #59B0E2
+    color: #59B0E2;
 }
 
 /* The blue header */
 .vmm-header {
-    background-color: #0072A8
+    background-color: #0072A8;
+}
+
+/* Show black borders around scaled SPICE displays. */
+.vmm-console-background {
+    background-color: black;
 }
 """
 
@@ -171,7 +176,7 @@ class vmmConfig:
         # the keyring
         self._keyring = None
 
-        self.default_graphics_from_config = BuildConfig.default_graphics
+        self.default_graphics_from_config = "spice"
         self.default_hvs = BuildConfig.default_hvs
 
         self.default_storage_format_from_config = "qcow2"
@@ -184,19 +189,14 @@ class vmmConfig:
     def _init_css(self):
         from gi.repository import Gdk
 
-        screen = Gdk.Screen.get_default()
-
         css_provider = Gtk.CssProvider()
         css_provider.load_from_data(CSSDATA.encode("utf-8"))
-
-        context = Gtk.StyleContext()
-        context.add_provider_for_screen(screen, css_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
-
-        found, color = context.lookup_color("insensitive_fg_color")
-        if not found:  # pragma: no cover
-            log.debug("Didn't find insensitive_fg_color in theme")
-            return
-        self.color_insensitive = color.to_string()
+        Gtk.StyleContext.add_provider_for_display(
+            Gdk.Display.get_default(), css_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER
+        )
+        label = Gtk.Label()
+        label.set_sensitive(False)
+        self.color_insensitive = label.get_color().to_string()
 
     # General app wide helpers (gsettings agnostic)
 
@@ -497,10 +497,10 @@ class vmmConfig:
     # New VM preferences
     def get_graphics_type(self, raw=False):
         ret = self.conf.get("/new-vm/graphics-type")
-        if ret not in ["system", "vnc", "spice"]:
-            ret = "system"  # pragma: no cover
+        if ret not in ["system", "spice"]:
+            ret = "system"
         if ret == "system" and not raw:
-            return self.default_graphics_from_config
+            return "spice"
         return ret
 
     def set_graphics_type(self, gtype):

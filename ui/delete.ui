@@ -1,226 +1,137 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.38.2 -->
+<?xml version='1.0' encoding='UTF-8'?>
 <interface>
-  <requires lib="gtk+" version="3.22"/>
+  <requires lib="gtk" version="4.0"/>
   <object class="GtkWindow" id="vmm-delete">
     <property name="width-request">450</property>
     <property name="height-request">350</property>
-    <property name="can-focus">False</property>
-    <property name="title" translatable="yes">Delete Virtual Machine</property>
-    <property name="window-position">center-on-parent</property>
-    <property name="type-hint">dialog</property>
-    <signal name="delete-event" handler="on_vmm_delete_delete_event" swapped="no"/>
-    <child>
+    <property name="title" translatable="1">Delete Virtual Machine</property>
+    <signal name="close-request" handler="on_vmm_delete_delete_event" swapped="no"/>
+    <property name="child">
       <object class="GtkBox" id="dialog-vbox1">
-        <property name="visible">True</property>
-        <property name="can-focus">False</property>
         <property name="orientation">vertical</property>
         <property name="spacing">6</property>
         <child>
           <object class="GtkViewport" id="header">
-            <property name="visible">True</property>
-            <property name="can-focus">False</property>
-            <property name="resize-mode">queue</property>
-            <child>
+            <property name="child">
               <object class="GtkBox" id="hbox77">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <property name="border-width">6</property>
                 <property name="spacing">10</property>
                 <child>
                   <object class="GtkImage" id="image2">
-                    <property name="visible">True</property>
-                    <property name="can-focus">False</property>
+                    <property name="halign">center</property>
                     <property name="icon-name">vm_delete_wizard</property>
-                    <property name="icon_size">6</property>
+                    <property name="pixel-size">48</property>
                   </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">False</property>
-                    <property name="position">0</property>
-                  </packing>
                 </child>
                 <child>
                   <object class="GtkLabel" id="header-label">
-                    <property name="visible">True</property>
-                    <property name="can-focus">False</property>
                     <property name="halign">start</property>
                     <property name="label">&lt;span size='large'&gt;Placeholder&lt;/span&gt;</property>
-                    <property name="use-markup">True</property>
+                    <property name="use-markup">1</property>
                     <style>
                       <class name="vmm-header-text"/>
                     </style>
                   </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">True</property>
-                    <property name="position">1</property>
-                  </packing>
                 </child>
-              </object>
-            </child>
+              <property name="margin-start">6</property><property name="margin-end">6</property><property name="margin-top">6</property><property name="margin-bottom">6</property></object>
+            </property>
             <style>
               <class name="vmm-header"/>
             </style>
           </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="position">0</property>
-          </packing>
         </child>
         <child>
           <object class="GtkBox" id="vbox1">
-            <property name="visible">True</property>
-            <property name="can-focus">False</property>
-            <property name="border-width">12</property>
+            <property name="vexpand">1</property>
             <property name="orientation">vertical</property>
             <property name="spacing">18</property>
             <child>
-              <!-- n-columns=1 n-rows=3 -->
               <object class="GtkGrid" id="grid1">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
+                <property name="vexpand">1</property>
                 <property name="orientation">vertical</property>
                 <property name="row-spacing">6</property>
                 <child>
                   <object class="GtkBox" id="delete-warn-running-vm-box">
-                    <property name="visible">True</property>
-                    <property name="can-focus">False</property>
                     <property name="spacing">3</property>
+                    <layout>
+                      <property name="column">0</property>
+                      <property name="row">0</property>
+                    </layout>
                     <child>
                       <object class="GtkImage" id="delete-warn-running-vm-icon">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
                         <property name="icon-name">dialog-warning</property>
                       </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="position">0</property>
-                      </packing>
                     </child>
                     <child>
                       <object class="GtkLabel" id="delete-warn-running-vm-label">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
-                        <property name="label" translatable="yes">&lt;small&gt;This VM is currently running and will be forced off before being deleted&lt;/small&gt;</property>
-                        <property name="use-markup">True</property>
+                        <property name="label" translatable="1">&lt;small&gt;This VM is currently running and will be forced off before being deleted&lt;/small&gt;</property>
+                        <property name="use-markup">1</property>
                       </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="position">1</property>
-                      </packing>
                     </child>
                   </object>
-                  <packing>
-                    <property name="left-attach">0</property>
-                    <property name="top-attach">0</property>
-                  </packing>
                 </child>
                 <child>
                   <object class="GtkCheckButton" id="delete-remove-storage">
-                    <property name="label" translatable="yes">Delete _associated storage files</property>
-                    <property name="visible">True</property>
-                    <property name="can-focus">True</property>
-                    <property name="receives-default">False</property>
+                    <property name="label" translatable="1">Delete _associated storage files</property>
+                    <property name="focusable">1</property>
                     <property name="halign">start</property>
-                    <property name="use-underline">True</property>
-                    <property name="draw-indicator">True</property>
+                    <property name="use-underline">1</property>
                     <signal name="toggled" handler="on_delete_remove_storage_toggled" swapped="no"/>
+                    <layout>
+                      <property name="column">0</property>
+                      <property name="row">1</property>
+                    </layout>
                   </object>
-                  <packing>
-                    <property name="left-attach">0</property>
-                    <property name="top-attach">1</property>
-                  </packing>
                 </child>
                 <child>
                   <object class="GtkScrolledWindow" id="delete-storage-scroll">
-                    <property name="visible">True</property>
-                    <property name="can-focus">True</property>
-                    <property name="hexpand">True</property>
-                    <property name="vexpand">True</property>
+                    <property name="focusable">1</property>
+                    <property name="hexpand">1</property>
+                    <property name="vexpand">1</property>
                     <property name="hscrollbar-policy">never</property>
-                    <property name="shadow-type">etched-in</property>
-                    <child>
+                    <property name="child">
                       <object class="GtkTreeView" id="delete-storage-list">
-                        <property name="visible">True</property>
-                        <property name="can-focus">True</property>
+                        <property name="focusable">1</property>
                         <child internal-child="selection">
                           <object class="GtkTreeSelection" id="treeview-selection"/>
                         </child>
-                        <child internal-child="accessible">
-                          <object class="AtkObject" id="delete-storage-list-atkobject">
-                            <property name="AtkObject::accessible-name">storage-list</property>
-                          </object>
-                        </child>
-                      </object>
-                    </child>
+                        </object>
+                    </property>
+                    <layout>
+                      <property name="column">0</property>
+                      <property name="row">2</property>
+                    </layout>
                   </object>
-                  <packing>
-                    <property name="left-attach">0</property>
-                    <property name="top-attach">2</property>
-                  </packing>
                 </child>
               </object>
-              <packing>
-                <property name="expand">True</property>
-                <property name="fill">True</property>
-                <property name="position">0</property>
-              </packing>
             </child>
             <child>
-              <object class="GtkButtonBox" id="buttonbox1">
+              <object class="GtkBox" id="buttonbox1">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
                 <property name="spacing">6</property>
-                <property name="layout-style">end</property>
                 <child>
                   <object class="GtkButton" id="delete-cancel">
-                    <property name="label" translatable="yes">_Cancel</property>
-                    <property name="visible">True</property>
-                    <property name="can-focus">True</property>
-                    <property name="receives-default">True</property>
-                    <property name="use-underline">True</property>
+                    <property name="label" translatable="1">_Cancel</property>
+                    <property name="focusable">1</property>
+                    <property name="receives-default">1</property>
+                    <property name="use-underline">1</property>
                     <signal name="clicked" handler="on_delete_cancel_clicked" swapped="no"/>
                   </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">False</property>
-                    <property name="position">0</property>
-                  </packing>
-                </child>
+                  </child>
                 <child>
                   <object class="GtkButton" id="delete-ok">
-                    <property name="label" translatable="yes">_Delete</property>
-                    <property name="visible">True</property>
-                    <property name="can-focus">True</property>
-                    <property name="receives-default">True</property>
-                    <property name="use-underline">True</property>
+                    <property name="label" translatable="1">_Delete</property>
+                    <property name="focusable">1</property>
+                    <property name="receives-default">1</property>
+                    <property name="use-underline">1</property>
                     <signal name="clicked" handler="on_delete_ok_clicked" swapped="no"/>
                   </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">False</property>
-                    <property name="position">1</property>
-                  </packing>
-                </child>
+                  </child>
               </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">1</property>
-              </packing>
             </child>
-          </object>
-          <packing>
-            <property name="expand">True</property>
-            <property name="fill">True</property>
-            <property name="position">1</property>
-          </packing>
+          <property name="margin-start">12</property><property name="margin-end">12</property><property name="margin-top">12</property><property name="margin-bottom">12</property></object>
         </child>
       </object>
-    </child>
+    </property>
   </object>
 </interface>

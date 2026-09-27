@@ -45,18 +45,16 @@ class vmmFSDetails(vmmGObjectUI):
 
             return signal_cb
 
-        self.builder.connect_signals(
-            {
-                "on_fs_source_browse_clicked": self._browse_fs_source_cb,
-                "on_fs_type_combo_changed": _e(_EDIT_FS_TYPE),
-                "on_fs_driver_combo_changed": _e(_EDIT_FS_DRIVER),
-                "on_fs_readonly_toggled": _e(_EDIT_FS_READONLY),
-                "on_fs_format_combo_changed": _e(_EDIT_FS_FORMAT),
-                "on_fs_source_changed": _e(_EDIT_FS_SOURCE),
-                "on_fs_ram_source_changed": _e(_EDIT_FS_RAM_SOURCE),
-                "on_fs_target_changed": _e(_EDIT_FS_TARGET),
-            }
-        )
+        self.connect_signals({
+            "on_fs_source_browse_clicked": self._browse_fs_source_cb,
+            "on_fs_type_combo_changed": _e(_EDIT_FS_TYPE),
+            "on_fs_driver_combo_changed": _e(_EDIT_FS_DRIVER),
+            "on_fs_readonly_toggled": _e(_EDIT_FS_READONLY),
+            "on_fs_format_combo_changed": _e(_EDIT_FS_FORMAT),
+            "on_fs_source_changed": _e(_EDIT_FS_SOURCE),
+            "on_fs_ram_source_changed": _e(_EDIT_FS_RAM_SOURCE),
+            "on_fs_target_changed": _e(_EDIT_FS_TARGET),
+        })
 
         self._init_ui()
         self.top_box = self.widget("vmm-fs-details")

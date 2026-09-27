@@ -38,18 +38,16 @@ class vmmHostNets(vmmGObjectUI):
         self._active_edits = set()
         self.top_box = self.widget("top-box")
 
-        self.builder.connect_signals(
-            {
-                "on_net_add_clicked": self._add_network_cb,
-                "on_net_delete_clicked": self._delete_network_cb,
-                "on_net_stop_clicked": self._stop_network_cb,
-                "on_net_start_clicked": self._start_network_cb,
-                "on_net_apply_clicked": (lambda *x: self._net_apply()),
-                "on_net_list_changed": self._net_selected_cb,
-                "on_net_autostart_toggled": (lambda *x: self._enable_net_apply(EDIT_NET_AUTOSTART)),
-                "on_net_name_changed": (lambda *x: self._enable_net_apply(EDIT_NET_NAME)),
-            }
-        )
+        self.connect_signals({
+            "on_net_add_clicked": self._add_network_cb,
+            "on_net_delete_clicked": self._delete_network_cb,
+            "on_net_stop_clicked": self._stop_network_cb,
+            "on_net_start_clicked": self._start_network_cb,
+            "on_net_apply_clicked": (lambda *x: self._net_apply()),
+            "on_net_list_changed": self._net_selected_cb,
+            "on_net_autostart_toggled": (lambda *x: self._enable_net_apply(EDIT_NET_AUTOSTART)),
+            "on_net_name_changed": (lambda *x: self._enable_net_apply(EDIT_NET_NAME)),
+        })
 
         self._init_ui()
         self._populate_networks()
@@ -182,7 +180,7 @@ class vmmHostNets(vmmGObjectUI):
                         net,
                         net.get_name(),
                         "network-idle",
-                        Gtk.IconSize.LARGE_TOOLBAR,
+                        Gtk.IconSize.LARGE,
                         bool(net.is_active()),
                     ]
                 )
@@ -237,7 +235,7 @@ class vmmHostNets(vmmGObjectUI):
 
         icon = active and ICON_RUNNING or ICON_SHUTOFF
         self.widget("net-state").set_text(net.run_status())
-        self.widget("net-state-icon").set_from_icon_name(icon, Gtk.IconSize.BUTTON)
+        self.widget("net-state-icon").set_from_icon_name(icon)
 
         self.widget("net-start").set_sensitive(not active)
         self.widget("net-stop").set_sensitive(active)

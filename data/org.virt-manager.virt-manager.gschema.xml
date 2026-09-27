@@ -250,7 +250,7 @@
     <key name="graphics-type" type="s">
       <default>'system'</default>
       <summary>Install selected graphics type for new VM</summary>
-      <description>Install selected graphics type for new VM. vnc or spice, system for software configured default</description>
+      <description>Install selected graphics type for new VM. Spice or system for the configured default.</description>
     </key>
 
     <key name="storage-format" type="s">

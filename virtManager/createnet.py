@@ -38,22 +38,20 @@ class vmmCreateNetwork(vmmGObjectUI):
         )
         self._xmleditor.connect("xml-requested", self._xmleditor_xml_requested_cb)
 
-        self.builder.connect_signals(
-            {
-                "on_create_cancel_clicked": self.close,
-                "on_vmm_create_delete_event": self.close,
-                "on_create_finish_clicked": self.finish,
-                "on_net_forward_mode_changed": self._net_forward_mode_changed_cb,
-                "on_net_forward_device_changed": self._net_forward_device_changed_cb,
-                "on_net_dns_use_toggled": self._net_dns_use_toggled_cb,
-                "on_net-ipv4-enable_toggled": self._ipv4_toggled_cb,
-                "on_net-ipv4-network_changed": self._change_ipv4_network_cb,
-                "on_net-dhcpv4-enable_toggled": self._dhcpv4_toggled_cb,
-                "on_net-ipv6-enable_toggled": self._ipv6_toggled_cb,
-                "on_net-ipv6-network_changed": self._change_ipv6_network_cb,
-                "on_net-dhcpv6-enable_toggled": self._dhcpv6_toggled_cb,
-            }
-        )
+        self.connect_signals({
+            "on_create_cancel_clicked": self.close,
+            "on_vmm_create_delete_event": self.close,
+            "on_create_finish_clicked": self.finish,
+            "on_net_forward_mode_changed": self._net_forward_mode_changed_cb,
+            "on_net_forward_device_changed": self._net_forward_device_changed_cb,
+            "on_net_dns_use_toggled": self._net_dns_use_toggled_cb,
+            "on_net-ipv4-enable_toggled": self._ipv4_toggled_cb,
+            "on_net-ipv4-network_changed": self._change_ipv4_network_cb,
+            "on_net-dhcpv4-enable_toggled": self._dhcpv4_toggled_cb,
+            "on_net-ipv6-enable_toggled": self._ipv6_toggled_cb,
+            "on_net-ipv6-network_changed": self._change_ipv6_network_cb,
+            "on_net-dhcpv6-enable_toggled": self._dhcpv6_toggled_cb,
+        })
         self.bind_escape_key_close()
 
         self.set_initial_state()

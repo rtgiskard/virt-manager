@@ -40,20 +40,18 @@ class vmmGraphicsDetails(vmmGObjectUI):
 
             return signal_cb
 
-        self.builder.connect_signals(
-            {
-                "on_graphics_show_password": self._show_password_cb,
-                "on_graphics_port_auto_toggled": self._change_port_auto,
-                "on_graphics_opengl_toggled": _e(_EDIT_GFX_OPENGL),
-                "on_graphics_type_changed": _e(_EDIT_GFX_TYPE),
-                "on_graphics_use_password": _e(_EDIT_GFX_PASSWD),
-                "on_graphics_listen_type_changed": _e(_EDIT_GFX_LISTEN),
-                "on_graphics_password_changed": _e(_EDIT_GFX_PASSWD),
-                "on_graphics_address_changed": _e(_EDIT_GFX_LISTEN),
-                "on_graphics_port_changed": _e(_EDIT_GFX_PORT),
-                "on_graphics_rendernode_changed": _e(_EDIT_GFX_OPENGL),
-            }
-        )
+        self.connect_signals({
+            "on_graphics_show_password": self._show_password_cb,
+            "on_graphics_port_auto_toggled": self._change_port_auto,
+            "on_graphics_opengl_toggled": _e(_EDIT_GFX_OPENGL),
+            "on_graphics_type_changed": _e(_EDIT_GFX_TYPE),
+            "on_graphics_use_password": _e(_EDIT_GFX_PASSWD),
+            "on_graphics_listen_type_changed": _e(_EDIT_GFX_LISTEN),
+            "on_graphics_password_changed": _e(_EDIT_GFX_PASSWD),
+            "on_graphics_address_changed": _e(_EDIT_GFX_LISTEN),
+            "on_graphics_port_changed": _e(_EDIT_GFX_PORT),
+            "on_graphics_rendernode_changed": _e(_EDIT_GFX_OPENGL),
+        })
 
         self._init_ui()
         self.top_box = self.widget("graphics-box")
@@ -87,7 +85,6 @@ class vmmGraphicsDetails(vmmGObjectUI):
         uiutil.init_combo_text_column(graphics_list, 1)
         graphics_model.clear()
         graphics_model.append(["spice", _("Spice server")])
-        graphics_model.append(["vnc", _("VNC server")])
 
         graphics_listen_list = self.widget("graphics-listen-type")
         graphics_listen_model = Gtk.ListStore(str, str)

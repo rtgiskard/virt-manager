@@ -179,10 +179,6 @@ def _checkConsoleStandard(app, dom):
     win.window_close()
 
 
-@_vm_wrapper("uitests-vnc-standard")
-def testConsoleVNCStandard(app, dom):
-    return _checkConsoleStandard(app, dom)
-
 
 @_vm_wrapper("uitests-spice-standard")
 def testConsoleSpiceStandard(app, dom):
@@ -209,10 +205,6 @@ def _checkConsoleFocus(app, dom):
     win.keyCombo("<ctrl><shift>w")
     lib.utils.check(lambda: not win.showing)
 
-
-@_vm_wrapper("uitests-vnc-standard")
-def testConsoleVNCFocus(app, dom):
-    return _checkConsoleFocus(app, dom)
 
 
 @_vm_wrapper("uitests-spice-standard")
@@ -266,57 +258,11 @@ def _checkPassword(app):
     lib.utils.check(lambda: not bool(passwd.text))
 
 
-@_vm_wrapper("uitests-vnc-password")
-def testConsoleVNCPassword(app, dom):
-    ignore = dom
-    return _checkPassword(app)
-
-
 @_vm_wrapper("uitests-spice-password")
 def testConsoleSpicePassword(app, dom):
     ignore = dom
     return _checkPassword(app)
 
-
-@_vm_wrapper("uitests-vnc-password", opts=["--test-options=fake-vnc-username"])
-def testConsoleVNCPasswordUsername(app, dom):
-    ignore = dom
-    win = app.topwin
-    con = win.find("console-gfx-viewport")
-    lib.utils.check(lambda: not con.showing)
-    passwd = win.find("Password:", "password text")
-    lib.utils.check(lambda: passwd.showing)
-    username = win.find("Username:", "text")
-    lib.utils.check(lambda: username.showing)
-
-    # Since we are mocking the username, sending the credentials
-    # is ignored, so with the correct password this succeeds
-    username.text = "fakeuser"
-    passwd.typeText("goodp")
-    win.find("Login", "push button").click()
-    lib.utils.check(lambda: con.showing)
-
-
-@_vm_wrapper("uitests-vnc-socket")
-def testConsoleVNCSocket(app, dom):
-    ignore = dom
-    win = app.topwin
-    con = win.find("console-gfx-viewport")
-    lib.utils.check(lambda: con.showing)
-
-    def _click_textconsole_menu(msg):
-        vmenu = win.find("^View$", "menu")
-        vmenu.click()
-        tmenu = win.find("Consoles", "menu")
-        tmenu.point()
-        app.sleep(0.5)  # give console menu time to dynamically populate
-        tmenu.find(msg, "radio menu item").click()
-
-    # A bit of an extra test, make sure selecting Graphical Console works
-    _click_textconsole_menu("Serial 1")
-    lib.utils.check(lambda: not con.showing)
-    _click_textconsole_menu("Graphical Console")
-    lib.utils.check(lambda: con.showing)
 
 
 def _testConsoleAutoconnect(app, dom, wname):
@@ -437,33 +383,6 @@ def testConsoleSpiceSpecific(app, dom):
     win.click_title()
     win.click_title()
 
-
-@_vm_wrapper("uitests-vnc-standard")
-def testVNCSpecific(app, dom):
-    from gi.repository import GtkVnc
-
-    if not hasattr(GtkVnc.Display, "set_allow_resize"):
-        pytest.skip("GtkVnc is too old")
-
-    ignore = dom
-    win = app.topwin
-    con = win.find("console-gfx-viewport")
-    lib.utils.check(lambda: con.showing)
-
-    # Test guest resize behavior
-    def _click_auto():
-        vmenu = win.find("^View$", "menu")
-        vmenu.click()
-        smenu = vmenu.find("Scale Display", "menu")
-        smenu.point()
-        smenu.find("Auto resize VM", "check menu item").click()
-
-    _click_auto()
-    win.click_title()
-    win.window_maximize()
-    _click_auto()
-    win.click_title()
-    win.click_title()
 
 
 @_vm_wrapper("uitests-hotplug")

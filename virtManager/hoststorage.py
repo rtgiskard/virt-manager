@@ -79,26 +79,23 @@ class vmmHostStorage(vmmGObjectUI):
         self._xmleditor = None
         self.top_box = self.widget("storage-grid")
 
-        self.builder.connect_signals(
-            {
-                "on_pool_add_clicked": self._pool_add_cb,
-                "on_pool_stop_clicked": self._pool_stop_cb,
-                "on_pool_start_clicked": self._pool_start_cb,
-                "on_pool_delete_clicked": self._pool_delete_cb,
-                "on_pool_refresh_clicked": self._pool_refresh_cb,
-                "on_pool_apply_clicked": (lambda *x: self._pool_apply()),
-                "on_vol_delete_clicked": self._vol_delete_cb,
-                "on_vol_list_button_press_event": self._vol_popup_menu_cb,
-                "on_vol_list_changed": self._vol_selected_cb,
-                "on_vol_add_clicked": self._vol_add_cb,
-                "on_browse_cancel_clicked": self._cancel_clicked_cb,
-                "on_browse_local_clicked": self._browse_local_clicked_cb,
-                "on_choose_volume_clicked": self._choose_volume_clicked_cb,
-                "on_vol_list_row_activated": self._vol_list_row_activated_cb,
-                "on_pool_name_changed": (lambda *x: self._enable_pool_apply(EDIT_POOL_NAME)),
-                "on_pool_autostart_toggled": self._pool_autostart_changed_cb,
-            }
-        )
+        self.connect_signals({
+            "on_pool_add_clicked": self._pool_add_cb,
+            "on_pool_stop_clicked": self._pool_stop_cb,
+            "on_pool_start_clicked": self._pool_start_cb,
+            "on_pool_delete_clicked": self._pool_delete_cb,
+            "on_pool_refresh_clicked": self._pool_refresh_cb,
+            "on_pool_apply_clicked": (lambda *x: self._pool_apply()),
+            "on_vol_delete_clicked": self._vol_delete_cb,
+            "on_vol_list_changed": self._vol_selected_cb,
+            "on_vol_add_clicked": self._vol_add_cb,
+            "on_browse_cancel_clicked": self._cancel_clicked_cb,
+            "on_browse_local_clicked": self._browse_local_clicked_cb,
+            "on_choose_volume_clicked": self._choose_volume_clicked_cb,
+            "on_vol_list_row_activated": self._vol_list_row_activated_cb,
+            "on_pool_name_changed": (lambda *x: self._enable_pool_apply(EDIT_POOL_NAME)),
+            "on_pool_autostart_toggled": self._pool_autostart_changed_cb,
+        })
 
         self._init_ui()
         self._populate_pools()
@@ -126,7 +123,8 @@ class vmmHostStorage(vmmGObjectUI):
             self._addvol.cleanup()
             self._addvol = None
 
-        self._volmenu.destroy()
+        if self._volmenu.get_parent():
+            self._volmenu.unparent()
         self._volmenu = None
 
         self._xmleditor.cleanup()
@@ -169,11 +167,15 @@ class vmmHostStorage(vmmGObjectUI):
         self.widget("choose-volume").set_visible(False)
 
         # Volume list popup menu
-        self._volmenu = Gtk.Menu()
-        volCopyPath = Gtk.MenuItem.new_with_mnemonic(_("Copy Volume Path"))
-        volCopyPath.show()
-        volCopyPath.connect("activate", self._vol_copy_path_cb)
-        self._volmenu.add(volCopyPath)
+        self._volmenu = Gtk.Popover()
+        box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        self._volmenu.set_child(box)
+        volCopyPath = Gtk.Button.new_with_mnemonic(_("Copy Volume Path"))
+        volCopyPath.connect("clicked", self._vol_copy_path_cb)
+        box.append(volCopyPath)
+        click = Gtk.GestureClick(button=3)
+        click.connect("pressed", self._vol_popup_menu_cb)
+        self.widget("vol-list").add_controller(click)
 
         # Volume list
         # [obj, name, sizestr, capacity, format, in use by string, sensitive]
@@ -304,7 +306,7 @@ class vmmHostStorage(vmmGObjectUI):
         )
         self.widget("pool-location").set_text(pool.get_target_path())
         self.widget("pool-state-icon").set_from_icon_name(
-            ((active and ICON_RUNNING) or ICON_SHUTOFF), Gtk.IconSize.BUTTON
+            (active and ICON_RUNNING) or ICON_SHUTOFF
         )
         self.widget("pool-state").set_text(pool.run_status())
         self.widget("pool-autostart").set_label(_("On Boot"))
@@ -507,14 +509,14 @@ class vmmHostStorage(vmmGObjectUI):
     ###########################
 
     def _vol_copy_path_cb(self, src):
+        self._volmenu.popdown()
         vol = self._current_vol()
         if not vol:
             return  # pragma: no cover
 
-        clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
         target_path = vol.get_target_path()
         if target_path:
-            clipboard.set_text(target_path, -1)
+            self.widget("vol-list").get_clipboard().set(target_path)
 
     def _vol_add_cb(self, src):
         pool = self._current_pool()
@@ -635,11 +637,18 @@ class vmmHostStorage(vmmGObjectUI):
         can_choose = bool(treeiter and model[treeiter][VOL_COLUMN_SENSITIVE])
         self.widget("choose-volume").set_sensitive(can_choose)
 
-    def _vol_popup_menu_cb(self, src, event):
-        if event.button != 3:
+    def _vol_popup_menu_cb(self, gesture, _press_count, x, y):
+        widget = gesture.get_widget()
+        hit = widget.get_path_at_pos(int(x), int(y))
+        if hit is None:
             return
-
-        self._volmenu.popup_at_pointer(event)
+        widget.get_selection().select_path(hit[0])
+        if not self._volmenu.get_parent():
+            self._volmenu.set_parent(widget)
+        rect = Gdk.Rectangle()
+        rect.x, rect.y, rect.width, rect.height = int(x), int(y), 1, 1
+        self._volmenu.set_pointing_to(rect)
+        self._volmenu.popup()
 
     def _cancel_clicked_cb(self, src):
         self.emit("cancel-clicked")

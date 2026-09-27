@@ -40,18 +40,16 @@ class vmmAddStorage(vmmGObjectUI):
 
             return signal_cb
 
-        self.builder.connect_signals(
-            {
-                "on_storage_browse_clicked": self._browse_storage,
-                "on_storage_select_toggled": self._toggle_storage_select,
-                "on_disk_cache_combo_changed": _e(_EDIT_CACHE),
-                "on_disk_discard_combo_changed": _e(_EDIT_DISCARD),
-                "on_disk_readonly_changed": _e(_EDIT_RO),
-                "on_disk_shareable_changed": _e(_EDIT_SHARE),
-                "on_disk_removable_changed": _e(_EDIT_REMOVABLE),
-                "on_disk_serial_changed": _e(_EDIT_SERIAL),
-            }
-        )
+        self.connect_signals({
+            "on_storage_browse_clicked": self._browse_storage,
+            "on_storage_select_toggled": self._toggle_storage_select,
+            "on_disk_cache_combo_changed": _e(_EDIT_CACHE),
+            "on_disk_discard_combo_changed": _e(_EDIT_DISCARD),
+            "on_disk_readonly_changed": _e(_EDIT_RO),
+            "on_disk_shareable_changed": _e(_EDIT_SHARE),
+            "on_disk_removable_changed": _e(_EDIT_REMOVABLE),
+            "on_disk_serial_changed": _e(_EDIT_SERIAL),
+        })
 
         self._active_edits = []
         self.top_box = self.widget("storage-box")
@@ -60,8 +58,10 @@ class vmmAddStorage(vmmGObjectUI):
 
     def _cleanup(self):
         self.conn = None
-        self.top_box.destroy()
-        self.advanced_top_box.destroy()
+        if self.top_box.get_parent():
+            self.top_box.unparent()
+        if self.advanced_top_box.get_parent():
+            self.advanced_top_box.unparent()
 
     ##########################
     # Initialization methods #

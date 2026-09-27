@@ -23,12 +23,10 @@ class vmmAbout(vmmGObjectUI):
         vmmGObjectUI.__init__(self, "about.ui", "vmm-about")
         self._cleanup_on_app_close()
 
-        self.builder.connect_signals(
-            {
-                "on_vmm_about_delete_event": self.close,
-                "on_vmm_about_response": self.close,
-            }
-        )
+        self.connect_signals({
+            "on_vmm_about_delete_event": self.close,
+            "on_vmm_about_response": self.close,
+        })
 
     def show(self, parent):
         log.debug("Showing about")

@@ -29,16 +29,14 @@ class vmmOSList(vmmGObjectUI):
         self.search_entry.set_placeholder_text(_("Type to start searching..."))
         self.eol_text = self.widget("eol-warn").get_text()
 
-        self.builder.connect_signals(
-            {
-                "on_include_eol_toggled": self._eol_toggled_cb,
-                "on_os_name_activate": self._entry_activate_cb,
-                "on_os_name_key_press_event": self._key_press_cb,
-                "on_os_name_search_changed": self._search_changed_cb,
-                "on_os_name_stop_search": self._stop_search_cb,
-                "on_os_list_row_activated": self._os_selected_cb,
-            }
-        )
+        self.connect_signals({
+            "on_include_eol_toggled": self._eol_toggled_cb,
+            "on_os_name_activate": self._entry_activate_cb,
+            "on_os_name_key_press_event": self._key_press_cb,
+            "on_os_name_search_changed": self._search_changed_cb,
+            "on_os_name_stop_search": self._stop_search_cb,
+            "on_os_list_row_activated": self._os_selected_cb,
+        })
 
         self._init_state()
 

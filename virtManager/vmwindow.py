@@ -4,7 +4,6 @@
 # This work is licensed under the GNU GPLv2 or later.
 # See the COPYING file in the top-level directory.
 
-from gi.repository import Gdk
 from gi.repository import Gtk
 
 from virtinst import log
@@ -51,7 +50,6 @@ class vmmVMWindow(vmmGObjectUI):
             # Details window is being abused as a 'configure before install'
             # dialog, set things as appropriate
             self.is_customize_dialog = True
-            self.topwin.set_type_hint(Gdk.WindowTypeHint.DIALOG)
             self.topwin.set_transient_for(parent)
             self.topwin.set_deletable(False)
 
@@ -65,18 +63,19 @@ class vmmVMWindow(vmmGObjectUI):
             self.conn.connect("vm-removed", self._vm_removed_cb)
 
         self.ignoreDetails = False
+        self._syncing_pause_state = False
 
         self._console = vmmConsolePages(self.vm, self.builder, self.topwin)
-        self.widget("console-placeholder").add(self._console.top_box)
+        self.widget("console-placeholder").append(self._console.top_box)
         self._console.connect("page-changed", self._console_page_changed_cb)
         self._console.connect("leave-fullscreen", self._console_leave_fullscreen_cb)
         self._console.connect("change-title", self._console_change_title_cb)
 
         self._snapshots = vmmSnapshotPage(self.vm, self.builder, self.topwin)
-        self.widget("snapshot-placeholder").add(self._snapshots.top_box)
+        self.widget("snapshot-placeholder").append(self._snapshots.top_box)
 
         self._details = vmmDetails(self.vm, self.builder, self.topwin, self.is_customize_dialog)
-        self.widget("details-placeholder").add(self._details.top_box)
+        self.widget("details-placeholder").append(self._details.top_box)
 
         # Set default window size
         w, h = self.vm.get_details_window_size()
@@ -90,40 +89,37 @@ class vmmVMWindow(vmmGObjectUI):
         self._vmmenu = None
         self.init_menus()
 
-        self.builder.connect_signals(
-            {
-                "on_close_details_clicked": self.close,
-                "on_details_menu_close_activate": self.close,
-                "on_vmm_details_delete_event": self._window_delete_event,
-                "on_vmm_details_configure_event": self.window_resized,
-                "on_details_menu_quit_activate": self.exit_app,
-                "on_control_vm_details_toggled": self.details_console_changed,
-                "on_control_vm_console_toggled": self.details_console_changed,
-                "on_control_snapshots_toggled": self.details_console_changed,
-                "on_control_run_clicked": self.control_vm_run,
-                "on_control_shutdown_clicked": self.control_vm_shutdown,
-                "on_control_pause_toggled": self.control_vm_pause,
-                "on_control_fullscreen_toggled": self.control_fullscreen,
-                "on_details_customize_finish_clicked": self.customize_finish,
-                "on_details_cancel_customize_clicked": self._customize_cancel_clicked,
-                "on_details_menu_virtual_manager_activate": self._on_menu_virtual_machine_activate_cb,  # noqa: E501
-                "on_details_menu_screenshot_activate": self.control_vm_screenshot,
-                "on_details_menu_usb_redirection": self.control_vm_usb_redirection,
-                "on_details_menu_view_toolbar_activate": self.toggle_toolbar,
-                "on_details_menu_view_manager_activate": self.view_manager,
-                "on_details_menu_view_details_toggled": self.details_console_changed,
-                "on_details_menu_view_console_toggled": self.details_console_changed,
-                "on_details_menu_view_snapshots_toggled": self.details_console_changed,
-                "on_details_pages_switch_page": self._details_page_switch_cb,
-                "on_details_menu_view_fullscreen_activate": self._fullscreen_changed_cb,
-                "on_details_menu_view_size_to_vm_activate": self._size_to_vm_cb,
-                "on_details_menu_view_scale_always_toggled": self._scaling_ui_changed_cb,
-                "on_details_menu_view_scale_fullscreen_toggled": self._scaling_ui_changed_cb,
-                "on_details_menu_view_scale_never_toggled": self._scaling_ui_changed_cb,
-                "on_details_menu_view_resizeguest_toggled": self._resizeguest_ui_changed_cb,
-                "on_details_menu_view_autoconnect_activate": self._autoconnect_ui_changed_cb,
-            }
-        )
+        self.connect_signals({
+            "on_close_details_clicked": self.close,
+            "on_details_menu_close_activate": self.close,
+            "on_vmm_details_delete_event": self._window_delete_event,
+            "on_details_menu_quit_activate": self.exit_app,
+            "on_control_vm_details_toggled": self.details_console_changed,
+            "on_control_vm_console_toggled": self.details_console_changed,
+            "on_control_snapshots_toggled": self.details_console_changed,
+            "on_control_run_clicked": self.control_vm_run,
+            "on_control_shutdown_clicked": self.control_vm_shutdown,
+            "on_control_pause_toggled": self.control_vm_pause,
+            "on_control_fullscreen_toggled": self.control_fullscreen,
+            "on_details_customize_finish_clicked": self.customize_finish,
+            "on_details_cancel_customize_clicked": self._customize_cancel_clicked,
+            "on_details_menu_virtual_manager_activate": self._on_menu_virtual_machine_activate_cb,  # noqa: E501
+            "on_details_menu_screenshot_activate": self.control_vm_screenshot,
+            "on_details_menu_usb_redirection": self.control_vm_usb_redirection,
+            "on_details_menu_view_toolbar_activate": self.toggle_toolbar,
+            "on_details_menu_view_manager_activate": self.view_manager,
+            "on_details_menu_view_details_toggled": self.details_console_changed,
+            "on_details_menu_view_console_toggled": self.details_console_changed,
+            "on_details_menu_view_snapshots_toggled": self.details_console_changed,
+            "on_details_pages_switch_page": self._details_page_switch_cb,
+            "on_details_menu_view_fullscreen_activate": self._fullscreen_changed_cb,
+            "on_details_menu_view_size_to_vm_activate": self._size_to_vm_cb,
+            "on_details_menu_view_scale_always_toggled": self._scaling_ui_changed_cb,
+            "on_details_menu_view_scale_fullscreen_toggled": self._scaling_ui_changed_cb,
+            "on_details_menu_view_scale_never_toggled": self._scaling_ui_changed_cb,
+            "on_details_menu_view_resizeguest_toggled": self._resizeguest_ui_changed_cb,
+            "on_details_menu_view_autoconnect_activate": self._autoconnect_ui_changed_cb,
+        })
 
         # Deliberately keep all this after signal connection
         self.vm.connect("state-changed", self._vm_state_changed_cb)
@@ -160,9 +156,9 @@ class vmmVMWindow(vmmGObjectUI):
         self._snapshots = None
         self._details.cleanup()
         self._details = None
-        self._shutdownmenu.destroy()
+        self.widget("control-shutdown-menu").set_popover(None)
         self._shutdownmenu = None
-        self._vmmenu.destroy()
+        self.widget("details-vm-menu").set_popover(None)
         self._vmmenu = None
 
         if self._window_size:
@@ -200,12 +196,12 @@ class vmmVMWindow(vmmGObjectUI):
         h = 800
         hid = []
 
-        def win_cb(src, event):
+        def win_cb(*_args):
             self.widget("details-pages").set_size_request(-1, -1)
             self.topwin.disconnect(hid[0])
 
         self.widget("details-pages").set_size_request(w, h)
-        hid.append(self.topwin.connect("configure-event", win_cb))
+        hid.append(self.topwin.connect("map", win_cb))
 
     def _vm_removed_cb(self, _conn, vm):
         if self.vm == vm:
@@ -242,6 +238,7 @@ class vmmVMWindow(vmmGObjectUI):
         if not self.is_visible():
             return
 
+        self._window_size = (self.topwin.get_width(), self.topwin.get_height())
         self.topwin.hide()
         self._console.vmwindow_close()
         self._details.vmwindow_close()
@@ -257,26 +254,27 @@ class vmmVMWindow(vmmGObjectUI):
     def init_menus(self):
         # Virtual Machine menu
         self._shutdownmenu = vmmenu.VMShutdownMenu(self, lambda: self.vm)
-        self.widget("control-shutdown").set_menu(self._shutdownmenu)
+        self.widget("control-shutdown-menu").set_popover(self._shutdownmenu)
         self.widget("control-shutdown").set_icon_name("system-shutdown")
 
-        topmenu = self.widget("details-vm-menu")
-        submenu = topmenu.get_submenu()
         self._vmmenu = vmmenu.VMActionMenu(self, lambda: self.vm, show_open=False)
-        for child in submenu.get_children():
-            submenu.remove(child)
-            self._vmmenu.add(child)
-        topmenu.set_submenu(self._vmmenu)
-        topmenu.show_all()
+        static_box = self.widget("virtual_machine1_menu-items")
+        while child := static_box.get_first_child():
+            child.unparent()
+            self._vmmenu._box.append(child)
+        self.widget("details-vm-menu").set_popover(self._vmmenu)
+        self._vmmenu.connect("show", self._on_menu_virtual_machine_activate_cb)
 
         self.widget("details-pages").set_show_tabs(False)
         self.widget("details-menu-view-toolbar").set_active(self.config.get_details_show_toolbar())
 
         # Keycombo menu (ctrl+alt+del etc.)
-        self.widget("details-menu-send-key").set_submenu(self._console.vmwindow_get_keycombo_menu())
+        self.widget("details-menu-send-key").set_popover(
+            self._console.vmwindow_get_keycombo_menu()
+        )
 
         # Serial list menu
-        self.widget("details-menu-view-console-list").set_submenu(
+        self.widget("details-menu-view-console-list").set_popover(
             self._console.vmwindow_get_console_list_menu()
         )
 
@@ -284,10 +282,6 @@ class vmmVMWindow(vmmGObjectUI):
     # Window state listeners #
     ##########################
 
-    def window_resized(self, ignore, ignore2):
-        if not self.is_visible():
-            return  # pragma: no cover
-        self._window_size = self.topwin.get_size()
 
     def control_fullscreen(self, src):
         menu = self.widget("details-menu-view-fullscreen")
@@ -370,7 +364,7 @@ class vmmVMWindow(vmmGObjectUI):
             text = _("_Run")
         strip_text = text.replace("_", "")
 
-        self.widget("details-vm-menu").get_submenu().change_run_text(text)
+        self._vmmenu.change_run_text(text)
         self.widget("control-run").set_label(strip_text)
 
     def _refresh_title(self):
@@ -401,7 +395,7 @@ class vmmVMWindow(vmmGObjectUI):
 
         self.widget("control-run").set_sensitive(run)
         self.widget("control-shutdown").set_sensitive(stop)
-        self.widget("control-shutdown").get_menu().update_widget_states(vm)
+        self._shutdownmenu.update_widget_states(vm)
         self.widget("control-pause").set_sensitive(stop)
 
         if paused:
@@ -410,7 +404,7 @@ class vmmVMWindow(vmmGObjectUI):
             pauseTooltip = _("Pause the virtual machine")
         self.widget("control-pause").set_tooltip_text(pauseTooltip)
 
-        self.widget("details-vm-menu").get_submenu().update_widget_states(vm)
+        self._vmmenu.update_widget_states(vm)
         self.set_pause_state(paused)
 
         errmsg = self.vm.snapshots_supported()
@@ -459,14 +453,15 @@ class vmmVMWindow(vmmGObjectUI):
         self.widget("details-pages").set_current_page(DETAILS_PAGE_DETAILS)
 
     def set_pause_state(self, state):
-        src = self.widget("control-pause")
+        self._syncing_pause_state = True
         try:
-            src.handler_block_by_func(self.control_vm_pause)
-            src.set_active(state)
+            self.widget("control-pause").set_active(state)
         finally:
-            src.handler_unblock_by_func(self.control_vm_pause)
+            self._syncing_pause_state = False
 
     def control_vm_pause(self, src):
+        if self._syncing_pause_state:
+            return
         do_pause = src.get_active()
 
         # Set button state back to original value: just let the status
@@ -572,7 +567,8 @@ class vmmVMWindow(vmmGObjectUI):
             self._details.vmwindow_resources_refreshed()
 
     def _refresh_current_page(self, newpage=None):
-        newpage = newpage or self.widget("details-pages").get_current_page()
+        if newpage is None:
+            newpage = self.widget("details-pages").get_current_page()
 
         is_details = newpage == DETAILS_PAGE_DETAILS
         self._details.vmwindow_refresh_vm_state(is_details)
@@ -596,11 +592,7 @@ class vmmVMWindow(vmmGObjectUI):
         is_viewer = self._console.vmwindow_get_viewer_is_visible()
 
         self.widget("details-menu-vm-screenshot").set_sensitive(is_viewer)
-        keycombo_menu = self._console.vmwindow_get_keycombo_menu()
-
-        can_sendkey = is_viewer and not paused
-        for c in keycombo_menu.get_children():
-            c.set_sensitive(can_sendkey)
+        self.widget("details-menu-send-key").set_sensitive(is_viewer and not paused)
 
         self._console_refresh_can_usbredir()
         self._console_refresh_can_fullscreen()

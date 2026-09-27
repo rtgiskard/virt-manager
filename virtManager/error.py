@@ -8,11 +8,30 @@ import sys
 import textwrap
 import traceback
 
+from gi.repository import GLib
 from gi.repository import Gtk
 
 from virtinst import log
 
 from .baseclass import vmmGObject
+
+
+def run_dialog(dialog):
+    """Present a GTK4 dialog and wait for its response."""
+    loop = GLib.MainLoop()
+    response = Gtk.ResponseType.DELETE_EVENT
+
+    def on_response(_dialog, result):
+        nonlocal response
+        response = result
+        loop.quit()
+
+    handler = dialog.connect("response", on_response)
+    dialog.set_modal(True)
+    dialog.show()
+    loop.run()
+    dialog.disconnect(handler)
+    return response
 
 
 def _launch_dialog(dialog, primary_text, secondary_text, title, widget=None, modal=True):
@@ -33,15 +52,15 @@ def _launch_dialog(dialog, primary_text, secondary_text, title, widget=None, mod
     secondary_text = fix_text(secondary_text)
 
     dialog.set_property("text", primary_text)
-    dialog.format_secondary_text(secondary_text or None)
+    dialog.set_property("secondary-text", secondary_text or "")
     dialog.set_title(title)
 
     if widget:
-        dialog.get_content_area().add(widget)
+        dialog.get_content_area().append(widget)
 
     res = False
     if modal:
-        res = dialog.run()
+        res = run_dialog(dialog)
         res = bool(res in [Gtk.ResponseType.YES, Gtk.ResponseType.OK])
         dialog.destroy()
     else:
@@ -114,7 +133,7 @@ class vmmErrorDialog(vmmGObject):
             details = summary + "\n\n" + details
 
         dialog = _errorDialog(
-            parent=self.get_parent(), flags=0, message_type=dialog_type, buttons=buttons
+            transient_for=self.get_parent(), message_type=dialog_type, buttons=buttons
         )
 
         return dialog.show_dialog(
@@ -128,15 +147,15 @@ class vmmErrorDialog(vmmGObject):
     def _simple_dialog(self, dialog_type, buttons, text1, text2, title, widget=None, modal=True):
 
         dialog = Gtk.MessageDialog(
-            self.get_parent(),
-            flags=Gtk.DialogFlags.DESTROY_WITH_PARENT,
+            transient_for=self.get_parent(),
+            modal=modal,
             message_type=dialog_type,
             buttons=buttons,
         )
         if self._simple:
             self._simple.destroy()
         self._simple = dialog
-        self._simple.get_accessible().set_name("vmm dialog")
+        self._simple.update_property([Gtk.AccessibleProperty.LABEL], ["vmm dialog"])
 
         return _launch_dialog(
             self._simple, text1, text2 or "", title or "", widget=widget, modal=modal
@@ -196,7 +215,7 @@ class vmmErrorDialog(vmmGObject):
         dtype = Gtk.MessageType.WARNING
         buttons = buttons or Gtk.ButtonsType.OK_CANCEL
         chkbox = _errorDialog(
-            parent=self.get_parent(), flags=0, message_type=dtype, buttons=buttons
+            transient_for=self.get_parent(), message_type=dtype, buttons=buttons
         )
         return chkbox.show_dialog(primary_text=text1, secondary_text=text2, chktext=chktext)
 
@@ -204,7 +223,7 @@ class vmmErrorDialog(vmmGObject):
         dtype = Gtk.MessageType.ERROR
         buttons = buttons or Gtk.ButtonsType.OK
         chkbox = _errorDialog(
-            parent=self.get_parent(), flags=0, message_type=dtype, buttons=buttons
+            transient_for=self.get_parent(), message_type=dtype, buttons=buttons
         )
         return chkbox.show_dialog(primary_text=text1, secondary_text=text2, chktext=chktext)
 
@@ -261,8 +280,6 @@ class vmmErrorDialog(vmmGObject):
         if default_name:
             fcdialog.set_current_name(default_name)
 
-        fcdialog.set_do_overwrite_confirmation(confirm_overwrite)
-
         # Set file match pattern (ex. *.png)
         if _type is not None:
             pattern = _type
@@ -279,12 +296,14 @@ class vmmErrorDialog(vmmGObject):
 
         if start_folder is not None:
             if os.access(start_folder, os.R_OK):
-                fcdialog.set_current_folder(start_folder)
+                from gi.repository import Gio
+
+                fcdialog.set_current_folder(Gio.File.new_for_path(start_folder))
 
         # Run the dialog and parse the response
         ret = None
-        if fcdialog.run() == Gtk.ResponseType.ACCEPT:
-            ret = fcdialog.get_filename()
+        if run_dialog(fcdialog) == Gtk.ResponseType.ACCEPT:
+            ret = fcdialog.get_file().get_path()
         fcdialog.destroy()
 
         return ret
@@ -299,11 +318,13 @@ class _errorDialog(Gtk.MessageDialog):
         Gtk.MessageDialog.__init__(self, *args, **kwargs)
 
         self.set_title("")
-        for child in self.get_message_area().get_children():
+        child = self.get_message_area().get_first_child()
+        while child:
             if hasattr(child, "set_max_width_chars"):
                 child.set_max_width_chars(40)
+            child = child.get_next_sibling()
 
-        self.get_accessible().set_name("vmm dialog")
+        self.update_property([Gtk.AccessibleProperty.LABEL], ["vmm dialog"])
 
         self.chk_vbox = None
         self.init_chkbox()
@@ -314,18 +335,15 @@ class _errorDialog(Gtk.MessageDialog):
 
     def init_chkbox(self):
         # Init check items
-        self.chk_vbox = Gtk.VBox(False, False)
-        self.chk_vbox.set_spacing(0)
-
-        self.chk_vbox.show_all()
-        self.vbox.pack_start(self.chk_vbox, False, False, 0)  # pylint: disable=no-member
+        self.chk_vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        self.get_content_area().append(self.chk_vbox)
 
     def init_details(self):
         # Init details buffer
         self.buffer = Gtk.TextBuffer()
         self.buf_expander = Gtk.Expander.new(_("Details"))
         sw = Gtk.ScrolledWindow()
-        sw.set_shadow_type(Gtk.ShadowType.IN)
+        sw.set_has_frame(True)
         sw.set_size_request(400, 240)
         sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
         details = Gtk.TextView.new_with_buffer(self.buffer)
@@ -333,11 +351,13 @@ class _errorDialog(Gtk.MessageDialog):
         details.set_overwrite(False)
         details.set_cursor_visible(False)
         details.set_wrap_mode(Gtk.WrapMode.WORD)
-        details.set_border_width(6)
-        sw.add(details)
-        self.buf_expander.add(sw)
-        self.vbox.pack_start(self.buf_expander, False, False, 0)  # pylint: disable=no-member
-        self.buf_expander.show_all()
+        details.set_margin_start(6)
+        details.set_margin_end(6)
+        details.set_margin_top(6)
+        details.set_margin_bottom(6)
+        sw.set_child(details)
+        self.buf_expander.set_child(sw)
+        self.get_content_area().append(self.buf_expander)
 
     def show_dialog(
         self, primary_text, secondary_text="", title="", details="", chktext="", modal=True
@@ -348,8 +368,10 @@ class _errorDialog(Gtk.MessageDialog):
         # Hide starting widgets
         self.hide()
         self.buf_expander.hide()
-        for c in self.chk_vbox.get_children():
-            self.chk_vbox.remove(c)  # pragma: no cover
+        child = self.chk_vbox.get_first_child()
+        while child:
+            self.chk_vbox.remove(child)
+            child = self.chk_vbox.get_first_child()
 
         if details:
             self.buffer.set_text(details)
@@ -357,8 +379,8 @@ class _errorDialog(Gtk.MessageDialog):
             self.buf_expander.show()
 
         if chktext:
-            chkbox = Gtk.CheckButton(chktext)
-            self.chk_vbox.add(chkbox)
+            chkbox = Gtk.CheckButton(label=chktext)
+            self.chk_vbox.append(chkbox)
             chkbox.show()
 
         res = _launch_dialog(self, primary_text, secondary_text or "", title, modal=modal)

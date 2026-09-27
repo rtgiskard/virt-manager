@@ -31,17 +31,15 @@ class vmmCreatePool(vmmGObjectUI):
         )
         self._xmleditor.connect("xml-requested", self._xmleditor_xml_requested_cb)
 
-        self.builder.connect_signals(
-            {
-                "on_pool_cancel_clicked": self.close,
-                "on_vmm_create_pool_delete_event": self.close,
-                "on_pool_finish_clicked": self._finish_clicked_cb,
-                "on_pool_type_changed": self._pool_type_changed_cb,
-                "on_pool_source_button_clicked": self._browse_source_cb,
-                "on_pool_target_button_clicked": self._browse_target_cb,
-                "on_pool_iqn_chk_toggled": self._iqn_toggled_cb,
-            }
-        )
+        self.connect_signals({
+            "on_pool_cancel_clicked": self.close,
+            "on_vmm_create_pool_delete_event": self.close,
+            "on_pool_finish_clicked": self._finish_clicked_cb,
+            "on_pool_type_changed": self._pool_type_changed_cb,
+            "on_pool_source_button_clicked": self._browse_source_cb,
+            "on_pool_target_button_clicked": self._browse_target_cb,
+            "on_pool_iqn_chk_toggled": self._iqn_toggled_cb,
+        })
         self.bind_escape_key_close()
 
         self._init_ui()
@@ -115,7 +113,7 @@ class vmmCreatePool(vmmGObjectUI):
         self.widget("pool-source-path").get_child().set_text("")
         self.widget("pool-hostname").set_text("")
         self.widget("pool-iqn-chk").set_active(False)
-        self.widget("pool-iqn-chk").toggled()
+        self.widget("pool-iqn-chk").emit("toggled")
         self.widget("pool-iqn").set_text("")
         self.widget("pool-format").set_active(0)
 

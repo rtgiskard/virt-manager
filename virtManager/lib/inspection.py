@@ -35,11 +35,14 @@ def _make_fake_data(vm):
     data.product_name = "test_product_name"
     data.product_variant = "test_product_variant"
 
+    from gi.repository import Gdk
     from gi.repository import Gtk
 
-    icontheme = Gtk.IconTheme.get_default()
-    icon = icontheme.lookup_icon("vm_new", Gtk.IconSize.LARGE_TOOLBAR, 0)
-    data.icon = open(icon.get_filename(), "rb").read()
+    icontheme = Gtk.IconTheme.get_for_display(Gdk.Display.get_default())
+    icon = icontheme.lookup_icon(
+        "vm_new", None, 24, 1, Gtk.TextDirection.LTR, Gtk.IconLookupFlags.NONE
+    )
+    data.icon = icon.get_file().load_contents(None)[1]
 
     data.applications = []
     for prefix in ["test_app1_", "test_app2_"]:

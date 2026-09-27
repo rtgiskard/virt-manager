@@ -64,13 +64,11 @@ class vmmNetworkList(vmmGObjectUI):
         vmmGObjectUI.__init__(self, "netlist.ui", None, builder=builder, topwin=topwin)
         self.conn = conn
 
-        self.builder.connect_signals(
-            {
-                "on_net_source_changed": self._on_net_source_changed,
-                "on_net_portgroup_changed": self._emit_changed,
-                "on_net_bridge_name_changed": self._emit_changed,
-            }
-        )
+        self.connect_signals({
+            "on_net_source_changed": self._on_net_source_changed,
+            "on_net_portgroup_changed": self._emit_changed,
+            "on_net_bridge_name_changed": self._emit_changed,
+        })
 
         self._init_ui()
         self.top_label = self.widget("net-source-label")
@@ -80,8 +78,10 @@ class vmmNetworkList(vmmGObjectUI):
         self.conn.disconnect_by_obj(self)
         self.conn = None
 
-        self.top_label.destroy()
-        self.top_box.destroy()
+        if self.top_label.get_parent():
+            self.top_label.unparent()
+        if self.top_box.get_parent():
+            self.top_box.unparent()
 
     ##########################
     # Initialization methods #

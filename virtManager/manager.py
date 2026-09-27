@@ -4,7 +4,6 @@
 # This work is licensed under the GNU GPLv2 or later.
 # See the COPYING file in the top-level directory.
 
-from gi.repository import GObject
 from gi.repository import Gtk
 from gi.repository import Gdk
 from gi.repository import GdkPixbuf
@@ -40,12 +39,6 @@ GRAPH_LEN = 40
 # Columns in the tree view
 (COL_NAME, COL_GUEST_CPU, COL_HOST_CPU, COL_MEM, COL_DISK, COL_NETWORK) = range(6)
 
-
-def _style_get_prop(widget, propname):
-    value = GObject.Value()
-    value.init(GObject.TYPE_INT)
-    widget.style_get_property(propname, value)
-    return value.get_int()
 
 
 def _cmp(a, b):
@@ -89,43 +82,40 @@ class vmmManager(vmmGObjectUI):
         w, h = self.config.get_manager_window_size()
         self.topwin.set_default_size(w or 550, h or 550)
         self.prev_position = None
+        self._syncing_pause_state = False
         self._window_size = None
 
         self.vmmenu = vmmenu.VMActionMenu(self, self.current_vm)
         self.shutdownmenu = vmmenu.VMShutdownMenu(self, self.current_vm)
-        self.connmenu = Gtk.Menu()
-        self.connmenu.get_accessible().set_name("conn-menu")
+        self.connmenu = Gtk.Popover()
+        self._connmenu_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        self.connmenu.set_child(self._connmenu_box)
         self.connmenu_items = {}
 
-        self.builder.connect_signals(
-            {
-                "on_menu_view_guest_cpu_usage_activate": self.toggle_stats_visible_guest_cpu,
-                "on_menu_view_host_cpu_usage_activate": self.toggle_stats_visible_host_cpu,
-                "on_menu_view_memory_usage_activate": self.toggle_stats_visible_memory_usage,
-                "on_menu_view_disk_io_activate": self.toggle_stats_visible_disk,
-                "on_menu_view_network_traffic_activate": self.toggle_stats_visible_network,
-                "on_vm_manager_delete_event": self.close,
-                "on_vmm_manager_configure_event": self.window_resized,
-                "on_menu_file_add_connection_activate": self.open_newconn,
-                "on_menu_new_vm_activate": self.new_vm,
-                "on_menu_file_quit_activate": self.exit_app,
-                "on_menu_file_close_activate": self.close,
-                "on_vmm_close_clicked": self.close,
-                "on_vm_open_clicked": self.show_vm,
-                "on_vm_run_clicked": self.start_vm,
-                "on_vm_new_clicked": self.new_vm,
-                "on_vm_shutdown_clicked": self.poweroff_vm,
-                "on_vm_pause_clicked": self.pause_vm_button,
-                "on_menu_edit_details_activate": self.show_vm,
-                "on_menu_edit_delete_activate": self.do_delete,
-                "on_menu_host_details_activate": self.show_host,
-                "on_vm_list_row_activated": self.row_activated,
-                "on_vm_list_button_press_event": self.popup_vm_menu_button,
-                "on_vm_list_key_press_event": self.popup_vm_menu_key,
-                "on_menu_edit_preferences_activate": self.show_preferences,
-                "on_menu_help_about_activate": self.show_about,
-            }
-        )
+        self.connect_signals({
+            "on_menu_view_guest_cpu_usage_activate": self.toggle_stats_visible_guest_cpu,
+            "on_menu_view_host_cpu_usage_activate": self.toggle_stats_visible_host_cpu,
+            "on_menu_view_memory_usage_activate": self.toggle_stats_visible_memory_usage,
+            "on_menu_view_disk_io_activate": self.toggle_stats_visible_disk,
+            "on_menu_view_network_traffic_activate": self.toggle_stats_visible_network,
+            "on_vm_manager_delete_event": self.close,
+            "on_menu_file_add_connection_activate": self.open_newconn,
+            "on_menu_new_vm_activate": self.new_vm,
+            "on_menu_file_quit_activate": self.exit_app,
+            "on_menu_file_close_activate": self.close,
+            "on_vmm_close_clicked": self.close,
+            "on_vm_open_clicked": self.show_vm,
+            "on_vm_run_clicked": self.start_vm,
+            "on_vm_new_clicked": self.new_vm,
+            "on_vm_shutdown_clicked": self.poweroff_vm,
+            "on_vm_pause_clicked": self.pause_vm_button,
+            "on_menu_edit_details_activate": self.show_vm,
+            "on_menu_edit_delete_activate": self.do_delete,
+            "on_menu_host_details_activate": self.show_host,
+            "on_vm_list_row_activated": self.row_activated,
+            "on_menu_edit_preferences_activate": self.show_preferences,
+            "on_menu_help_about_activate": self.show_about,
+        })
 
         # There seem to be ref counting issues with calling
         # list.get_column, so avoid it
@@ -141,8 +131,15 @@ class vmmManager(vmmGObjectUI):
         self.init_toolbar()
         self.init_context_menus()
 
-        self.update_current_selection()
         self.widget("vm-list").get_selection().connect("changed", self.update_current_selection)
+        click = Gtk.GestureClick(button=3)
+        click.connect("pressed", self.popup_vm_menu_button)
+        self.widget("vm-list").add_controller(click)
+        keys = Gtk.EventControllerKey()
+        keys.connect("key-pressed", self.popup_vm_menu_key)
+        self.widget("vm-list").add_controller(keys)
+        self.topwin.connect("notify::default-width", self.window_resized)
+        self.topwin.connect("notify::default-height", self.window_resized)
 
         self.max_disk_rate = 10.0
         self.max_net_rate = 10.0
@@ -171,9 +168,6 @@ class vmmManager(vmmGObjectUI):
             return
 
         log.debug("Showing manager")
-        if self.prev_position:
-            self.topwin.move(*self.prev_position)
-            self.prev_position = None
 
         vmmEngine.get_instance().increment_window_counter()
 
@@ -182,7 +176,8 @@ class vmmManager(vmmGObjectUI):
             return
 
         log.debug("Closing manager")
-        self.prev_position = self.topwin.get_position()
+        self.prev_position = None
+        self._window_size = (self.topwin.get_width(), self.topwin.get_height())
         self.topwin.hide()
         vmmEngine.get_instance().decrement_window_counter()
 
@@ -195,11 +190,13 @@ class vmmManager(vmmGObjectUI):
         self.hostcpucol = None
         self.netcol = None
 
-        self.shutdownmenu.destroy()
+        self.widget("vm-shutdown-menu").set_popover(None)
         self.shutdownmenu = None
-        self.vmmenu.destroy()
+        if self.vmmenu.get_parent():
+            self.vmmenu.unparent()
         self.vmmenu = None
-        self.connmenu.destroy()
+        if self.connmenu.get_parent():
+            self.connmenu.unparent()
         self.connmenu = None
         self.connmenu_items = None
 
@@ -269,31 +266,24 @@ class vmmManager(vmmGObjectUI):
         self.widget("vm-open").set_icon_name("icon_console")
 
         self.widget("vm-shutdown").set_icon_name("system-shutdown")
-        self.widget("vm-shutdown").set_menu(self.shutdownmenu)
-
-        tool = self.widget("vm-toolbar")
-        tool.set_property("icon-size", Gtk.IconSize.LARGE_TOOLBAR)
-        for c in tool.get_children():
-            c.set_homogeneous(False)
+        self.widget("vm-shutdown-menu").set_popover(self.shutdownmenu)
 
     def init_context_menus(self):
         def add_to_menu(idx, text, cb):
-            item = Gtk.MenuItem.new_with_mnemonic(text)
+            item = Gtk.Button.new_with_mnemonic(text)
+            item.set_has_frame(False)
             if cb:
-                item.connect("activate", cb)
-            item.get_accessible().set_name("conn-%s" % idx)
-            self.connmenu.add(item)
+                item.connect("clicked", lambda button: (self.connmenu.popdown(), cb(button)))
+            self._connmenu_box.append(item)
             self.connmenu_items[idx] = item
 
-        # Build connection context menu
         add_to_menu("create", _("_New"), self.new_vm)
         add_to_menu("connect", _("_Connect"), self.open_conn)
         add_to_menu("disconnect", _("Dis_connect"), self.close_conn)
-        self.connmenu.add(Gtk.SeparatorMenuItem())
+        self._connmenu_box.append(Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL))
         add_to_menu("delete", _("De_lete"), self.do_delete)
-        self.connmenu.add(Gtk.SeparatorMenuItem())
+        self._connmenu_box.append(Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL))
         add_to_menu("details", _("_Details"), self.show_host)
-        self.connmenu.show_all()
 
     def init_vmlist(self):
         vmlist = self.widget("vm-list")
@@ -316,7 +306,7 @@ class vmmManager(vmmGObjectUI):
         vmlist.set_model(model)
         vmlist.set_tooltip_column(ROW_HINT)
         vmlist.set_headers_visible(True)
-        vmlist.set_level_indentation(-(_style_get_prop(vmlist, "expander-size") + 3))
+        vmlist.set_level_indentation(-19)
 
         nameCol = Gtk.TreeViewColumn(_("Name"))
         nameCol.set_expand(True)
@@ -327,7 +317,7 @@ class vmmManager(vmmGObjectUI):
         vmlist.append_column(nameCol)
 
         status_icon = Gtk.CellRendererPixbuf()
-        status_icon.set_property("stock-size", Gtk.IconSize.DND)
+        status_icon.set_property("icon-size", Gtk.IconSize.LARGE)
         nameCol.pack_start(status_icon, False)
         nameCol.add_attribute(status_icon, "icon-name", ROW_STATUS_ICON)
         nameCol.add_attribute(status_icon, "visible", ROW_IS_VM)
@@ -431,7 +421,7 @@ class vmmManager(vmmGObjectUI):
     def window_resized(self, ignore, ignore2):
         if not self.is_visible():
             return
-        self._window_size = self.topwin.get_size()
+        self._window_size = (self.topwin.get_width(), self.topwin.get_height())
 
     def exit_app(self, src_ignore=None, src2_ignore=None):
         vmmEngine.get_instance().exit_app()
@@ -498,14 +488,15 @@ class vmmManager(vmmGObjectUI):
         vmmConnectionManager.get_instance().remove_conn(conn.get_uri())
 
     def set_pause_state(self, state):
-        src = self.widget("vm-pause")
+        self._syncing_pause_state = True
         try:
-            src.handler_block_by_func(self.pause_vm_button)
-            src.set_active(state)
+            self.widget("vm-pause").set_active(state)
         finally:
-            src.handler_unblock_by_func(self.pause_vm_button)
+            self._syncing_pause_state = False
 
     def pause_vm_button(self, src):
+        if self._syncing_pause_state:
+            return
         do_pause = src.get_active()
 
         # Set button state back to original value: just let the status
@@ -778,7 +769,7 @@ class vmmManager(vmmGObjectUI):
         self.widget("vm-open").set_sensitive(show_open)
         self.widget("vm-run").set_sensitive(show_run)
         self.widget("vm-shutdown").set_sensitive(show_shutdown)
-        self.widget("vm-shutdown").get_menu().update_widget_states(vm)
+        self.shutdownmenu.update_widget_states(vm)
 
         self.set_pause_state(is_paused)
         self.widget("vm-pause").set_sensitive(show_pause)
@@ -793,44 +784,44 @@ class vmmManager(vmmGObjectUI):
         self.widget("menu_edit_details").set_sensitive(show_details)
         self.widget("menu_host_details").set_sensitive(host_details)
 
-    def popup_vm_menu_key(self, widget_ignore, event):
-        if Gdk.keyval_name(event.keyval) != "Menu":
-            return False  # pragma: no cover
-
+    def popup_vm_menu_key(self, _controller, keyval, _keycode, _state):
+        if keyval != Gdk.KEY_Menu:
+            return False
         model, treeiter = self.widget("vm-list").get_selection().get_selected()
-        self.popup_vm_menu(model, treeiter, event)
+        self.popup_vm_menu(model, treeiter)
         return True
 
-    def popup_vm_menu_button(self, vmlist, event):
-        if event.button != 3:
-            return False
-
-        tup = vmlist.get_path_at_pos(int(event.x), int(event.y))
+    def popup_vm_menu_button(self, gesture, _n_press, x, y):
+        vmlist = gesture.get_widget()
+        tup = vmlist.get_path_at_pos(int(x), int(y))
         if tup is None:
-            return False  # pragma: no cover
+            return
         path = tup[0]
+        vmlist.get_selection().select_path(path)
+        self.popup_vm_menu(self.model, self.model.get_iter(path), x, y)
 
-        self.popup_vm_menu(self.model, self.model.get_iter(path), event)
-        return False
-
-    def popup_vm_menu(self, model, _iter, event):
+    def popup_vm_menu(self, model, _iter, x=0, y=0):
+        if _iter is None:
+            return
         if model.iter_parent(_iter) is not None:
-            # Popup the vm menu
             vm = model[_iter][ROW_HANDLE]
             self.vmmenu.update_widget_states(vm)
-            self.vmmenu.popup_at_pointer(event)
+            menu = self.vmmenu
         else:
-            # Pop up connection menu
             conn = model[_iter][ROW_HANDLE]
             disconn = conn.is_disconnected()
             conning = conn.is_connecting()
-
             self.connmenu_items["create"].set_sensitive(not disconn)
             self.connmenu_items["disconnect"].set_sensitive(not (disconn or conning))
             self.connmenu_items["connect"].set_sensitive(disconn)
             self.connmenu_items["delete"].set_sensitive(disconn)
-
-            self.connmenu.popup_at_pointer(event)
+            menu = self.connmenu
+        if not menu.get_parent():
+            menu.set_parent(self.widget("vm-list"))
+        rect = Gdk.Rectangle()
+        rect.x, rect.y, rect.width, rect.height = int(x), int(y), 1, 1
+        menu.set_pointing_to(rect)
+        menu.popup()
 
     #################
     # Stats methods #

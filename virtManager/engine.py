@@ -336,11 +336,7 @@ class vmmEngine(vmmGObject):
                 raise RuntimeError("systray did not show up")
             self.timeout_add(1000, check, self, count)  # pragma: no cover
 
-        startcount = 5
-        timeout = 1000
-        if self.config.CLITestOptions.fake_systray:
-            timeout = 1
-        self.timeout_add(timeout, check, self, startcount)
+        self.timeout_add(1000, check, self, 5)
 
     def _can_exit(self):
         return self._window_count <= 0 and not self._systray_is_embedded()

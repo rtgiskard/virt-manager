@@ -13,6 +13,7 @@ from virtinst import xmlutil
 
 from .lib import uiutil
 from .baseclass import vmmGObjectUI
+from .error import run_dialog
 from .lib.inspection import vmmInspection
 from .systray import vmmSystray
 
@@ -59,35 +60,33 @@ class vmmPreferences(vmmGObjectUI):
         self.refresh_confirm_unapplied()
         self.refresh_confirm_delstorage()
 
-        self.builder.connect_signals(
-            {
-                "on_vmm_preferences_delete_event": self.close,
-                "on_prefs_close_clicked": self.close,
-                "on_prefs_system_tray_toggled": self.change_view_system_tray,
-                "on_prefs_xmleditor_toggled": self.change_xmleditor,
-                "on_prefs_libguestfs_toggled": self.change_libguestfs,
-                "on_prefs_stats_update_interval_changed": self.change_update_interval,
-                "on_prefs_console_scaling_changed": self.change_console_scaling,
-                "on_prefs_console_resizeguest_changed": self.change_console_resizeguest,
-                "on_prefs_console_autoredir_changed": self.change_console_autoredir,
-                "on_prefs_console_autoconnect_toggled": self.change_console_autoconnect,
-                "on_prefs_graphics_type_changed": self.change_graphics_type,
-                "on_prefs_storage_format_changed": self.change_storage_format,
-                "on_prefs_cpu_default_changed": self.change_cpu_default,
-                "on_prefs_firmware_default_changed": self.change_firmware_default,
-                "on_prefs_stats_enable_cpu_toggled": self.change_cpu_poll,
-                "on_prefs_stats_enable_disk_toggled": self.change_disk_poll,
-                "on_prefs_stats_enable_net_toggled": self.change_net_poll,
-                "on_prefs_stats_enable_memory_toggled": self.change_memory_poll,
-                "on_prefs_confirm_forcepoweroff_toggled": self.change_confirm_forcepoweroff,
-                "on_prefs_confirm_poweroff_toggled": self.change_confirm_poweroff,
-                "on_prefs_confirm_pause_toggled": self.change_confirm_pause,
-                "on_prefs_confirm_removedev_toggled": self.change_confirm_removedev,
-                "on_prefs_confirm_unapplied_toggled": self.change_confirm_unapplied,
-                "on_prefs_confirm_delstorage_toggled": self.change_confirm_delstorage,
-                "on_prefs_btn_keys_define_clicked": self.change_grab_keys,
-            }
-        )
+        self.connect_signals({
+            "on_vmm_preferences_delete_event": self.close,
+            "on_prefs_close_clicked": self.close,
+            "on_prefs_system_tray_toggled": self.change_view_system_tray,
+            "on_prefs_xmleditor_toggled": self.change_xmleditor,
+            "on_prefs_libguestfs_toggled": self.change_libguestfs,
+            "on_prefs_stats_update_interval_changed": self.change_update_interval,
+            "on_prefs_console_scaling_changed": self.change_console_scaling,
+            "on_prefs_console_resizeguest_changed": self.change_console_resizeguest,
+            "on_prefs_console_autoredir_changed": self.change_console_autoredir,
+            "on_prefs_console_autoconnect_toggled": self.change_console_autoconnect,
+            "on_prefs_graphics_type_changed": self.change_graphics_type,
+            "on_prefs_storage_format_changed": self.change_storage_format,
+            "on_prefs_cpu_default_changed": self.change_cpu_default,
+            "on_prefs_firmware_default_changed": self.change_firmware_default,
+            "on_prefs_stats_enable_cpu_toggled": self.change_cpu_poll,
+            "on_prefs_stats_enable_disk_toggled": self.change_disk_poll,
+            "on_prefs_stats_enable_net_toggled": self.change_net_poll,
+            "on_prefs_stats_enable_memory_toggled": self.change_memory_poll,
+            "on_prefs_confirm_forcepoweroff_toggled": self.change_confirm_forcepoweroff,
+            "on_prefs_confirm_poweroff_toggled": self.change_confirm_poweroff,
+            "on_prefs_confirm_pause_toggled": self.change_confirm_pause,
+            "on_prefs_confirm_removedev_toggled": self.change_confirm_removedev,
+            "on_prefs_confirm_unapplied_toggled": self.change_confirm_unapplied,
+            "on_prefs_confirm_delstorage_toggled": self.change_confirm_delstorage,
+            "on_prefs_btn_keys_define_clicked": self.change_grab_keys,
+        })
 
         self.widget("prefs-graphics-type").emit("changed")
 
@@ -145,7 +144,6 @@ class vmmPreferences(vmmGObjectUI):
         model = Gtk.ListStore(str, str)
         for row in [
             ["system", _("System default (%s)") % self.config.default_graphics_from_config],
-            ["vnc", "VNC"],
             ["spice", "Spice"],
         ]:
             model.append(row)
@@ -321,27 +319,24 @@ class vmmPreferences(vmmGObjectUI):
             keystr += Gdk.keyval_name(keyval)
         return keystr
 
-    def grabkeys_dlg_press(self, src_ignore, event, label, events):
-        if not [e for e in events if e[0] == event.hardware_keycode]:
-            events.append((event.hardware_keycode, event.keyval))
+    def grabkeys_dlg_press(self, _controller, keyval, keycode, _state, label, events):
+        if not [e for e in events if e[0] == keycode]:
+            events.append((keycode, keyval))
 
         label.set_text(self.grabkeys_get_string(events))
+        return False
 
-    def grabkeys_dlg_release(self, src_ignore, event, label, events):
-        for e in [e for e in events if e[0] == event.hardware_keycode]:
+    def grabkeys_dlg_release(self, _controller, _keyval, keycode, _state, label, events):
+        for e in [e for e in events if e[0] == keycode]:
             events.remove(e)
 
         label.set_text(self.grabkeys_get_string(events))
 
+
     def change_grab_keys(self, src_ignore):
-        dialog = Gtk.Dialog(
-            _("Configure grab key combination"),
-            self.topwin,
-            Gtk.DialogFlags.MODAL | Gtk.DialogFlags.DESTROY_WITH_PARENT,
-            (Gtk.STOCK_CANCEL, Gtk.ResponseType.REJECT, Gtk.STOCK_OK, Gtk.ResponseType.ACCEPT),
-        )
+        dialog = Gtk.Dialog(title=_("Configure grab key combination"), transient_for=self.topwin)
+        dialog.add_buttons(_("_Cancel"), Gtk.ResponseType.REJECT, _("_OK"), Gtk.ResponseType.ACCEPT)
         dialog.set_default_size(325, 160)
-        dialog.set_border_width(6)
 
         infolabel = Gtk.Label(
             label=_(
@@ -352,17 +347,22 @@ class vmmPreferences(vmmGObjectUI):
         )
         keylabel = Gtk.Label(label=_("Please press desired grab key combination"))
 
-        vbox = Gtk.VBox()
-        vbox.set_spacing(12)
-        vbox.pack_start(infolabel, False, False, 0)
-        vbox.pack_start(keylabel, False, False, 0)
-        dialog.get_content_area().add(vbox)
+        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=12)
+        vbox.set_margin_start(6)
+        vbox.set_margin_end(6)
+        vbox.set_margin_top(6)
+        vbox.set_margin_bottom(6)
+        vbox.append(infolabel)
+        vbox.append(keylabel)
+        dialog.get_content_area().append(vbox)
 
         events = []
-        dialog.connect("key-press-event", self.grabkeys_dlg_press, keylabel, events)
-        dialog.connect("key-release-event", self.grabkeys_dlg_release, keylabel, events)
-        dialog.show_all()
-        result = dialog.run()
+        keys = Gtk.EventControllerKey()
+        keys.set_propagation_phase(Gtk.PropagationPhase.CAPTURE)
+        keys.connect("key-pressed", self.grabkeys_dlg_press, keylabel, events)
+        keys.connect("key-released", self.grabkeys_dlg_release, keylabel, events)
+        dialog.add_controller(keys)
+        result = run_dialog(dialog)
 
         if result == Gtk.ResponseType.ACCEPT:
             self.config.set_keys_combination([e[1] for e in events])

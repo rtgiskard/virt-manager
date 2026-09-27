@@ -4,6 +4,7 @@
 # This work is licensed under the GNU GPLv2 or later.
 # See the COPYING file in the top-level directory.
 
+from gi.repository import Gdk
 from gi.repository import Gtk
 
 import libvirt
@@ -313,7 +314,7 @@ def _get_performance_icon_name():
     # This icon isn't in standard adwaita-icon-theme, so
     # fallback to system-run if it is missing
     icon = "utilities-system-monitor"
-    if not Gtk.IconTheme.get_default().has_icon(icon):
+    if not Gtk.IconTheme.get_for_display(Gdk.Display.get_default()).has_icon(icon):
         icon = "system-run"  # pragma: no cover
     return icon
 
@@ -338,35 +339,35 @@ class vmmDetails(vmmGObjectUI):
             return signal_cb
 
         self._mediacombo = vmmMediaCombo(self.conn, self.builder, self.topwin)
-        self.widget("disk-source-align").add(self._mediacombo.top_box)
+        self.widget("disk-source-align").append(self._mediacombo.top_box)
         self._mediacombo.set_mnemonic_label(self.widget("disk-source-mnemonic"))
         self._mediacombo.connect("changed", _e(EDIT_DISK_PATH))
         self._mediacombo.show_clear_icon()
 
         self.fsDetails = vmmFSDetails(self.vm, self.builder, self.topwin)
-        self.widget("fs-alignment").add(self.fsDetails.top_box)
+        self.widget("fs-alignment").append(self.fsDetails.top_box)
         self.fsDetails.connect("changed", _e(EDIT_FS))
 
         self.gfxdetails = vmmGraphicsDetails(self.vm, self.builder, self.topwin)
-        self.widget("graphics-align").add(self.gfxdetails.top_box)
+        self.widget("graphics-align").append(self.gfxdetails.top_box)
         self.gfxdetails.connect("changed", _e(EDIT_GFX))
 
         self.netlist = vmmNetworkList(self.conn, self.builder, self.topwin)
-        self.widget("network-source-label-align").add(self.netlist.top_label)
-        self.widget("network-source-ui-align").add(self.netlist.top_box)
+        self.widget("network-source-label-align").append(self.netlist.top_label)
+        self.widget("network-source-ui-align").append(self.netlist.top_box)
         self.netlist.connect("changed", _e(EDIT_NET_SOURCE))
 
         self.tpmdetails = vmmTPMDetails(self.vm, self.builder, self.topwin)
-        self.widget("tpm-align").add(self.tpmdetails.top_box)
+        self.widget("tpm-align").append(self.tpmdetails.top_box)
         self.tpmdetails.connect("changed", _e(EDIT_TPM))
 
         self.vsockdetails = vmmVsockDetails(self.vm, self.builder, self.topwin)
-        self.widget("vsock-align").add(self.vsockdetails.top_box)
+        self.widget("vsock-align").append(self.vsockdetails.top_box)
         self.vsockdetails.connect("changed-auto-cid", _e(EDIT_VSOCK_AUTO))
         self.vsockdetails.connect("changed-cid", _e(EDIT_VSOCK_CID))
 
         self._addstorage = vmmAddStorage(self.conn, self.builder, self.topwin)
-        self.widget("storage-advanced-align").add(self._addstorage.advanced_top_box)
+        self.widget("storage-advanced-align").append(self._addstorage.advanced_top_box)
         self._addstorage.connect("changed", _e(EDIT_DISK))
 
         self._xmleditor = vmmXMLEditor(
@@ -394,63 +395,60 @@ class vmmDetails(vmmGObjectUI):
 
         self.vm.connect("inspection-changed", self._vm_inspection_changed_cb)
 
-        self.builder.connect_signals(
-            {
-                "on_hw_list_changed": self._hw_changed_cb,
-                "on_overview_name_changed": _e(EDIT_NAME),
-                "on_overview_title_changed": _e(EDIT_TITLE),
-                "on_machine_type_changed": _e(EDIT_MACHTYPE),
-                "on_overview_firmware_changed": _e(EDIT_FIRMWARE),
-                "on_overview_chipset_changed": _e(EDIT_MACHTYPE),
-                "on_details_inspection_refresh_clicked": self._inspection_refresh_clicked_cb,
-                "on_cpu_vcpus_changed": self._config_vcpus_changed_cb,
-                "on_cpu_model_changed": _e(EDIT_CPU),
-                "on_cpu_copy_host_clicked": self._cpu_copy_host_clicked_cb,
-                "on_cpu_secure_toggled": _e(EDIT_CPU),
-                "on_cpu_cores_changed": self._cpu_topology_changed_cb,
-                "on_cpu_sockets_changed": self._cpu_topology_changed_cb,
-                "on_cpu_threads_changed": self._cpu_topology_changed_cb,
-                "on_cpu_topology_enable_toggled": self._cpu_topology_enable_cb,
-                "on_mem_maxmem_changed": _e(EDIT_MEM),
-                "on_mem_memory_changed": self._curmem_changed_cb,
-                "on_mem_shared_access_toggled": _e(EDIT_MEM_SHARED),
-                "on_boot_list_changed": self._boot_list_changed_cb,
-                "on_boot_moveup_clicked": self._boot_moveup_clicked_cb,
-                "on_boot_movedown_clicked": self._boot_movedown_clicked_cb,
-                "on_boot_autostart_changed": _e(EDIT_AUTOSTART),
-                "on_boot_menu_changed": _e(EDIT_BOOTMENU),
-                "on_boot_kernel_enable_toggled": self._boot_kernel_toggled_cb,
-                "on_boot_kernel_changed": _e(EDIT_KERNEL),
-                "on_boot_initrd_changed": _e(EDIT_KERNEL),
-                "on_boot_dtb_changed": _e(EDIT_KERNEL),
-                "on_boot_kernel_args_changed": _e(EDIT_KERNEL),
-                "on_boot_kernel_browse_clicked": self._browse_kernel_clicked_cb,
-                "on_boot_initrd_browse_clicked": self._browse_initrd_clicked_cb,
-                "on_boot_dtb_browse_clicked": self._browse_dtb_clicked_cb,
-                "on_boot_init_path_changed": _e(EDIT_INIT),
-                "on_boot_init_args_changed": _e(EDIT_INIT),
-                "on_disk_source_browse_clicked": self._disk_source_browse_clicked_cb,
-                "on_disk_bus_combo_changed": _e(EDIT_DISK_BUS),
-                "on_network_model_combo_changed": _e(EDIT_NET_MODEL),
-                "on_network_mac_entry_changed": _e(EDIT_NET_MAC),
-                "on_network_link_state_checkbox_toggled": _e(EDIT_NET_LINKSTATE),
-                "on_network_refresh_ip_clicked": self._refresh_ip_clicked_cb,
-                "on_sound_model_combo_changed": _e(EDIT_SOUND_MODEL),
-                "on_video_model_combo_changed": self._video_model_changed_cb,
-                "on_video_3d_toggled": self._video_3d_toggled_cb,
-                "on_watchdog_model_combo_changed": _e(EDIT_WATCHDOG_MODEL),
-                "on_watchdog_action_combo_changed": _e(EDIT_WATCHDOG_ACTION),
-                "on_smartcard_mode_combo_changed": _e(EDIT_SMARTCARD_MODE),
-                "on_hostdev_rombar_toggled": _e(EDIT_HOSTDEV_ROMBAR),
-                "on_hostdev_usb_startup_policy_changed": _e(EDIT_HOSTDEV_USB_STARTUPPOLICY),
-                "on_controller_model_combo_changed": _e(EDIT_CONTROLLER_MODEL),
-                "on_config_apply_clicked": self._config_apply_clicked_cb,
-                "on_config_cancel_clicked": self._config_cancel_clicked_cb,
-                "on_config_remove_clicked": self._config_remove_clicked_cb,
-                "on_add_hardware_button_clicked": self._addhw_clicked_cb,
-                "on_hw_list_button_press_event": self._popup_addhw_menu_cb,
-            }
-        )
+        self.connect_signals({
+            "on_hw_list_changed": self._hw_changed_cb,
+            "on_overview_name_changed": _e(EDIT_NAME),
+            "on_overview_title_changed": _e(EDIT_TITLE),
+            "on_machine_type_changed": _e(EDIT_MACHTYPE),
+            "on_overview_firmware_changed": _e(EDIT_FIRMWARE),
+            "on_overview_chipset_changed": _e(EDIT_MACHTYPE),
+            "on_details_inspection_refresh_clicked": self._inspection_refresh_clicked_cb,
+            "on_cpu_vcpus_changed": self._config_vcpus_changed_cb,
+            "on_cpu_model_changed": _e(EDIT_CPU),
+            "on_cpu_copy_host_clicked": self._cpu_copy_host_clicked_cb,
+            "on_cpu_secure_toggled": _e(EDIT_CPU),
+            "on_cpu_cores_changed": self._cpu_topology_changed_cb,
+            "on_cpu_sockets_changed": self._cpu_topology_changed_cb,
+            "on_cpu_threads_changed": self._cpu_topology_changed_cb,
+            "on_cpu_topology_enable_toggled": self._cpu_topology_enable_cb,
+            "on_mem_maxmem_changed": _e(EDIT_MEM),
+            "on_mem_memory_changed": self._curmem_changed_cb,
+            "on_mem_shared_access_toggled": _e(EDIT_MEM_SHARED),
+            "on_boot_list_changed": self._boot_list_changed_cb,
+            "on_boot_moveup_clicked": self._boot_moveup_clicked_cb,
+            "on_boot_movedown_clicked": self._boot_movedown_clicked_cb,
+            "on_boot_autostart_changed": _e(EDIT_AUTOSTART),
+            "on_boot_menu_changed": _e(EDIT_BOOTMENU),
+            "on_boot_kernel_enable_toggled": self._boot_kernel_toggled_cb,
+            "on_boot_kernel_changed": _e(EDIT_KERNEL),
+            "on_boot_initrd_changed": _e(EDIT_KERNEL),
+            "on_boot_dtb_changed": _e(EDIT_KERNEL),
+            "on_boot_kernel_args_changed": _e(EDIT_KERNEL),
+            "on_boot_kernel_browse_clicked": self._browse_kernel_clicked_cb,
+            "on_boot_initrd_browse_clicked": self._browse_initrd_clicked_cb,
+            "on_boot_dtb_browse_clicked": self._browse_dtb_clicked_cb,
+            "on_boot_init_path_changed": _e(EDIT_INIT),
+            "on_boot_init_args_changed": _e(EDIT_INIT),
+            "on_disk_source_browse_clicked": self._disk_source_browse_clicked_cb,
+            "on_disk_bus_combo_changed": _e(EDIT_DISK_BUS),
+            "on_network_model_combo_changed": _e(EDIT_NET_MODEL),
+            "on_network_mac_entry_changed": _e(EDIT_NET_MAC),
+            "on_network_link_state_checkbox_toggled": _e(EDIT_NET_LINKSTATE),
+            "on_network_refresh_ip_clicked": self._refresh_ip_clicked_cb,
+            "on_sound_model_combo_changed": _e(EDIT_SOUND_MODEL),
+            "on_video_model_combo_changed": self._video_model_changed_cb,
+            "on_video_3d_toggled": self._video_3d_toggled_cb,
+            "on_watchdog_model_combo_changed": _e(EDIT_WATCHDOG_MODEL),
+            "on_watchdog_action_combo_changed": _e(EDIT_WATCHDOG_ACTION),
+            "on_smartcard_mode_combo_changed": _e(EDIT_SMARTCARD_MODE),
+            "on_hostdev_rombar_toggled": _e(EDIT_HOSTDEV_ROMBAR),
+            "on_hostdev_usb_startup_policy_changed": _e(EDIT_HOSTDEV_USB_STARTUPPOLICY),
+            "on_controller_model_combo_changed": _e(EDIT_CONTROLLER_MODEL),
+            "on_config_apply_clicked": self._config_apply_clicked_cb,
+            "on_config_cancel_clicked": self._config_cancel_clicked_cb,
+            "on_config_remove_clicked": self._config_remove_clicked_cb,
+            "on_add_hardware_button_clicked": self._addhw_clicked_cb,
+        })
 
         self._init_hw_list()
         self._refresh_page()
@@ -474,6 +472,8 @@ class vmmDetails(vmmGObjectUI):
 
         self.conn.disconnect_by_obj(self)
         self.vm = None
+        if self._popupmenu.get_parent():
+            self._popupmenu.unparent()
         self._popupmenu = None
         self._popupmenuitems = None
 
@@ -497,29 +497,23 @@ class vmmDetails(vmmGObjectUI):
     ##########################
 
     def _init_menus(self):
-        # Add HW popup menu
-        self._popupmenu = Gtk.Menu()
+        self._popupmenu = Gtk.Popover()
+        box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        self._popupmenu.set_child(box)
 
-        addHW = Gtk.MenuItem.new_with_mnemonic(_("_Add Hardware"))
-        addHW.show()
+        addHW = Gtk.Button.new_with_mnemonic(_("_Add Hardware"))
+        addHW.connect("clicked", lambda _button: (self._popupmenu.popdown(), self._show_addhw()))
 
-        def _addhw_clicked_cb(*args, **kwargs):
-            self._show_addhw()
-
-        addHW.connect("activate", _addhw_clicked_cb)
-
-        rmHW = Gtk.MenuItem.new_with_mnemonic(_("_Remove Hardware"))
-        rmHW.show()
-
-        def _remove_clicked_cb(*args, **kwargs):
-            self._config_remove()
-
-        rmHW.connect("activate", _remove_clicked_cb)
+        rmHW = Gtk.Button.new_with_mnemonic(_("_Remove Hardware"))
+        rmHW.connect("clicked", lambda _button: (self._popupmenu.popdown(), self._config_remove()))
 
         self._popupmenuitems = {"add": addHW, "remove": rmHW}
-        for i in list(self._popupmenuitems.values()):
-            self._popupmenu.add(i)
+        for item in self._popupmenuitems.values():
+            box.append(item)
 
+        click = Gtk.GestureClick(button=3)
+        click.connect("pressed", self._popup_addhw_menu_cb)
+        self.widget("hw-list").add_controller(click)
         self.widget("hw-panel").set_show_tabs(False)
 
     def _init_graphs(self):
@@ -531,10 +525,10 @@ class vmmDetails(vmmGObjectUI):
             return g
 
         self._graph_cpu = _make_graph()
-        self.widget("overview-cpu-usage-align").add(self._graph_cpu)
+        self.widget("overview-cpu-usage-align").append(self._graph_cpu)
 
         self._graph_memory = _make_graph()
-        self.widget("overview-memory-usage-align").add(self._graph_memory)
+        self.widget("overview-memory-usage-align").append(self._graph_memory)
 
         self._graph_disk = _make_graph()
         self._graph_disk.set_property("filled", False)
@@ -542,7 +536,7 @@ class vmmDetails(vmmGObjectUI):
         self._graph_disk.set_property(
             "rgb", [x / 255.0 for x in [0x82, 0x00, 0x3B, 0x29, 0x5C, 0x45]]
         )
-        self.widget("overview-disk-usage-align").add(self._graph_disk)
+        self.widget("overview-disk-usage-align").append(self._graph_disk)
 
         self._graph_network = _make_graph()
         self._graph_network.set_property("filled", False)
@@ -550,7 +544,7 @@ class vmmDetails(vmmGObjectUI):
         self._graph_network.set_property(
             "rgb", [x / 255.0 for x in [0x82, 0x00, 0x3B, 0x29, 0x5C, 0x45]]
         )
-        self.widget("overview-network-traffic-align").add(self._graph_network)
+        self.widget("overview-network-traffic-align").append(self._graph_network)
 
     def _init_details(self):
         # Hardware list
@@ -563,7 +557,7 @@ class vmmDetails(vmmGObjectUI):
         hwCol.set_min_width(165)
         hw_txt = Gtk.CellRendererText()
         hw_img = Gtk.CellRendererPixbuf()
-        hw_img.set_property("stock-size", Gtk.IconSize.LARGE_TOOLBAR)
+        hw_img.set_property("icon-size", Gtk.IconSize.LARGE)
         hwCol.pack_start(hw_img, False)
         hwCol.pack_start(hw_txt, True)
         hwCol.add_attribute(hw_txt, "text", HW_LIST_COL_LABEL)
@@ -676,7 +670,7 @@ class vmmDetails(vmmGObjectUI):
 
         # OS/Inspection page
         self._os_list = vmmOSList()
-        self.widget("details-os-align").add(self._os_list.search_entry)
+        self.widget("details-os-align").append(self._os_list.search_entry)
         self.widget("details-os-label").set_mnemonic_widget(self._os_list.search_entry)
         self._os_list.connect("os-selected", self._os_list_name_selected_cb)
 
@@ -826,14 +820,11 @@ class vmmDetails(vmmGObjectUI):
     # Window state listeners #
     ##########################
 
-    def _popup_addhw_menu_cb(self, widget, event):
-        if event.button != 3:
-            return
-
-        # force select the list entry before showing popup_menu
-        path_tuple = widget.get_path_at_pos(int(event.x), int(event.y))
+    def _popup_addhw_menu_cb(self, gesture, _press_count, x, y):
+        widget = gesture.get_widget()
+        path_tuple = widget.get_path_at_pos(int(x), int(y))
         if path_tuple is None:
-            return False  # pragma: no cover
+            return
         path = path_tuple[0]
         _iter = widget.get_model().get_iter(path)
         widget.get_selection().select_iter(_iter)
@@ -842,7 +833,12 @@ class vmmDetails(vmmGObjectUI):
         rmdev.set_visible(self.widget("config-remove").get_visible())
         rmdev.set_sensitive(self.widget("config-remove").get_sensitive())
 
-        self._popupmenu.popup_at_pointer(event)
+        if not self._popupmenu.get_parent():
+            self._popupmenu.set_parent(widget)
+        rect = Gdk.Rectangle()
+        rect.x, rect.y, rect.width, rect.height = int(x), int(y), 1, 1
+        self._popupmenu.set_pointing_to(rect)
+        self._popupmenu.popup()
 
     def _set_hw_selection(self, page, _disable_apply=True):
         if _disable_apply:
@@ -931,9 +927,7 @@ class vmmDetails(vmmGObjectUI):
         else:
             status = self.vm.run_status()
         self.widget("overview-status-text").set_text(status)
-        self.widget("overview-status-icon").set_from_icon_name(
-            self.vm.run_status_icon_name(), Gtk.IconSize.BUTTON
-        )
+        self.widget("overview-status-icon").set_from_icon_name(self.vm.run_status_icon_name())
 
     def vmwindow_resources_refreshed(self):
         row = self._get_hw_row()
@@ -2255,7 +2249,7 @@ class vmmDetails(vmmGObjectUI):
             # magically unexpand the UI the user just touched
             self.widget("boot-kernel-expander").set_expanded(True)
         self.widget("boot-kernel-enable").set_active(expand)
-        self.widget("boot-kernel-enable").toggled()
+        self.widget("boot-kernel-enable").emit("toggled")
 
         # Only show dtb if it's supported
         arch = self.vm.get_arch() or ""

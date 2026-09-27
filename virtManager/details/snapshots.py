@@ -9,6 +9,7 @@ import glob
 import io
 import os
 
+from gi.repository import Gdk
 from gi.repository import GdkPixbuf
 from gi.repository import Gtk
 from gi.repository import Pango
@@ -78,17 +79,15 @@ class vmmSnapshotNew(vmmGObjectUI):
 
         self._init_ui()
 
-        self.builder.connect_signals(
-            {
-                "on_snapshot_new_delete_event": self.close,
-                "on_snapshot_new_cancel_clicked": self.close,
-                "on_snapshot_new_name_changed": self._name_changed_cb,
-                "on_snapshot_new_name_activate": self._ok_clicked_cb,
-                "on_snapshot_new_ok_clicked": self._ok_clicked_cb,
-                "on_snapshot_new_mode_toggled": self._mode_toggled_cb,
-                "on_snapshot_new_memory_toggled": self._memory_toggled_cb,
-            }
-        )
+        self.connect_signals({
+            "on_snapshot_new_delete_event": self.close,
+            "on_snapshot_new_cancel_clicked": self.close,
+            "on_snapshot_new_name_changed": self._name_changed_cb,
+            "on_snapshot_new_name_activate": self._ok_clicked_cb,
+            "on_snapshot_new_ok_clicked": self._ok_clicked_cb,
+            "on_snapshot_new_mode_toggled": self._mode_toggled_cb,
+            "on_snapshot_new_memory_toggled": self._memory_toggled_cb,
+        })
         self.bind_escape_key_close()
 
     #######################
@@ -98,7 +97,7 @@ class vmmSnapshotNew(vmmGObjectUI):
     def show(self, parent):
         log.debug("Showing new snapshot wizard")
         self._reset_state()
-        self.topwin.resize(1, 1)
+        self.topwin.set_default_size(1, 1)
         self.topwin.set_transient_for(parent)
         self.topwin.present()
 
@@ -175,9 +174,7 @@ class vmmSnapshotNew(vmmGObjectUI):
         self.widget("snapshot-new-description").get_buffer().set_text("")
         self.widget("snapshot-new-ok").grab_focus()
         self.widget("snapshot-new-status-text").set_text(self.vm.run_status())
-        self.widget("snapshot-new-status-icon").set_from_icon_name(
-            self.vm.run_status_icon_name(), Gtk.IconSize.BUTTON
-        )
+        self.widget("snapshot-new-status-icon").set_from_icon_name(self.vm.run_status_icon_name())
 
         self._reset_snapshot_mode()
 
@@ -423,21 +420,18 @@ class vmmSnapshotPage(vmmGObjectUI):
         self._snapmenu = None
         self._init_ui()
 
-        self.builder.connect_signals(
-            {
-                "on_snapshot_add_clicked": self._on_add_clicked,
-                "on_snapshot_delete_clicked": self._on_delete_clicked,
-                "on_snapshot_start_clicked": self._on_start_clicked,
-                "on_snapshot_apply_clicked": self._on_apply_clicked,
-                "on_snapshot_list_changed": self._snapshot_selected,
-                "on_snapshot_list_button_press_event": self._popup_snapshot_menu,
-                "on_snapshot_refresh_clicked": self._on_refresh_clicked,
-                "on_snapshot_list_row_activated": self._on_start_clicked,
-            }
-        )
+        self.connect_signals({
+            "on_snapshot_add_clicked": self._on_add_clicked,
+            "on_snapshot_delete_clicked": self._on_delete_clicked,
+            "on_snapshot_start_clicked": self._on_start_clicked,
+            "on_snapshot_apply_clicked": self._on_apply_clicked,
+            "on_snapshot_list_changed": self._snapshot_selected,
+            "on_snapshot_refresh_clicked": self._on_refresh_clicked,
+            "on_snapshot_list_row_activated": self._on_start_clicked,
+        })
 
         self.top_box = self.widget("snapshot-top-box")
-        self.widget("snapshot-top-window").remove(self.top_box)
+        self.widget("snapshot-top-window").set_child(None)
         selection = self.widget("snapshot-list").get_selection()
         selection.emit("changed")
         selection.set_mode(Gtk.SelectionMode.MULTIPLE)
@@ -449,6 +443,8 @@ class vmmSnapshotPage(vmmGObjectUI):
 
     def _cleanup(self):
         self.vm = None
+        if self._snapmenu.get_parent():
+            self._snapmenu.unparent()
         self._snapmenu = None
 
         if self._snapshot_new:
@@ -472,7 +468,7 @@ class vmmSnapshotPage(vmmGObjectUI):
         col.set_spacing(6)
 
         img = Gtk.CellRendererPixbuf()
-        img.set_property("stock-size", Gtk.IconSize.LARGE_TOOLBAR)
+        img.set_property("icon-size", Gtk.IconSize.LARGE)
         col.pack_start(img, False)
         col.add_attribute(img, "icon-name", 3)
 
@@ -482,7 +478,7 @@ class vmmSnapshotPage(vmmGObjectUI):
         col.add_attribute(txt, "markup", 1)
 
         img = Gtk.CellRendererPixbuf()
-        img.set_property("stock-size", Gtk.IconSize.MENU)
+        img.set_property("icon-size", Gtk.IconSize.NORMAL)
         img.set_property("icon-name", "emblem-default")
         img.set_property("xalign", 0.0)
         col.pack_start(img, False)
@@ -498,19 +494,22 @@ class vmmSnapshotPage(vmmGObjectUI):
         slist.set_row_separator_func(_sep_cb, None)
 
         # Snapshot popup menu
-        menu = Gtk.Menu()
+        menu = Gtk.Popover()
+        box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        menu.set_child(box)
 
-        item = Gtk.MenuItem.new_with_mnemonic(_("_Start snapshot"))
-        item.show()
-        item.connect("activate", self._on_start_clicked)
-        menu.add(item)
+        item = Gtk.Button.new_with_mnemonic(_("_Start snapshot"))
+        item.connect("clicked", lambda button: (menu.popdown(), self._on_start_clicked(button)))
+        box.append(item)
 
-        item = Gtk.MenuItem.new_with_mnemonic(_("_Delete snapshot"))
-        item.show()
-        item.connect("activate", self._on_delete_clicked)
-        menu.add(item)
+        item = Gtk.Button.new_with_mnemonic(_("_Delete snapshot"))
+        item.connect("clicked", lambda button: (menu.popdown(), self._on_delete_clicked(button)))
+        box.append(item)
 
         self._snapmenu = menu
+        click = Gtk.GestureClick(button=3)
+        click.connect("pressed", self._popup_snapshot_menu)
+        slist.add_controller(click)
 
     ###################
     # Functional bits #
@@ -640,7 +639,7 @@ class vmmSnapshotPage(vmmGObjectUI):
 
         self.widget("snapshot-status-text").set_text(state)
         if icon:
-            self.widget("snapshot-status-icon").set_from_icon_name(icon, Gtk.IconSize.BUTTON)
+            self.widget("snapshot-status-icon").set_from_icon_name(icon)
 
         uiutil.set_grid_row_visible(self.widget("snapshot-mode"), is_external)
         if is_external:
@@ -706,11 +705,18 @@ class vmmSnapshotPage(vmmGObjectUI):
     # Listeners #
     #############
 
-    def _popup_snapshot_menu(self, src, event):
-        ignore = src
-        if event.button != 3:
+    def _popup_snapshot_menu(self, gesture, _press_count, x, y):
+        widget = gesture.get_widget()
+        hit = widget.get_path_at_pos(int(x), int(y))
+        if hit is None:
             return
-        self._snapmenu.popup_at_pointer(event)
+        widget.get_selection().select_path(hit[0])
+        if not self._snapmenu.get_parent():
+            self._snapmenu.set_parent(widget)
+        rect = Gdk.Rectangle()
+        rect.x, rect.y, rect.width, rect.height = int(x), int(y), 1, 1
+        self._snapmenu.set_pointing_to(rect)
+        self._snapmenu.popup()
 
     def close(self, ignore1=None, ignore2=None):
         if self._snapshot_new:

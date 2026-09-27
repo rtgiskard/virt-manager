@@ -53,18 +53,17 @@ class vmmHost(vmmGObjectUI):
         self._hostnets = None
         self._init_net_state()
 
-        self.builder.connect_signals(
-            {
-                "on_menu_file_view_manager_activate": self._view_manager_cb,
-                "on_menu_file_quit_activate": self._exit_app_cb,
-                "on_menu_file_close_activate": self.close,
-                "on_vmm_host_delete_event": self.close,
-                "on_vmm_host_configure_event": self._window_resized_cb,
-                "on_host_page_switch": self._page_changed_cb,
-                "on_overview_name_changed": self._overview_name_changed_cb,
-                "on_config_autoconnect_toggled": self._autoconnect_toggled_cb,
-            }
-        )
+        self.connect_signals({
+            "on_menu_file_view_manager_activate": self._view_manager_cb,
+            "on_menu_file_quit_activate": self._exit_app_cb,
+            "on_menu_file_close_activate": self.close,
+            "on_vmm_host_delete_event": self.close,
+            "on_host_page_switch": self._page_changed_cb,
+            "on_overview_name_changed": self._overview_name_changed_cb,
+            "on_config_autoconnect_toggled": self._autoconnect_toggled_cb,
+        })
+        self.topwin.connect("notify::default-width", self._window_resized_cb)
+        self.topwin.connect("notify::default-height", self._window_resized_cb)
 
         self.conn.connect("state-changed", self._conn_state_changed_cb)
         self.conn.connect("resources-sampled", self._conn_resources_sampled_cb)
@@ -95,6 +94,7 @@ class vmmHost(vmmGObjectUI):
         if not self.is_visible():
             return
 
+        self._window_size = (self.topwin.get_width(), self.topwin.get_height())
         self.topwin.hide()
         vmmEngine.get_instance().decrement_window_counter()
 
@@ -112,10 +112,10 @@ class vmmHost(vmmGObjectUI):
         self._hostnets.cleanup()
         self._hostnets = None
 
-        self._cpu_usage_graph.destroy()
+        self._cpu_usage_graph.unparent()
         self._cpu_usage_graph = None
 
-        self._memory_usage_graph.destroy()
+        self._memory_usage_graph.unparent()
         self._memory_usage_graph = None
 
     ###########
@@ -124,11 +124,11 @@ class vmmHost(vmmGObjectUI):
 
     def _init_net_state(self):
         self._hostnets = vmmHostNets(self.conn, self.builder, self.topwin)
-        self.widget("net-align").add(self._hostnets.top_box)
+        self.widget("net-align").append(self._hostnets.top_box)
 
     def _init_storage_state(self):
         self._storagelist = vmmHostStorage(self.conn, self.builder, self.topwin)
-        self.widget("storage-align").add(self._storagelist.top_box)
+        self.widget("storage-align").append(self._storagelist.top_box)
 
     def _init_conn_state(self):
         uri = self.conn.get_uri()
@@ -140,12 +140,12 @@ class vmmHost(vmmGObjectUI):
         self._cpu_usage_graph = Sparkline()
         self._cpu_usage_graph.set_hexpand(True)
         self._cpu_usage_graph.show()
-        self.widget("performance-cpu-align").add(self._cpu_usage_graph)
+        self.widget("performance-cpu-align").append(self._cpu_usage_graph)
 
         self._memory_usage_graph = Sparkline()
         self._memory_usage_graph.set_hexpand(True)
         self._memory_usage_graph.show()
-        self.widget("performance-memory-align").add(self._memory_usage_graph)
+        self.widget("performance-memory-align").append(self._memory_usage_graph)
 
     ######################
     # UI conn populating #
@@ -197,7 +197,7 @@ class vmmHost(vmmGObjectUI):
     def _window_resized_cb(self, src, event):
         if not self.is_visible():
             return
-        self._window_size = self.topwin.get_size()
+        self._window_size = (self.topwin.get_width(), self.topwin.get_height())
 
     def _overview_name_changed_cb(self, src):
         src = self.widget("overview-name")

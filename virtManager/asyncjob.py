@@ -185,11 +185,9 @@ class vmmAsyncJob(vmmGObjectUI):
         self._bg_thread = threading.Thread(target=cb_wrapper, args=[callback, self] + args)
         self._bg_thread.daemon = True
 
-        self.builder.connect_signals(
-            {
-                "on_async_job_cancel_clicked": self._on_cancel,
-            }
-        )
+        self.connect_signals({
+            "on_async_job_cancel_clicked": self._on_cancel,
+        })
 
         # UI state
         self.topwin.set_title(title)
@@ -325,7 +323,7 @@ class vmmAsyncJob(vmmGObjectUI):
         from gi.repository import Vte
 
         self._details_widget = Vte.Terminal()
-        self.widget("details-box").add(self._details_widget)
+        self.widget("details-box").append(self._details_widget)
         self._details_widget.set_visible(True)
         self.widget("details").set_visible(True)
 

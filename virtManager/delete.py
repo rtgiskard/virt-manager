@@ -38,14 +38,12 @@ class _vmmDeleteBase(vmmGObjectUI):
         vmmGObjectUI.__init__(self, "delete.ui", "vmm-delete")
         self.vm = None
 
-        self.builder.connect_signals(
-            {
-                "on_vmm_delete_delete_event": self.close,
-                "on_delete_cancel_clicked": self.close,
-                "on_delete_ok_clicked": self._finish_clicked_cb,
-                "on_delete_remove_storage_toggled": self._toggle_remove_storage,
-            }
-        )
+        self.connect_signals({
+            "on_vmm_delete_delete_event": self.close,
+            "on_delete_cancel_clicked": self.close,
+            "on_delete_ok_clicked": self._finish_clicked_cb,
+            "on_delete_remove_storage_toggled": self._toggle_remove_storage,
+        })
         self.bind_escape_key_close()
         self._cleanup_on_app_close()
 
@@ -90,7 +88,7 @@ class _vmmDeleteBase(vmmGObjectUI):
         title_str = "<span size='large'>%s</span>" % xmlutil.xml_escape(text)
         self.widget("header-label").set_markup(title_str)
 
-        self.topwin.resize(1, 1)
+        self.topwin.set_default_size(1, 1)
         self.widget("delete-cancel").grab_focus()
 
         # Show warning message if VM is running
@@ -100,7 +98,7 @@ class _vmmDeleteBase(vmmGObjectUI):
         # Enable storage removal by default
         remove_storage_default = self._get_remove_storage_default()
         self.widget("delete-remove-storage").set_active(remove_storage_default)
-        self.widget("delete-remove-storage").toggled()
+        self.widget("delete-remove-storage").emit("toggled")
         diskdatas = self._get_disk_datas()
         _populate_storage_list(self.widget("delete-storage-list"), self.vm, self.vm.conn, diskdatas)
 
@@ -500,7 +498,7 @@ def _populate_storage_list(storage_list, vm, conn, diskdatas):
             info = definfo
 
         icon = "dialog-warning"
-        icon_size = Gtk.IconSize.LARGE_TOOLBAR
+        icon_size = Gtk.IconSize.LARGE
 
         row = [
             default,
@@ -567,7 +565,7 @@ def _prepare_storage_list(storage_list):
     infoCol.pack_start(info_img, False)
     infoCol.add_attribute(info_img, "visible", STORAGE_ROW_ICON_SHOW)
     infoCol.add_attribute(info_img, "icon-name", STORAGE_ROW_ICON)
-    infoCol.add_attribute(info_img, "stock-size", STORAGE_ROW_ICON_SIZE)
+    infoCol.add_attribute(info_img, "icon-size", STORAGE_ROW_ICON_SIZE)
     infoCol.set_sort_column_id(STORAGE_ROW_ICON)
 
 

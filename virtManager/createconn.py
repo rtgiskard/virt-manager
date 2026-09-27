@@ -57,17 +57,15 @@ class vmmCreateConn(vmmGObjectUI):
         vmmGObjectUI.__init__(self, "createconn.ui", "vmm-open-connection")
         self._cleanup_on_app_close()
 
-        self.builder.connect_signals(
-            {
-                "on_hypervisor_changed": self.hypervisor_changed,
-                "on_connect_remote_toggled": self.connect_remote_toggled,
-                "on_username_entry_changed": self.username_changed,
-                "on_hostname_changed": self.hostname_changed,
-                "on_cancel_clicked": self.cancel,
-                "on_connect_clicked": self.open_conn,
-                "on_vmm_open_connection_delete_event": self.cancel,
-            }
-        )
+        self.connect_signals({
+            "on_hypervisor_changed": self.hypervisor_changed,
+            "on_connect_remote_toggled": self.connect_remote_toggled,
+            "on_username_entry_changed": self.username_changed,
+            "on_hostname_changed": self.hostname_changed,
+            "on_cancel_clicked": self.cancel,
+            "on_connect_clicked": self.open_conn,
+            "on_vmm_open_connection_delete_event": self.cancel,
+        })
 
         self.set_initial_state()
         self.reset_state()

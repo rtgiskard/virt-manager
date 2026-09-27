@@ -5,11 +5,10 @@
 
 from gi.repository import GObject
 from gi.repository import Gtk
+from gi.repository import Graphene
 
 # pylint: disable=arguments-differ
 # Newer pylint can detect, but warns that overridden arguments are wrong
-
-BASECOLOR = Gtk.StyleContext().lookup_color("theme_base_color")[1]
 
 
 def rect_print(name, rect):  # pragma: no cover
@@ -113,17 +112,10 @@ class CellRendererSparkline(Gtk.CellRenderer):
         self.reversed = False
         self.rgb = None
 
-    def do_render(self, cr, widget, background_area, cell_area, flags):
-        # cr                : Cairo context
-        # widget            : GtkWidget instance
-        # background_area   : GdkRectangle: entire cell area
-        # cell_area         : GdkRectangle: area normally rendered by cell
-        # flags             : flags that affect rendering
-        # flags = Gtk.CELL_RENDERER_SELECTED, Gtk.CELL_RENDERER_PRELIT,
-        #         Gtk.CELL_RENDERER_INSENSITIVE or Gtk.CELL_RENDERER_SORTED
-        ignore = widget
-        ignore = background_area
-        ignore = flags
+    def do_snapshot(self, snapshot, widget, background_area, cell_area, flags):
+        cr = snapshot.append_cairo(
+            Graphene.Rect().init(cell_area.x, cell_area.y, cell_area.width, cell_area.height)
+        )
 
         # Indent of the gray border around the graph
         BORDER_PADDING = 2
@@ -171,15 +163,12 @@ class CellRendererSparkline(Gtk.CellRenderer):
         )
         cr.stroke()
 
-        # Fill in basecolor box inside graph outline
-        cr.set_source_rgb(BASECOLOR.red, BASECOLOR.green, BASECOLOR.blue)
-        cr.rectangle(
-            cell_area.x + BORDER_PADDING,
-            cell_area.y + BORDER_PADDING,
-            border_width,
-            cell_area.height - (BORDER_PADDING * 2),
+        # Paint the interior using the GTK theme of the containing tree.
+        Gtk.render_background(
+            widget.get_style_context(), cr,
+            cell_area.x + BORDER_PADDING, cell_area.y + BORDER_PADDING,
+            border_width, cell_area.height - (BORDER_PADDING * 2),
         )
-        cr.fill()
 
         def get_y(index):
             baseline_y = graph_y + graph_height
@@ -218,21 +207,13 @@ class CellRendererSparkline(Gtk.CellRenderer):
         draw_fill(cr, cell_area.x, cell_area.y, cell_area.width, cell_area.height, points)
         return
 
-    def do_get_size(self, widget, cell_area=None):
-        ignore = widget
-        ignore = cell_area
+    def do_get_preferred_width(self, widget):
+        width = self.get_property("xpad") * 2 + len(self.data_array)
+        return width, width
 
-        FIXED_WIDTH = len(self.data_array)
-        FIXED_HEIGHT = 15
-        xpad = self.get_property("xpad")
-        ypad = self.get_property("ypad")
-        xoffset = 0
-        yoffset = 0
-
-        width = (xpad * 2) + FIXED_WIDTH
-        height = (ypad * 2) + FIXED_HEIGHT
-
-        return (xoffset, yoffset, width, height)
+    def do_get_preferred_height(self, widget):
+        height = self.get_property("ypad") * 2 + 15
+        return height, height
 
     # Properties are passed to use with "-" in the name, but python
     # variables can't be named like that
@@ -299,11 +280,13 @@ class Sparkline(Gtk.DrawingArea):
         self.reversed = False
         self.rgb = []
 
-        ctxt = self.get_style_context()
-        ctxt.add_class(Gtk.STYLE_CLASS_ENTRY)
+        self.add_css_class("entry")
+        self.set_draw_func(self._draw)
+        self.set_content_height(20)
 
     def set_data_array(self, val):
         self._data_array = val
+        self.set_content_width(int(len(val) / self.num_sets))
         self.queue_draw()
 
     def get_data_array(self):
@@ -311,12 +294,8 @@ class Sparkline(Gtk.DrawingArea):
 
     data_array = property(get_data_array, set_data_array)
 
-    def do_draw(self, cr):
+    def _draw(self, area, cr, w, h):
         cr.save()
-
-        window = self.get_window()
-        w = window.get_width()
-        h = window.get_height()
 
         points_per_set = len(self.data_array) // self.num_sets
         pixels_per_point = float(w) / (float((points_per_set - 1) or 1))
@@ -380,12 +359,6 @@ class Sparkline(Gtk.DrawingArea):
 
         return 0
 
-    def do_size_request(self, requisition):  # pragma: no cover
-        width = len(self.data_array) / self.num_sets
-        height = 20
-
-        requisition.width = width
-        requisition.height = height
 
     # Properties are passed to use with "-" in the name, but python
     # variables can't be named like that
@@ -403,9 +376,3 @@ class Sparkline(Gtk.DrawingArea):
     # These make pylint happy
     def set_property(self, *args, **kwargs):
         return Gtk.DrawingArea.set_property(self, *args, **kwargs)
-
-    def show(self, *args, **kwargs):
-        return Gtk.DrawingArea.show(self, *args, **kwargs)
-
-    def destroy(self, *args, **kwargs):
-        return Gtk.DrawingArea.destroy(self, *args, **kwargs)

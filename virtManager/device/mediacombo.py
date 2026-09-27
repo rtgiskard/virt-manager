@@ -41,7 +41,8 @@ class vmmMediaCombo(vmmGObjectUI):
 
     def _cleanup(self):
         self.conn = None
-        self.top_box.destroy()
+        if self.top_box.get_parent():
+            self.top_box.unparent()
         self.top_box = None
 
     ##########################
@@ -54,7 +55,7 @@ class vmmMediaCombo(vmmGObjectUI):
         self.top_box.set_orientation(Gtk.Orientation.HORIZONTAL)
         self._combo = Gtk.ComboBox(has_entry=True)
         self._combo.set_entry_text_column(self.MEDIA_FIELD_LABEL)
-        self._combo.get_accessible().set_name("media-combo")
+        self._combo.update_property([Gtk.AccessibleProperty.LABEL], ["media-combo"])
 
         def separator_cb(_model, _iter):
             return _model[_iter][self.MEDIA_FIELD_PATH] is None
@@ -64,15 +65,13 @@ class vmmMediaCombo(vmmGObjectUI):
         self._entry = self._combo.get_child()
         self._entry.set_placeholder_text(_("No media selected"))
         self._entry.set_hexpand(True)
-        self._entry.get_accessible().set_name("media-entry")
+        self._entry.update_property([Gtk.AccessibleProperty.LABEL], ["media-entry"])
         self._entry.connect("changed", self._on_entry_changed_cb)
         self._entry.connect("activate", self._on_entry_activated_cb)
         self._entry.connect("icon-press", self._on_entry_icon_press_cb)
 
-        self._browse = Gtk.Button()
 
-        self.top_box.add(self._combo)
-        self.top_box.show_all()
+        self.top_box.append(self._combo)
 
         # [path, label, has_media?, device key]
         store = Gtk.ListStore(str, str, bool, str)

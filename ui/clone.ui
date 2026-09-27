@@ -1,298 +1,194 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.38.2 -->
+<?xml version='1.0' encoding='UTF-8'?>
 <interface>
-  <requires lib="gtk+" version="3.22"/>
+  <requires lib="gtk" version="4.0"/>
   <object class="GtkDialog" id="vmm-change-storage">
-    <property name="can-focus">False</property>
-    <property name="border-width">5</property>
-    <property name="title" translatable="yes">Change storage path</property>
-    <property name="window-position">center-on-parent</property>
-    <property name="destroy-with-parent">True</property>
-    <property name="type-hint">dialog</property>
-    <signal name="delete-event" handler="on_vmm_change_storage_delete_event" swapped="no"/>
-    <child internal-child="vbox">
+    <property name="title" translatable="1">Change storage path</property>
+    <property name="destroy-with-parent">1</property>
+    <signal name="close-request" handler="on_vmm_change_storage_delete_event" swapped="no"/>
+    <child internal-child="content_area">
       <object class="GtkBox" id="dialog-vbox2">
-        <property name="visible">True</property>
-        <property name="can-focus">False</property>
         <property name="orientation">vertical</property>
         <property name="spacing">2</property>
-        <child internal-child="action_area">
-          <object class="GtkButtonBox" id="dialog-action_area2">
-            <property name="visible">True</property>
-            <property name="can-focus">False</property>
-            <property name="layout-style">end</property>
-            <child>
-              <object class="GtkButton" id="change-storage-cancel">
-                <property name="label" translatable="yes">_Cancel</property>
-                <property name="visible">True</property>
-                <property name="can-focus">True</property>
-                <property name="receives-default">True</property>
-                <property name="use-underline">True</property>
-                <signal name="clicked" handler="on_change_storage_cancel_clicked" swapped="no"/>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">False</property>
-                <property name="position">0</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkButton" id="change-storage-ok">
-                <property name="label" translatable="yes">_OK</property>
-                <property name="visible">True</property>
-                <property name="can-focus">True</property>
-                <property name="receives-default">True</property>
-                <property name="use-underline">True</property>
-                <signal name="clicked" handler="on_change_storage_ok_clicked" swapped="no"/>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">False</property>
-                <property name="position">1</property>
-              </packing>
-            </child>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="pack-type">end</property>
-            <property name="position">0</property>
-          </packing>
-        </child>
         <child>
           <object class="GtkBox" id="vbox2">
-            <property name="visible">True</property>
-            <property name="can-focus">False</property>
-            <property name="border-width">6</property>
             <property name="orientation">vertical</property>
             <property name="spacing">12</property>
             <child>
-              <!-- n-columns=2 n-rows=2 -->
               <object class="GtkGrid" id="table4">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
+                <property name="valign">center</property>
                 <property name="row-spacing">6</property>
                 <property name="column-spacing">6</property>
                 <child>
-                  <!-- n-columns=2 n-rows=3 -->
                   <object class="GtkGrid" id="table5">
-                    <property name="visible">True</property>
-                    <property name="can-focus">False</property>
                     <property name="valign">center</property>
-                    <property name="hexpand">True</property>
+                    <property name="hexpand">1</property>
                     <property name="row-spacing">6</property>
                     <property name="column-spacing">12</property>
                     <child>
                       <object class="GtkLabel" id="change-storage-size">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
                         <property name="halign">start</property>
                         <property name="label">size</property>
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="row">2</property>
+                        </layout>
                       </object>
-                      <packing>
-                        <property name="left-attach">1</property>
-                        <property name="top-attach">2</property>
-                      </packing>
                     </child>
                     <child>
                       <object class="GtkLabel" id="change-storage-target">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
                         <property name="halign">start</property>
                         <property name="label">target</property>
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="row">1</property>
+                        </layout>
                       </object>
-                      <packing>
-                        <property name="left-attach">1</property>
-                        <property name="top-attach">1</property>
-                      </packing>
                     </child>
                     <child>
                       <object class="GtkLabel" id="change-storage-orig">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
                         <property name="label">orig-path</property>
-                        <property name="selectable">True</property>
+                        <property name="selectable">1</property>
                         <property name="ellipsize">start</property>
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="row">0</property>
+                        </layout>
                       </object>
-                      <packing>
-                        <property name="left-attach">1</property>
-                        <property name="top-attach">0</property>
-                      </packing>
                     </child>
                     <child>
                       <object class="GtkLabel" id="label15">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
                         <property name="halign">end</property>
                         <property name="valign">end</property>
-                        <property name="label" translatable="yes">Size:</property>
-                        <property name="use-markup">True</property>
+                        <property name="label" translatable="1">Size:</property>
+                        <property name="use-markup">1</property>
                         <style>
                           <class name="vmm-lighter"/>
                         </style>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="row">2</property>
+                        </layout>
                       </object>
-                      <packing>
-                        <property name="left-attach">0</property>
-                        <property name="top-attach">2</property>
-                      </packing>
                     </child>
                     <child>
                       <object class="GtkLabel" id="label14">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
                         <property name="halign">end</property>
-                        <property name="label" translatable="yes">Target:</property>
-                        <property name="use-markup">True</property>
+                        <property name="label" translatable="1">Target:</property>
+                        <property name="use-markup">1</property>
                         <style>
                           <class name="vmm-lighter"/>
                         </style>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="row">1</property>
+                        </layout>
                       </object>
-                      <packing>
-                        <property name="left-attach">0</property>
-                        <property name="top-attach">1</property>
-                      </packing>
                     </child>
                     <child>
                       <object class="GtkLabel" id="label13">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
                         <property name="halign">end</property>
                         <property name="valign">center</property>
-                        <property name="label" translatable="yes">Path:</property>
-                        <property name="use-markup">True</property>
+                        <property name="label" translatable="1">Path:</property>
+                        <property name="use-markup">1</property>
                         <style>
                           <class name="vmm-lighter"/>
                         </style>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="row">0</property>
+                        </layout>
                       </object>
-                      <packing>
-                        <property name="left-attach">0</property>
-                        <property name="top-attach">0</property>
-                      </packing>
                     </child>
+                    <layout>
+                      <property name="column">1</property>
+                      <property name="row">1</property>
+                    </layout>
                   </object>
-                  <packing>
-                    <property name="left-attach">1</property>
-                    <property name="top-attach">1</property>
-                  </packing>
                 </child>
                 <child>
                   <object class="GtkLabel" id="label1">
-                    <property name="visible">True</property>
-                    <property name="can-focus">False</property>
                     <property name="halign">start</property>
-                    <property name="label" translatable="yes">Existing disk</property>
+                    <property name="label" translatable="1">Existing disk</property>
+                    <layout>
+                      <property name="column">0</property>
+                      <property name="row">0</property>
+                      <property name="column-span">2</property>
+                    </layout>
                   </object>
-                  <packing>
-                    <property name="left-attach">0</property>
-                    <property name="top-attach">0</property>
-                    <property name="width">2</property>
-                  </packing>
                 </child>
                 <child>
                   <object class="GtkImage" id="image2">
-                    <property name="visible">True</property>
-                    <property name="can-focus">False</property>
                     <property name="margin-start">18</property>
                     <property name="margin-end">18</property>
                     <property name="icon-name">drive-harddisk</property>
-                    <property name="icon_size">6</property>
+                    <property name="pixel-size">48</property>
+                    <layout>
+                      <property name="column">0</property>
+                      <property name="row">1</property>
+                    </layout>
                   </object>
-                  <packing>
-                    <property name="left-attach">0</property>
-                    <property name="top-attach">1</property>
-                  </packing>
                 </child>
               </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">False</property>
-                <property name="position">0</property>
-              </packing>
             </child>
             <child>
-              <!-- n-columns=3 n-rows=2 -->
               <object class="GtkGrid" id="table3">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <property name="border-width">6</property>
+                <property name="vexpand">1</property>
                 <property name="row-spacing">6</property>
                 <property name="column-spacing">6</property>
                 <child>
                   <object class="GtkCheckButton" id="change-storage-doclone">
-                    <property name="label" translatable="yes">Create a new disk (c_lone) for the virtual machine</property>
-                    <property name="visible">True</property>
-                    <property name="can-focus">True</property>
-                    <property name="receives-default">False</property>
+                    <property name="label" translatable="1">Create a new disk (c_lone) for the virtual machine</property>
+                    <property name="focusable">1</property>
                     <property name="halign">start</property>
-                    <property name="use-underline">True</property>
-                    <property name="draw-indicator">True</property>
+                    <property name="use-underline">1</property>
                     <signal name="toggled" handler="on_change_storage_doclone_toggled" swapped="no"/>
+                    <layout>
+                      <property name="column">0</property>
+                      <property name="row">0</property>
+                      <property name="column-span">3</property>
+                    </layout>
                   </object>
-                  <packing>
-                    <property name="left-attach">0</property>
-                    <property name="top-attach">0</property>
-                    <property name="width">3</property>
-                  </packing>
                 </child>
                 <child>
                   <object class="GtkEntry" id="change-storage-new">
-                    <property name="visible">True</property>
-                    <property name="can-focus">True</property>
-                    <property name="hexpand">True</property>
+                    <property name="focusable">1</property>
+                    <property name="hexpand">1</property>
                     <property name="width-chars">25</property>
-                    <child internal-child="accessible">
-                      <object class="AtkObject" id="change-storage-new-atkobject">
-                        <property name="AtkObject::accessible-name">new-path</property>
-                      </object>
-                    </child>
+                    <layout>
+                      <property name="column">1</property>
+                      <property name="row">1</property>
+                    </layout>
                   </object>
-                  <packing>
-                    <property name="left-attach">1</property>
-                    <property name="top-attach">1</property>
-                  </packing>
                 </child>
                 <child>
                   <object class="GtkButton" id="change-storage-browse">
-                    <property name="label" translatable="yes">_Browse...</property>
-                    <property name="visible">True</property>
-                    <property name="can-focus">True</property>
-                    <property name="receives-default">True</property>
-                    <property name="use-underline">True</property>
+                    <property name="label" translatable="1">_Browse...</property>
+                    <property name="focusable">1</property>
+                    <property name="receives-default">1</property>
+                    <property name="use-underline">1</property>
                     <signal name="clicked" handler="on_change_storage_browse_clicked" swapped="no"/>
+                    <layout>
+                      <property name="column">2</property>
+                      <property name="row">1</property>
+                    </layout>
                   </object>
-                  <packing>
-                    <property name="left-attach">2</property>
-                    <property name="top-attach">1</property>
-                  </packing>
                 </child>
                 <child>
                   <object class="GtkLabel" id="label12">
-                    <property name="visible">True</property>
-                    <property name="can-focus">False</property>
                     <property name="halign">end</property>
-                    <property name="label" translatable="yes">New _Path:</property>
-                    <property name="use-markup">True</property>
-                    <property name="use-underline">True</property>
+                    <property name="label" translatable="1">New _Path:</property>
+                    <property name="use-markup">1</property>
+                    <property name="use-underline">1</property>
                     <property name="mnemonic-widget">change-storage-new</property>
+                    <layout>
+                      <property name="column">0</property>
+                      <property name="row">1</property>
+                    </layout>
                   </object>
-                  <packing>
-                    <property name="left-attach">0</property>
-                    <property name="top-attach">1</property>
-                  </packing>
                 </child>
-              </object>
-              <packing>
-                <property name="expand">True</property>
-                <property name="fill">True</property>
-                <property name="position">1</property>
-              </packing>
+              <property name="margin-start">6</property><property name="margin-end">6</property><property name="margin-top">6</property><property name="margin-bottom">6</property></object>
             </child>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="position">1</property>
-          </packing>
+          <property name="margin-start">6</property><property name="margin-end">6</property><property name="margin-top">6</property><property name="margin-bottom">6</property></object>
         </child>
       </object>
     </child>
@@ -300,438 +196,305 @@
       <action-widget response="0">change-storage-cancel</action-widget>
       <action-widget response="0">change-storage-ok</action-widget>
     </action-widgets>
-  </object>
-  <object class="GtkWindow" id="vmm-clone">
-    <property name="can-focus">False</property>
-    <property name="title" translatable="yes">Clone Virtual Machine</property>
-    <property name="type-hint">dialog</property>
-    <signal name="delete-event" handler="on_clone_delete_event" swapped="no"/>
-    <child>
-      <object class="GtkBox" id="vbox1">
+    <child internal-child="action_area">
+      <object class="GtkBox" id="dialog-action_area2">
         <property name="visible">True</property>
         <property name="can-focus">False</property>
+        <child>
+          <object class="GtkButton" id="change-storage-cancel">
+            <property name="label" translatable="1">_Cancel</property>
+            <property name="focusable">1</property>
+            <property name="receives-default">1</property>
+            <property name="use-underline">1</property>
+            <signal name="clicked" handler="on_change_storage_cancel_clicked" swapped="no"/>
+          </object>
+          </child>
+        <child>
+          <object class="GtkButton" id="change-storage-ok">
+            <property name="label" translatable="1">_OK</property>
+            <property name="focusable">1</property>
+            <property name="receives-default">1</property>
+            <property name="use-underline">1</property>
+            <signal name="clicked" handler="on_change_storage_ok_clicked" swapped="no"/>
+          </object>
+          </child>
+      </object>
+    </child>
+  <property name="margin-start">5</property><property name="margin-end">5</property><property name="margin-top">5</property><property name="margin-bottom">5</property></object>
+  <object class="GtkWindow" id="vmm-clone">
+    <property name="title" translatable="1">Clone Virtual Machine</property>
+    <signal name="close-request" handler="on_clone_delete_event" swapped="no"/>
+    <property name="child">
+      <object class="GtkBox" id="vbox1">
         <property name="orientation">vertical</property>
         <child>
           <object class="GtkViewport" id="header">
-            <property name="visible">True</property>
-            <property name="can-focus">False</property>
-            <property name="resize-mode">queue</property>
-            <child>
+            <property name="child">
               <object class="GtkBox" id="hbox77">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <property name="border-width">6</property>
                 <property name="spacing">10</property>
                 <child>
                   <object class="GtkImage" id="image4">
-                    <property name="visible">True</property>
-                    <property name="can-focus">False</property>
+                    <property name="halign">center</property>
                     <property name="icon-name">vm_clone_wizard</property>
-                    <property name="icon_size">6</property>
+                    <property name="pixel-size">48</property>
                   </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">False</property>
-                    <property name="position">0</property>
-                  </packing>
                 </child>
                 <child>
                   <object class="GtkBox" id="hbox2">
-                    <property name="visible">True</property>
-                    <property name="can-focus">False</property>
+                    <property name="hexpand">1</property>
                     <child>
                       <object class="GtkLabel" id="label2">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
+                        <property name="hexpand">1</property>
                         <property name="halign">start</property>
-                        <property name="label" translatable="yes">&lt;span size='large'&gt;Clone virtual machine&lt;/span&gt;</property>
-                        <property name="use-markup">True</property>
+                        <property name="label" translatable="1">&lt;span size='large'&gt;Clone virtual machine&lt;/span&gt;</property>
+                        <property name="use-markup">1</property>
                         <style>
                           <class name="vmm-header-text"/>
                         </style>
                       </object>
-                      <packing>
-                        <property name="expand">True</property>
-                        <property name="fill">True</property>
-                        <property name="position">0</property>
-                      </packing>
                     </child>
                   </object>
-                  <packing>
-                    <property name="expand">True</property>
-                    <property name="fill">True</property>
-                    <property name="position">1</property>
-                  </packing>
                 </child>
-              </object>
-            </child>
+              <property name="margin-start">6</property><property name="margin-end">6</property><property name="margin-top">6</property><property name="margin-bottom">6</property></object>
+            </property>
             <style>
               <class name="vmm-header"/>
             </style>
           </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="position">0</property>
-          </packing>
         </child>
         <child>
           <object class="GtkBox" id="vbox4">
-            <property name="visible">True</property>
-            <property name="can-focus">False</property>
-            <property name="border-width">12</property>
+            <property name="vexpand">1</property>
             <property name="orientation">vertical</property>
             <property name="spacing">12</property>
             <child>
               <object class="GtkBox" id="vbox3">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
+                <property name="vexpand">1</property>
                 <property name="orientation">vertical</property>
                 <property name="spacing">24</property>
                 <child>
                   <object class="GtkBox" id="vbox5">
-                    <property name="visible">True</property>
-                    <property name="can-focus">False</property>
+                    <property name="vexpand">1</property>
                     <property name="orientation">vertical</property>
                     <property name="spacing">12</property>
                     <child>
-                      <!-- n-columns=2 n-rows=2 -->
                       <object class="GtkGrid" id="grid1">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
                         <property name="row-spacing">6</property>
                         <property name="column-spacing">6</property>
                         <child>
                           <object class="GtkLabel" id="clone-orig-name">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
                             <property name="halign">start</property>
                             <property name="label">orig name</property>
                             <property name="ellipsize">end</property>
+                            <layout>
+                              <property name="column">1</property>
+                              <property name="row">0</property>
+                            </layout>
                           </object>
-                          <packing>
-                            <property name="left-attach">1</property>
-                            <property name="top-attach">0</property>
-                          </packing>
                         </child>
                         <child>
                           <object class="GtkLabel" id="label4">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
                             <property name="halign">start</property>
-                            <property name="label" translatable="yes">Original VM:</property>
+                            <property name="label" translatable="1">Original VM:</property>
+                            <layout>
+                              <property name="column">0</property>
+                              <property name="row">0</property>
+                            </layout>
                           </object>
-                          <packing>
-                            <property name="left-attach">0</property>
-                            <property name="top-attach">0</property>
-                          </packing>
                         </child>
                         <child>
                           <object class="GtkLabel" id="label9">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
                             <property name="halign">start</property>
-                            <property name="label" translatable="yes">Connection:</property>
+                            <property name="label" translatable="1">Connection:</property>
+                            <layout>
+                              <property name="column">0</property>
+                              <property name="row">1</property>
+                            </layout>
                           </object>
-                          <packing>
-                            <property name="left-attach">0</property>
-                            <property name="top-attach">1</property>
-                          </packing>
                         </child>
                         <child>
                           <object class="GtkLabel" id="clone-dest-host">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
                             <property name="halign">start</property>
                             <property name="label">dest host</property>
                             <property name="ellipsize">end</property>
                             <property name="lines">0</property>
+                            <layout>
+                              <property name="column">1</property>
+                              <property name="row">1</property>
+                            </layout>
                           </object>
-                          <packing>
-                            <property name="left-attach">1</property>
-                            <property name="top-attach">1</property>
-                          </packing>
                         </child>
                       </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="position">0</property>
-                      </packing>
                     </child>
                     <child>
-                      <!-- n-columns=1 n-rows=2 -->
                       <object class="GtkGrid" id="table1">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
+                        <property name="vexpand">1</property>
                         <property name="row-spacing">12</property>
                         <property name="column-spacing">6</property>
                         <child>
                           <object class="GtkBox">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
                             <property name="spacing">6</property>
+                            <layout>
+                              <property name="column">0</property>
+                              <property name="row">0</property>
+                            </layout>
                             <child>
                               <object class="GtkLabel" id="label3">
-                                <property name="visible">True</property>
-                                <property name="can-focus">False</property>
                                 <property name="halign">start</property>
-                                <property name="hexpand">False</property>
-                                <property name="label" translatable="yes">_Name:</property>
-                                <property name="use-markup">True</property>
-                                <property name="use-underline">True</property>
+                                <property name="hexpand">0</property>
+                                <property name="label" translatable="1">_Name:</property>
+                                <property name="use-markup">1</property>
+                                <property name="use-underline">1</property>
                                 <property name="mnemonic-widget">clone-new-name</property>
                                 <style>
                                   <class name="vmm-lighter"/>
                                 </style>
                               </object>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">True</property>
-                                <property name="position">0</property>
-                              </packing>
                             </child>
                             <child>
                               <object class="GtkEntry" id="clone-new-name">
-                                <property name="visible">True</property>
-                                <property name="can-focus">True</property>
+                                <property name="focusable">1</property>
                                 <property name="halign">start</property>
                                 <property name="valign">start</property>
                                 <property name="margin-top">3</property>
                                 <property name="margin-bottom">3</property>
-                                <property name="hexpand">True</property>
+                                <property name="hexpand">1</property>
                                 <property name="invisible-char">●</property>
                                 <property name="width-chars">30</property>
                               </object>
-                              <packing>
-                                <property name="expand">True</property>
-                                <property name="fill">True</property>
-                                <property name="position">1</property>
-                              </packing>
                             </child>
                           </object>
-                          <packing>
-                            <property name="left-attach">0</property>
-                            <property name="top-attach">0</property>
-                          </packing>
                         </child>
                         <child>
-                          <!-- n-columns=1 n-rows=2 -->
                           <object class="GtkGrid">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <property name="hexpand">True</property>
+                            <property name="hexpand">1</property>
                             <property name="row-spacing">6</property>
                             <property name="column-spacing">6</property>
                             <child>
                               <object class="GtkScrolledWindow" id="storage-scroll">
                                 <property name="height-request">200</property>
-                                <property name="visible">True</property>
-                                <property name="can-focus">True</property>
-                                <property name="hexpand">True</property>
-                                <property name="vexpand">True</property>
-                                <property name="shadow-type">in</property>
-                                <child>
+                                <property name="focusable">1</property>
+                                <property name="hexpand">1</property>
+                                <property name="vexpand">1</property>
+                                <property name="child">
                                   <object class="GtkTreeView" id="storage-list">
-                                    <property name="visible">True</property>
-                                    <property name="can-focus">True</property>
+                                    <property name="focusable">1</property>
                                     <child internal-child="selection">
                                       <object class="GtkTreeSelection">
                                         <signal name="changed" handler="on_storage_selection_changed" swapped="no"/>
                                       </object>
                                     </child>
-                                    <child internal-child="accessible">
-                                      <object class="AtkObject" id="storage-list-atkobject">
-                                        <property name="AtkObject::accessible-name">storage-list</property>
+                                    </object>
+                                </property>
+                                <layout>
+                                  <property name="column">0</property>
+                                  <property name="row">1</property>
+                                </layout>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkCenterBox">
+                                <layout>
+                                  <property name="column">0</property>
+                                  <property name="row">0</property>
+                                </layout>
+                                <property name="start-widget">
+                                  <object class="GtkBox">
+                                    <child>
+                                      <object class="GtkLabel" id="label6">
+                                        <property name="halign">start</property>
+                                        <property name="label" translatable="1">Storage:</property>
+                                        <property name="use-markup">1</property>
+                                        <property name="use-underline">1</property>
+                                        <property name="mnemonic-widget">storage-list</property>
+                                        <style>
+                                          <class name="vmm-lighter"/>
+                                        </style>
                                       </object>
                                     </child>
                                   </object>
-                                </child>
-                              </object>
-                              <packing>
-                                <property name="left-attach">0</property>
-                                <property name="top-attach">1</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <object class="GtkBox">
-                                <property name="visible">True</property>
-                                <property name="can-focus">False</property>
-                                <property name="spacing">6</property>
-                                <child>
-                                  <object class="GtkLabel" id="label6">
-                                    <property name="visible">True</property>
-                                    <property name="can-focus">False</property>
-                                    <property name="halign">start</property>
-                                    <property name="label" translatable="yes">Storage:</property>
-                                    <property name="use-markup">True</property>
-                                    <property name="use-underline">True</property>
-                                    <property name="mnemonic-widget">storage-list</property>
-                                    <style>
-                                      <class name="vmm-lighter"/>
-                                    </style>
+                                </property>
+                                <property name="end-widget">
+                                  <object class="GtkBox">
+                                    <child>
+                                      <object class="GtkButton" id="storage-details-button">
+                                        <property name="label" translatable="1">_Details...</property>
+                                        <property name="focusable">1</property>
+                                        <property name="receives-default">1</property>
+                                        <property name="use-underline">1</property>
+                                        <signal name="clicked" handler="on_storage_details_clicked" swapped="no"/>
+                                      </object>
+                                    </child>
                                   </object>
-                                  <packing>
-                                    <property name="expand">False</property>
-                                    <property name="fill">True</property>
-                                    <property name="position">0</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <object class="GtkButton" id="storage-details-button">
-                                    <property name="label" translatable="yes">_Details...</property>
-                                    <property name="visible">True</property>
-                                    <property name="can-focus">True</property>
-                                    <property name="receives-default">True</property>
-                                    <property name="use-underline">True</property>
-                                    <signal name="clicked" handler="on_storage_details_clicked" swapped="no"/>
-                                  </object>
-                                  <packing>
-                                    <property name="expand">False</property>
-                                    <property name="fill">True</property>
-                                    <property name="pack-type">end</property>
-                                    <property name="position">1</property>
-                                  </packing>
-                                </child>
+                                </property>
                               </object>
-                              <packing>
-                                <property name="left-attach">0</property>
-                                <property name="top-attach">0</property>
-                              </packing>
                             </child>
+                            <layout>
+                              <property name="column">0</property>
+                              <property name="row">1</property>
+                            </layout>
                           </object>
-                          <packing>
-                            <property name="left-attach">0</property>
-                            <property name="top-attach">1</property>
-                          </packing>
                         </child>
                       </object>
-                      <packing>
-                        <property name="expand">True</property>
-                        <property name="fill">True</property>
-                        <property name="position">1</property>
-                      </packing>
                     </child>
                   </object>
-                  <packing>
-                    <property name="expand">True</property>
-                    <property name="fill">True</property>
-                    <property name="position">0</property>
-                  </packing>
                 </child>
                 <child>
                   <object class="GtkBox" id="box3">
-                    <property name="visible">True</property>
-                    <property name="can-focus">False</property>
                     <property name="orientation">vertical</property>
                     <property name="spacing">12</property>
                     <child>
                       <object class="GtkBox" id="box1">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
+                        <property name="vexpand">1</property>
                         <property name="spacing">3</property>
                         <child>
                           <object class="GtkImage" id="image5">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
                             <property name="halign">start</property>
                             <property name="valign">start</property>
                             <property name="icon-name">dialog-warning</property>
                           </object>
-                          <packing>
-                            <property name="expand">False</property>
-                            <property name="fill">True</property>
-                            <property name="position">0</property>
-                          </packing>
                         </child>
                         <child>
                           <object class="GtkLabel" id="label5">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <property name="label" translatable="yes">&lt;span size='small'&gt;Cloning does &lt;u&gt;not&lt;/u&gt; alter the guest OS contents. If you need to do things
+                            <property name="label" translatable="1">&lt;span size='small'&gt;Cloning does &lt;u&gt;not&lt;/u&gt; alter the guest OS contents. If you need to do things
 like change passwords or static IPs, please see the virt-sysprep(1) tool.&lt;/span&gt;</property>
-                            <property name="use-markup">True</property>
+                            <property name="use-markup">1</property>
                           </object>
-                          <packing>
-                            <property name="expand">False</property>
-                            <property name="fill">True</property>
-                            <property name="position">1</property>
-                          </packing>
                         </child>
                       </object>
-                      <packing>
-                        <property name="expand">True</property>
-                        <property name="fill">True</property>
-                        <property name="position">0</property>
-                      </packing>
                     </child>
                   </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">True</property>
-                    <property name="position">1</property>
-                  </packing>
                 </child>
               </object>
-              <packing>
-                <property name="expand">True</property>
-                <property name="fill">True</property>
-                <property name="position">0</property>
-              </packing>
             </child>
             <child>
-              <object class="GtkButtonBox" id="hbuttonbox1">
+              <object class="GtkBox" id="hbuttonbox1">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
                 <property name="spacing">12</property>
-                <property name="layout-style">end</property>
                 <child>
                   <object class="GtkButton" id="clone-cancel">
-                    <property name="label" translatable="yes">_Cancel</property>
-                    <property name="visible">True</property>
-                    <property name="can-focus">True</property>
-                    <property name="receives-default">True</property>
-                    <property name="use-underline">True</property>
+                    <property name="label" translatable="1">_Cancel</property>
+                    <property name="focusable">1</property>
+                    <property name="receives-default">1</property>
+                    <property name="use-underline">1</property>
                     <signal name="clicked" handler="on_clone_cancel_clicked" swapped="no"/>
                   </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">False</property>
-                    <property name="pack-type">end</property>
-                    <property name="position">1</property>
-                  </packing>
-                </child>
+                  </child>
                 <child>
                   <object class="GtkButton" id="clone-ok">
-                    <property name="label" translatable="yes">C_lone</property>
-                    <property name="visible">True</property>
-                    <property name="can-focus">True</property>
-                    <property name="receives-default">True</property>
-                    <property name="use-underline">True</property>
+                    <property name="label" translatable="1">C_lone</property>
+                    <property name="focusable">1</property>
+                    <property name="receives-default">1</property>
+                    <property name="use-underline">1</property>
                     <signal name="clicked" handler="on_clone_ok_clicked" swapped="no"/>
                   </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">False</property>
-                    <property name="pack-type">end</property>
-                    <property name="position">2</property>
-                  </packing>
-                </child>
+                  </child>
               </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">1</property>
-              </packing>
             </child>
-          </object>
-          <packing>
-            <property name="expand">True</property>
-            <property name="fill">True</property>
-            <property name="position">1</property>
-          </packing>
+          <property name="margin-start">12</property><property name="margin-end">12</property><property name="margin-top">12</property><property name="margin-bottom">12</property></object>
         </child>
       </object>
-    </child>
+    </property>
   </object>
 </interface>

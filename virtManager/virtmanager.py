@@ -12,8 +12,8 @@ import traceback
 
 import gi
 
-gi.require_version("Gdk", "3.0")
-gi.require_version("Gtk", "3.0")
+gi.require_version("Gdk", "4.0")
+gi.require_version("Gtk", "4.0")
 gi.require_version("LibvirtGLib", "1.0")
 from gi.repository import LibvirtGLib
 
@@ -59,8 +59,8 @@ def _import_gtk(leftovers):
 
         leftovers = sys.argv[1:]
 
-        if Gtk.check_version(3, 22, 0):  # pragma: no cover
-            print("gtk3 3.22.0 or later is required.")
+        if Gtk.check_version(4, 0, 0):  # pragma: no cover
+            print("gtk4 is required.")
             sys.exit(1)
 
         # This will error if Gtk wasn't correctly initialized
@@ -251,8 +251,10 @@ def main():
     config.vmmConfig.get_instance(BuildConfig, CLITestOptions)
 
     # Add our icon dir to icon theme
-    icon_theme = Gtk.IconTheme.get_default()
-    icon_theme.prepend_search_path(BuildConfig.icon_dir)
+    from gi.repository import Gdk
+
+    icon_theme = Gtk.IconTheme.get_for_display(Gdk.Display.get_default())
+    icon_theme.add_search_path(BuildConfig.icon_dir)
 
     from .engine import vmmEngine
 

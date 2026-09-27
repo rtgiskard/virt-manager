@@ -43,14 +43,12 @@ class vmmTPMDetails(vmmGObjectUI):
 
             return signal_cb
 
-        self.builder.connect_signals(
-            {
-                "on_tpm_type_changed": _e(_EDIT_TPM_TYPE),
-                "on_tpm_device_path_changed": _e(_EDIT_TPM_DEVICE_PATH),
-                "on_tpm_model_changed": _e(_EDIT_TPM_MODEL),
-                "on_tpm_version_changed": _e(_EDIT_TPM_VERSION),
-            }
-        )
+        self.connect_signals({
+            "on_tpm_type_changed": _e(_EDIT_TPM_TYPE),
+            "on_tpm_device_path_changed": _e(_EDIT_TPM_DEVICE_PATH),
+            "on_tpm_model_changed": _e(_EDIT_TPM_MODEL),
+            "on_tpm_version_changed": _e(_EDIT_TPM_VERSION),
+        })
 
         self._init_ui()
         self.top_box = self.widget("top-box")

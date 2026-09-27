@@ -402,9 +402,9 @@ def testAddGraphics(app):
     details = _open_app(app, "test-clone-simple")
     addhw = _open_addhw(app, details)
 
-    # VNC example
+    # Spice with explicit networking and authentication
     tab = _select_hw(addhw, "Graphics", "graphics-tab")
-    tab.combo_select("Type:", "VNC")
+    tab.combo_select("Type:", "Spice")
     tab.combo_select("Listen type:", "Address")
     tab.combo_select("Address:", "All interfaces")
     tab.find("graphics-port-auto", "check").click()
@@ -423,11 +423,6 @@ def testAddGraphics(app):
     tab.find("graphics-port", "spin button").set_text("5920")
     _finish(addhw, check=details)
 
-    # Spice regular example
-    _open_addhw(app, details)
-    tab = _select_hw(addhw, "Graphics", "graphics-tab")
-    tab.combo_select("Type:", "Spice")
-    _finish(addhw, check=details)
 
     # Spice GL example
     _open_addhw(app, details)

@@ -8,18 +8,16 @@ import gi
 
 from virtinst import log
 
-# We can use either gtksourceview3 or gtksourceview4
+from gi.repository import Gtk
+
+# GtkSource 5 is the native GTK4 source view. A plain TextView remains usable
+# when syntax highlighting support is not installed.
 have_gtksourceview = True
 try:
-    gi.require_version("GtkSource", "4")
-    log.debug("Using GtkSource 4")
-except ValueError:  # pragma: no cover
-    try:
-        gi.require_version("GtkSource", "3.0")
-        log.debug("Using GtkSource 3.0")
-    except ValueError:
-        log.debug("Not using GtkSource")
-        have_gtksourceview = False
+    gi.require_version("GtkSource", "5")
+except ValueError:
+    log.debug("Not using GtkSource 5")
+    have_gtksourceview = False
 
 if "VIRTINST_TEST_SUITE_FAKE_NO_SOURCEVIEW" in os.environ:
     log.debug("Faking missing GtkSource for test suite")
@@ -27,10 +25,6 @@ if "VIRTINST_TEST_SUITE_FAKE_NO_SOURCEVIEW" in os.environ:
 
 if have_gtksourceview:
     from gi.repository import GtkSource
-else:
-    # if GtkSourceView is not available, just use a plain TextView. This will
-    # only disable auto-indent and syntax highlighting.
-    from gi.repository import Gtk
 
 from .lib import uiutil
 from .baseclass import vmmGObjectUI
@@ -50,8 +44,8 @@ class vmmXMLEditor(vmmGObjectUI):
         super().__init__("xmleditor.ui", None, builder=builder, topwin=topwin)
 
         parent_container.remove(details_widget)
-        parent_container.add(self.widget("xml-notebook"))
-        self.widget("xml-details-box").add(details_widget)
+        parent_container.append(self.widget("xml-notebook"))
+        self.widget("xml-details-box").append(details_widget)
 
         self._curpage = _PAGE_DETAILS
         self._srcxml = ""
@@ -66,7 +60,7 @@ class vmmXMLEditor(vmmGObjectUI):
         )
 
     def _cleanup(self):
-        self._srcview.destroy()
+        self._srcview.unparent()
         self._srcbuff = None
 
     ###########
@@ -91,15 +85,14 @@ class vmmXMLEditor(vmmGObjectUI):
             self._srcbuff = self._srcview.get_buffer()
 
         self._srcview.set_monospace(True)
-        self._srcview.get_accessible().set_name("XML editor")
+        self._srcview.update_property([Gtk.AccessibleProperty.LABEL], ["XML editor"])
 
         self._srcbuff.connect("changed", self._buffer_changed_cb)
 
         self.widget("xml-notebook").connect("switch-page", self._before_page_changed_cb)
         self.widget("xml-notebook").connect("notify::page", self._after_page_changed_cb)
 
-        self._srcview.show_all()
-        self.widget("xml-scroll").add(self._srcview)
+        self.widget("xml-scroll").set_child(self._srcview)
         self._set_xmleditor_enabled_from_config()
 
     ####################

@@ -6,23 +6,16 @@
 
 # pylint: disable=wrong-import-order,ungrouped-imports
 import gi
+import libvirt
 from gi.repository import Gdk
 from gi.repository import Gtk
 
 from virtinst import log
 
-# We can use either 2.91 or 2.90. This is just to silence runtime warnings
-try:
-    gi.require_version("Vte", "2.91")
-    log.debug("Using VTE API 2.91")
-except ValueError:  # pragma: no cover
-    gi.require_version("Vte", "2.90")
-    log.debug("Using VTE API 2.90")
-from gi.repository import Vte
-
-import libvirt
-
 from ..baseclass import vmmGObject
+
+gi.require_version("Vte", "3.91")
+from gi.repository import Vte  # noqa: E402
 
 
 class _DataStream(vmmGObject):
@@ -225,6 +218,9 @@ class vmmSerialConsole(vmmGObject):
     def _cleanup(self):
         self._datastream.cleanup()
         self._datastream = None
+        if self._serial_popup.get_parent():
+            self._serial_popup.unparent()
+        self._serial_popup = None
 
         self.vm = None
         self._vteterminal = None
@@ -238,50 +234,52 @@ class vmmSerialConsole(vmmGObject):
         self._vteterminal = Vte.Terminal()
         self._vteterminal.set_scrollback_lines(1000)
         self._vteterminal.set_audible_bell(False)
-        self._vteterminal.get_accessible().set_name("Serial Terminal")
+        self._vteterminal.update_property([Gtk.AccessibleProperty.LABEL], ["Serial Terminal"])
 
-        self._vteterminal.connect("button-press-event", self._show_serial_rcpopup)
+        click = Gtk.GestureClick(button=3)
+        click.set_propagation_phase(Gtk.PropagationPhase.CAPTURE)
+        click.connect("pressed", self._show_serial_rcpopup)
+        self._vteterminal.add_controller(click)
         self._vteterminal.connect("commit", self._datastream.send_data, self._vteterminal)
-        self._vteterminal.show()
 
     def _init_popup(self):
-        self._serial_popup = Gtk.Menu()
-        self._serial_popup.get_accessible().set_name("serial-popup-menu")
+        self._serial_popup = Gtk.Popover()
+        self._serial_popup.update_property([Gtk.AccessibleProperty.LABEL], ["serial-popup-menu"])
+        box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        self._serial_popup.set_child(box)
 
-        self._serial_copy = Gtk.MenuItem.new_with_mnemonic(_("_Copy"))
-        self._serial_copy.connect("activate", self._serial_copy_text)
-        self._serial_popup.add(self._serial_copy)
+        self._serial_copy = Gtk.Button.new_with_mnemonic(_("_Copy"))
+        self._serial_copy.connect("clicked", self._serial_copy_text)
+        box.append(self._serial_copy)
 
-        self._serial_paste = Gtk.MenuItem.new_with_mnemonic(_("_Paste"))
-        self._serial_paste.connect("activate", self._serial_paste_text)
-        self._serial_popup.add(self._serial_paste)
+        self._serial_paste = Gtk.Button.new_with_mnemonic(_("_Paste"))
+        self._serial_paste.connect("clicked", self._serial_paste_text)
+        box.append(self._serial_paste)
 
     def _init_ui(self):
         self._box = Gtk.Notebook()
         self._box.set_show_tabs(False)
         self._box.set_show_border(False)
 
-        align = Gtk.Box()
-        align.set_border_width(2)
-        evbox = Gtk.EventBox()
-        evbox.modify_bg(Gtk.StateType.NORMAL, Gdk.Color(0, 0, 0))
-        terminalbox = Gtk.HBox()
-        scrollbar = Gtk.VScrollbar()
+        terminalbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        terminalbox.add_css_class("vmm-console-background")
+        scrollbar = Gtk.Scrollbar(orientation=Gtk.Orientation.VERTICAL)
         self._error_label = Gtk.Label()
         self._error_label.set_width_chars(40)
-        self._error_label.set_line_wrap(True)
+        self._error_label.set_wrap(True)
 
-        if self._vteterminal:
-            scrollbar.set_adjustment(self._vteterminal.get_vadjustment())
-            align.pack_start(self._vteterminal, True, True, 0)
+        scrollbar.set_adjustment(self._vteterminal.get_vadjustment())
+        self._vteterminal.set_hexpand(True)
+        self._vteterminal.set_vexpand(True)
+        self._vteterminal.set_margin_start(2)
+        self._vteterminal.set_margin_end(2)
+        self._vteterminal.set_margin_top(2)
+        self._vteterminal.set_margin_bottom(2)
+        terminalbox.append(self._vteterminal)
+        terminalbox.append(scrollbar)
 
-        evbox.add(align)
-        terminalbox.pack_start(evbox, True, True, 0)
-        terminalbox.pack_start(scrollbar, False, False, 0)
-
-        self._box.append_page(terminalbox, Gtk.Label(""))
-        self._box.append_page(self._error_label, Gtk.Label(""))
-        self._box.show_all()
+        self._box.append_page(terminalbox, Gtk.Label())
+        self._box.append_page(self._error_label, Gtk.Label())
 
         scrollbar.hide()
         scrollbar.get_adjustment().connect("changed", self._scrollbar_adjustment_changed, scrollbar)
@@ -327,9 +325,6 @@ class vmmSerialConsole(vmmGObject):
     def has_focus(self):
         return bool(self._vteterminal and self._vteterminal.get_property("has-focus"))
 
-    def set_focus_callbacks(self, in_cb, out_cb):
-        self._vteterminal.connect("focus-in-event", in_cb)
-        self._vteterminal.connect("focus-out-event", out_cb)
 
     def open_console(self):
         try:
@@ -359,20 +354,19 @@ class vmmSerialConsole(vmmGObject):
     def _scrollbar_adjustment_changed(self, adjustment, scrollbar):
         scrollbar.set_visible(adjustment.get_upper() > adjustment.get_page_size())
 
-    def _show_serial_rcpopup(self, src, event):
-        if event.button != 3:
-            return
-
-        self._serial_popup.show_all()
-
-        if src.get_has_selection():
-            self._serial_copy.set_sensitive(True)
-        else:
-            self._serial_copy.set_sensitive(False)
-        self._serial_popup.popup_at_pointer(event)
+    def _show_serial_rcpopup(self, gesture, _press_count, x, y):
+        if not self._serial_popup.get_parent():
+            self._serial_popup.set_parent(self._vteterminal)
+        self._serial_copy.set_sensitive(self._vteterminal.get_has_selection())
+        rect = Gdk.Rectangle()
+        rect.x, rect.y, rect.width, rect.height = int(x), int(y), 1, 1
+        self._serial_popup.set_pointing_to(rect)
+        self._serial_popup.popup()
 
     def _serial_copy_text(self, src_ignore):
+        self._serial_popup.popdown()
         self._vteterminal.copy_clipboard()
 
     def _serial_paste_text(self, src_ignore):
+        self._serial_popup.popdown()
         self._vteterminal.paste_clipboard()

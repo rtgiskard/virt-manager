@@ -4,7 +4,6 @@
 # This work is licensed under the GNU GPLv2 or later.
 # See the COPYING file in the top-level directory.
 
-from gi.repository import GObject
 from gi.repository import Gtk
 
 from virtinst import xmlutil
@@ -126,15 +125,6 @@ def set_list_selection(widget, value, column=0):
 ##################
 
 
-def child_get_property(parent, child, propname):
-    """
-    Wrapper for child_get_property, which pygobject doesn't properly
-    introspect
-    """
-    value = GObject.Value()
-    value.init(GObject.TYPE_INT)
-    parent.child_get_property(child, propname, value)
-    return value.get_int()
 
 
 def set_grid_row_visible(child, visible):
@@ -148,10 +138,12 @@ def set_grid_row_visible(child, visible):
     if not isinstance(parent, Gtk.Grid):
         raise xmlutil.DevError("parent must be grid, not %s" % type(parent))
 
-    row = child_get_property(parent, child, "top-attach")
-    for c in parent.get_children():
-        if child_get_property(parent, c, "top-attach") == row:
+    row = parent.query_child(child)[1]
+    c = parent.get_first_child()
+    while c:
+        if parent.query_child(c)[1] == row:
             c.set_visible(visible)
+        c = c.get_next_sibling()
 
 
 def init_combo_text_column(combo, col):

@@ -299,6 +299,25 @@ class vmmGObject(GObject.GObject):
         self.idle_add(emitwrap, signal, *args)
 
 
+class _BuilderScope(GObject.GObject, Gtk.BuilderScope):
+    """Resolve Builder signal handlers registered by UI sections after parsing."""
+
+    def __init__(self):
+        GObject.GObject.__init__(self)
+        self.handlers = {}
+
+    def do_create_closure(self, builder, name, flags, obj):
+        if flags & Gtk.BuilderClosureFlags.SWAPPED or obj is not None:
+            raise ValueError("Unsupported Builder signal closure: %s" % name)
+
+        def dispatch(*args):
+            handler = self.handlers.get(name)
+            if handler is not None:
+                return handler(*args)
+
+        return dispatch
+
+
 class vmmGObjectUI(vmmGObject):
     def __init__(self, filename, windowname, builder=None, topwin=None):
         vmmGObject.__init__(self)
@@ -309,6 +328,7 @@ class vmmGObjectUI(vmmGObject):
             uifile = os.path.join(self.config.get_ui_dir(), filename)
 
             self.builder = Gtk.Builder()
+            self.builder.set_scope(_BuilderScope())
             self.builder.set_translation_domain("virt-manager")
             self.builder.add_from_file(uifile)
 
@@ -322,6 +342,9 @@ class vmmGObjectUI(vmmGObject):
             self.topwin = topwin
 
         self._err = None
+
+    def connect_signals(self, handlers):
+        self.builder.get_scope().handlers.update(handlers)
 
     def _get_err(self):
         if self._err is None:
@@ -365,24 +388,19 @@ class vmmGObjectUI(vmmGObject):
         return bool(self.topwin and self.topwin.get_visible())
 
     def bind_escape_key_close(self):
-        def close_on_escape(src_ignore, event):
-            if Gdk.keyval_name(event.keyval) == "Escape":
-                self.close()
+        controller = Gtk.EventControllerKey()
 
-        self.topwin.connect("key-press-event", close_on_escape)
+        def close_on_escape(_controller, keyval, _keycode, _state):
+            if keyval == Gdk.KEY_Escape:
+                self.close()
+                return True
+            return False
+
+        controller.connect("key-pressed", close_on_escape)
+        self.topwin.add_controller(controller)
 
     def _set_cursor(self, cursor_type):
-        gdk_window = self.topwin.get_window()
-        if not gdk_window:
-            return
-
-        try:
-            cursor = Gdk.Cursor.new_from_name(gdk_window.get_display(), cursor_type)
-            gdk_window.set_cursor(cursor)
-        except Exception:  # pragma: no cover
-            # If a cursor icon theme isn't installed this can cause errors
-            # https://bugzilla.redhat.com/show_bug.cgi?id=1516588
-            log.debug("Error setting cursor_type=%s", cursor_type, exc_info=True)
+        self.topwin.set_cursor_from_name(cursor_type)
 
     def set_finish_cursor(self):
         self.topwin.set_sensitive(False)

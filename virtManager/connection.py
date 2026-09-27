@@ -235,7 +235,7 @@ class vmmConnection(vmmGObject):
         Wait for this object to emit the specified signal. Will not
         block the mainloop.
         """
-        from gi.repository import Gtk
+        from gi.repository import GLib
 
         is_main_thread = threading.current_thread().name == "MainThread"
         start_time = time.time()
@@ -248,8 +248,9 @@ class vmmConnection(vmmGObject):
                 return  # pragma: no cover
 
             if is_main_thread:
-                if Gtk.events_pending():
-                    Gtk.main_iteration_do(False)
+                context = GLib.MainContext.default()
+                if context.pending():
+                    context.iteration(False)
                     continue
 
             time.sleep(0.1)

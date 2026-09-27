@@ -33,16 +33,14 @@ class vmmCreateVolume(vmmGObjectUI):
         )
         self._xmleditor.connect("xml-requested", self._xmleditor_xml_requested_cb)
 
-        self.builder.connect_signals(
-            {
-                "on_vmm_create_vol_delete_event": self.close,
-                "on_vol_cancel_clicked": self.close,
-                "on_vol_create_clicked": self._create_clicked_cb,
-                "on_vol_name_changed": self._vol_name_changed_cb,
-                "on_vol_format_changed": self._vol_format_changed_cb,
-                "on_backing_browse_clicked": self._browse_backing_clicked_cb,
-            }
-        )
+        self.connect_signals({
+            "on_vmm_create_vol_delete_event": self.close,
+            "on_vol_cancel_clicked": self.close,
+            "on_vol_create_clicked": self._create_clicked_cb,
+            "on_vol_name_changed": self._vol_name_changed_cb,
+            "on_vol_format_changed": self._vol_format_changed_cb,
+            "on_backing_browse_clicked": self._browse_backing_clicked_cb,
+        })
         self.bind_escape_key_close()
 
         self._init_state()

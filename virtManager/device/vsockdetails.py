@@ -20,12 +20,10 @@ class vmmVsockDetails(vmmGObjectUI):
         self.vm = vm
         self.conn = vm.conn
 
-        self.builder.connect_signals(
-            {
-                "on_vsock_auto_toggled": self._vsock_auto_toggled,
-                "on_vsock_cid_changed": lambda ignore: self.emit("changed-cid"),
-            }
-        )
+        self.connect_signals({
+            "on_vsock_auto_toggled": self._vsock_auto_toggled,
+            "on_vsock_cid_changed": lambda ignore: self.emit("changed-cid"),
+        })
 
         self.top_box = self.widget("vsock-box")
 

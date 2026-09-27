@@ -76,25 +76,25 @@ class vmmAddHardware(vmmGObjectUI):
         self._selected_model = None
 
         self._gfxdetails = vmmGraphicsDetails(self.vm, self.builder, self.topwin)
-        self.widget("graphics-align").add(self._gfxdetails.top_box)
+        self.widget("graphics-align").append(self._gfxdetails.top_box)
 
         self._fsdetails = vmmFSDetails(self.vm, self.builder, self.topwin)
-        self.widget("fs-box").add(self._fsdetails.top_box)
+        self.widget("fs-box").append(self._fsdetails.top_box)
 
         self._netlist = vmmNetworkList(self.conn, self.builder, self.topwin)
-        self.widget("network-source-label-align").add(self._netlist.top_label)
-        self.widget("network-source-ui-align").add(self._netlist.top_box)
+        self.widget("network-source-label-align").append(self._netlist.top_label)
+        self.widget("network-source-ui-align").append(self._netlist.top_box)
 
         self.addstorage = vmmAddStorage(self.conn, self.builder, self.topwin)
-        self.widget("storage-align").add(self.addstorage.top_box)
-        self.widget("storage-advanced-align").add(self.addstorage.advanced_top_box)
+        self.widget("storage-align").append(self.addstorage.top_box)
+        self.widget("storage-advanced-align").append(self.addstorage.advanced_top_box)
         self.addstorage.connect("browse-clicked", self._browse_storage_cb)
 
         self._vsockdetails = vmmVsockDetails(self.vm, self.builder, self.topwin)
-        self.widget("vsock-align").add(self._vsockdetails.top_box)
+        self.widget("vsock-align").append(self._vsockdetails.top_box)
 
         self._tpmdetails = vmmTPMDetails(self.vm, self.builder, self.topwin)
-        self.widget("tpm-align").add(self._tpmdetails.top_box)
+        self.widget("tpm-align").append(self._tpmdetails.top_box)
 
         self._xmleditor = vmmXMLEditor(
             self.builder,
@@ -104,22 +104,20 @@ class vmmAddHardware(vmmGObjectUI):
         )
         self._xmleditor.connect("xml-requested", self._xmleditor_xml_requested_cb)
 
-        self.builder.connect_signals(
-            {
-                "on_create_cancel_clicked": self.close,
-                "on_vmm_create_delete_event": self.close,
-                "on_create_finish_clicked": self._finish,
-                "on_hw_list_changed": self._hw_selected_cb,
-                "on_storage_devtype_changed": self._change_storage_devtype,
-                "on_storage_bustype_changed": self._storage_bus_changed_cb,
-                "on_mac_address_clicked": self._change_macaddr_use,
-                "on_char_device_type_changed": self._change_char_device_type,
-                "on_char_target_name_changed": self._change_char_target_name,
-                "on_char_auto_socket_toggled": self._change_char_auto_socket,
-                "on_usbredir_type_changed": self._change_usbredir_type,
-                "on_controller_type_changed": self._change_controller_type,
-            }
-        )
+        self.connect_signals({
+            "on_create_cancel_clicked": self.close,
+            "on_vmm_create_delete_event": self.close,
+            "on_create_finish_clicked": self._finish,
+            "on_hw_list_changed": self._hw_selected_cb,
+            "on_storage_devtype_changed": self._change_storage_devtype,
+            "on_storage_bustype_changed": self._storage_bus_changed_cb,
+            "on_mac_address_clicked": self._change_macaddr_use,
+            "on_char_device_type_changed": self._change_char_device_type,
+            "on_char_target_name_changed": self._change_char_target_name,
+            "on_char_auto_socket_toggled": self._change_char_auto_socket,
+            "on_usbredir_type_changed": self._change_usbredir_type,
+            "on_controller_type_changed": self._change_controller_type,
+        })
         self.bind_escape_key_close()
 
         self._set_initial_state()
@@ -176,7 +174,7 @@ class vmmAddHardware(vmmGObjectUI):
         hw_col.set_min_width(165)
 
         icon = Gtk.CellRendererPixbuf()
-        icon.set_property("stock-size", Gtk.IconSize.BUTTON)
+        icon.set_property("icon-size", Gtk.IconSize.NORMAL)
         text = Gtk.CellRendererText()
         text.set_property("xpad", 6)
 
@@ -699,7 +697,7 @@ class vmmAddHardware(vmmGObjectUI):
         target_model = Gtk.ListStore(str, str, str)
         target_list.set_model(target_model)
         icon = Gtk.CellRendererPixbuf()
-        icon.set_property("stock-size", Gtk.IconSize.BUTTON)
+        icon.set_property("icon-size", Gtk.IconSize.NORMAL)
         target_list.pack_start(icon, False)
         target_list.add_attribute(icon, "icon-name", 1)
         text = Gtk.CellRendererText()

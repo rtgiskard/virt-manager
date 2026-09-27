@@ -540,9 +540,7 @@ def testDetailsEditDevices1(app):
     # Make sure it sticks
     tab.combo_check_default("Listen type:", "Address")
 
-    # Switch to VNC with options
-    tab.combo_select("Type:", "VNC")
-    tab.combo_select("Listen type:", "Address")
+    # Set explicit Spice port and authentication
     tab.find("graphics-port-auto", "check").click()
     tab.find("graphics-port", "spin button").set_text("6001")
     tab.find("Password:", "check").click()
@@ -896,13 +894,6 @@ def testDetailsConsoleChecksSSH(app):
     _run()
     _checkcon(".*configured for TLS only.*")
 
-    # Fake a socket connection
-    _stop()
-    xml = '<graphics type="vnc" socket="/tmp/foobar.sock"/>'
-    _change_gfx_xml(xml)
-    _run()
-    _checkcon(".*SSH tunnel error output.*")
-
     # Add a listen type='none' check
     _stop()
     xml = '<graphics type="spice"><listen type="none"/></graphics>'
@@ -954,7 +945,7 @@ def _testDetailsConsoleChecksTCP(app, fakeuri, msg):
     addhw = app.find_window("Add New Virtual Hardware")
     addhw.find("Graphics", "table cell").click()
     addhw.find("XML", "page tab").click()
-    dev = '<graphics type="vnc" port="6000" address="127.0.0.1"/>'
+    dev = '<graphics type="spice" port="6000" listen="127.0.0.1"/>'
     addhw.find("XML editor").text = dev
     addhw.find("Finish", "push button").click()
     lib.utils.check(lambda: not addhw.active)

@@ -71,11 +71,9 @@ class vmmStorageBrowser(vmmGObjectUI):
         )
         self._init_ui()
 
-        self.builder.connect_signals(
-            {
-                "on_vmm_storage_browse_delete_event": self.close,
-            }
-        )
+        self.connect_signals({
+            "on_vmm_storage_browse_delete_event": self.close,
+        })
         self.bind_escape_key_close()
 
     def show(self, parent):

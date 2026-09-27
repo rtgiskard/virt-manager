@@ -131,13 +131,19 @@ class _VMMDogtailNode(dogtail.tree.Node):
         # silently ignored.
         if self.roleName in ["frame"]:
             return True
-        screen = Gdk.Screen.get_default()
-        return (
-            self.position[0] >= 0
-            and self.position[0] + self.size[0] < screen.get_width()
-            and self.position[1] >= 0
-            and self.position[1] + self.size[1] < screen.get_height()
-        )
+        display = Gdk.Display.get_default()
+        if display is None:
+            return False
+        monitors = display.get_monitors()
+        x, y = self.position
+        width, height = self.size
+        for i in range(monitors.get_n_items()):
+            rect = monitors.get_item(i).get_geometry()
+            if (x >= rect.x and y >= rect.y and
+                x + width <= rect.x + rect.width and
+                y + height <= rect.y + rect.height):
+                return True
+        return False
 
     @_debug_decorator
     def check_onscreen(self):

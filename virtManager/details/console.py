@@ -6,13 +6,12 @@
 # See the COPYING file in the top-level directory.
 
 from gi.repository import Gtk
-from gi.repository import Gdk
 
 from virtinst import log
 
 from .serialcon import vmmSerialConsole
 from .sshtunnels import ConnectionInfo
-from .viewers import SpiceViewer, VNCViewer, SPICE_GTK_IMPORT_ERROR
+from .viewers import SpiceViewer, SPICE_GTK_IMPORT_ERROR
 from ..baseclass import vmmGObject, vmmGObjectUI
 from ..lib.keyring import vmmKeyring
 
@@ -42,46 +41,35 @@ class _TimedRevealer(vmmGObject):
         self._timeout_id = None
 
         self._revealer = Gtk.Revealer()
-        self._revealer.add(toolbar)
+        self._revealer.set_child(toolbar)
 
-        # Adding the revealer to the eventbox seems to ensure the
-        # eventbox always has 1 invisible pixel showing at the top of the
-        # screen, which we can use to grab the pointer event to show
-        # the hidden toolbar.
-
-        self._ebox = Gtk.EventBox()
-        self._ebox.add(self._revealer)
+        # Keep a pointer target visible even while the toolbar is concealed.
+        self._ebox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        self._ebox.set_size_request(1, 1)
+        self._ebox.append(self._revealer)
         self._ebox.set_halign(Gtk.Align.CENTER)
         self._ebox.set_valign(Gtk.Align.START)
-        self._ebox.show_all()
 
-        self._ebox.connect("enter-notify-event", self._enter_notify)
-        self._ebox.connect("leave-notify-event", self._enter_notify)
+        motion = Gtk.EventControllerMotion()
+        motion.connect("enter", self._enter_notify)
+        motion.connect("leave", self._leave_notify)
+        self._ebox.add_controller(motion)
 
     def _cleanup(self):
-        self._ebox.destroy()
+        self._ebox.unparent()
         self._ebox = None
-        self._revealer.destroy()
         self._revealer = None
         self._timeout_id = None
 
-    def _enter_notify(self, ignore1, ignore2):
-        x, y = self._ebox.get_pointer()
-        alloc = self._ebox.get_allocation()
-        entered = bool(x >= 0 and y >= 0 and x < alloc.width and y < alloc.height)
-
+    def _enter_notify(self, *_args):
         if not self._in_fullscreen:
             return
-
-        # Pointer exited the toolbar, and toolbar is revealed. Schedule
-        # a timeout to close it, if one isn't already scheduled
-        if not entered and self._revealer.get_reveal_child():
-            self._schedule_unreveal_timeout(1000)
-            return
-
         self._unregister_timeout()
-        if entered and not self._revealer.get_reveal_child():
-            self._revealer.set_reveal_child(True)
+        self._revealer.set_reveal_child(True)
+
+    def _leave_notify(self, *_args):
+        if self._in_fullscreen and self._revealer.get_reveal_child():
+            self._schedule_unreveal_timeout(1000)
 
     def _schedule_unreveal_timeout(self, timeout):
         if self._timeout_id:
@@ -109,89 +97,79 @@ class _TimedRevealer(vmmGObject):
 
 
 def build_keycombo_menu(on_send_key_fn):
-    menu = Gtk.Menu()
+    menu = Gtk.Popover()
+    box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+    menu.set_child(box)
 
     def make_item(accel, combo):
-        name = Gtk.accelerator_get_label(*Gtk.accelerator_parse(accel))
-        item = Gtk.MenuItem(name)
-        item.connect("activate", on_send_key_fn, combo)
+        _valid, keyval, modifiers = Gtk.accelerator_parse(accel)
+        name = Gtk.accelerator_get_label(keyval, modifiers)
+        item = Gtk.Button(label=name)
+        item.set_has_frame(False)
 
-        menu.add(item)
+        def send_key(button):
+            menu.popdown()
+            on_send_key_fn(button, combo)
+
+        item.connect("clicked", send_key)
+        box.append(item)
 
     make_item("<Control><Alt>BackSpace", ["Control_L", "Alt_L", "BackSpace"])
     make_item("<Control><Alt>Delete", ["Control_L", "Alt_L", "Delete"])
     make_item("<Control><Alt><Shift>Escape", ["Control_L", "Alt_L", "Shift_L", "Escape"])
-    menu.add(Gtk.SeparatorMenuItem())
+    box.append(Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL))
 
     for i in range(1, 13):
         make_item("<Control><Alt>F%d" % i, ["Control_L", "Alt_L", "F%d" % i])
-    menu.add(Gtk.SeparatorMenuItem())
-
+    box.append(Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL))
     make_item("Print", ["Print"])
 
-    menu.show_all()
     return menu
 
 
 class vmmOverlayToolbar:
     def __init__(self, on_leave_fn, on_send_key_fn):
-        self._send_key_button = None
         self._keycombo_menu = None
         self._toolbar = None
-
         self.timed_revealer = None
         self._init_ui(on_leave_fn, on_send_key_fn)
 
     def _init_ui(self, on_leave_fn, on_send_key_fn):
         self._keycombo_menu = build_keycombo_menu(on_send_key_fn)
 
-        self._toolbar = Gtk.Toolbar()
-        self._toolbar.set_show_arrow(False)
-        self._toolbar.set_style(Gtk.ToolbarStyle.BOTH_HORIZ)
-        self._toolbar.get_accessible().set_name("Fullscreen Toolbar")
+        self._toolbar = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        self._toolbar.add_css_class("toolbar")
+        self._toolbar.update_property([Gtk.AccessibleProperty.LABEL], ["Fullscreen Toolbar"])
 
-        # Exit button
-        button = Gtk.ToolButton()
-        button.set_label(_("Leave Fullscreen"))
-        button.set_icon_name("view-restore")
+        button = Gtk.Button(label=_("Leave Fullscreen"), icon_name="view-restore")
         button.set_tooltip_text(_("Leave fullscreen"))
-        button.show()
-        button.get_accessible().set_name("Fullscreen Exit")
-        self._toolbar.add(button)
+        button.update_property([Gtk.AccessibleProperty.LABEL], ["Fullscreen Exit"])
+        self._toolbar.append(button)
         button.connect("clicked", on_leave_fn)
 
-        self._send_key_button = Gtk.ToolButton()
-        self._send_key_button.set_icon_name("preferences-desktop-keyboard-shortcuts")
+        self._send_key_button = Gtk.MenuButton(icon_name="preferences-desktop-keyboard-shortcuts")
         self._send_key_button.set_tooltip_text(_("Send key combination"))
-        self._send_key_button.show_all()
-        self._send_key_button.connect("clicked", self._on_send_key_button_clicked_cb)
-        self._send_key_button.get_accessible().set_name("Fullscreen Send Key")
-        self._toolbar.add(self._send_key_button)
+        self._send_key_button.set_popover(self._keycombo_menu)
+        self._send_key_button.update_property(
+            [Gtk.AccessibleProperty.LABEL], ["Fullscreen Send Key"]
+        )
+        self._toolbar.append(self._send_key_button)
 
         self.timed_revealer = _TimedRevealer(self._toolbar)
 
-    def _on_send_key_button_clicked_cb(self, src):
-        event = Gtk.get_current_event()
-        win = self._toolbar.get_window()
-        rect = Gdk.Rectangle()
-
-        rect.y = win.get_height()
-        self._keycombo_menu.popup_at_rect(
-            win, rect, Gdk.Gravity.NORTH_WEST, Gdk.Gravity.NORTH_WEST, event
-        )
-
     def cleanup(self):
-        self._keycombo_menu.destroy()
+        self._send_key_button.set_popover(None)
         self._keycombo_menu = None
-        self._toolbar.destroy()
-        self._toolbar = None
         self.timed_revealer.cleanup()
         self.timed_revealer = None
+        self._toolbar = None
 
 
 def _cant_embed_graphics(ginfo):
-    if ginfo.gtype in ["vnc", "spice"]:
+    if ginfo.gtype == "spice":
         return
+    if ginfo.gtype == "vnc":
+        return _("VNC graphical consoles are not supported by the GTK 4 viewer.")
 
     msg = _("Cannot display graphical console type '%s'") % ginfo.gtype
     return msg
@@ -204,12 +182,15 @@ class _ConsoleMenu(vmmGObject):
 
     def __init__(self, show_cb, toggled_cb):
         vmmGObject.__init__(self)
-        self._menu = Gtk.Menu()
+        self._menu = Gtk.Popover()
+        self._box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        self._menu.set_child(self._box)
         self._menu.connect("show", show_cb)
         self._toggled_cb = toggled_cb
+        self._items = []
 
     def _cleanup(self):
-        self._menu.destroy()
+        self._menu.unparent()
         self._menu = None
         self._toggled_cb = None
 
@@ -264,8 +245,8 @@ class _ConsoleMenu(vmmGObject):
         return ret
 
     def _get_selected_menu_item(self):
-        for child in self._menu.get_children():
-            if hasattr(child, "get_active") and child.get_active():
+        for child in self._items:
+            if child.get_active():
                 return child
 
     ##############
@@ -274,63 +255,62 @@ class _ConsoleMenu(vmmGObject):
 
     def rebuild_menu(self, vm):
         olditem = self._get_selected_menu_item()
-        oldlabel = olditem and olditem.get_label() or None
+        oldlabel = olditem.get_label() if olditem else None
 
-        # Clear menu
-        for child in self._menu.get_children():
-            self._menu.remove(child)
+        while child := self._box.get_first_child():
+            self._box.remove(child)
+        self._items = []
 
         graphics = self._build_graphical_menu_items(vm)
         serials = self._build_serial_menu_items(vm)
-
-        # Use label == None to tell the loop to add a separator
         items = graphics + [[None, None, None]] + serials
 
         last_item = None
         for label, dev, tooltip in items:
             if label is None:
-                self._menu.add(Gtk.SeparatorMenuItem())
+                self._box.append(Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL))
                 continue
 
             sensitive = bool(dev and not tooltip)
             if not sensitive and not tooltip:
                 tooltip = label
 
-            active = False
             if oldlabel is None and sensitive:
-                # Select the first selectable option
                 oldlabel = label
-            if label == oldlabel:
-                active = True
 
-            item = Gtk.RadioMenuItem()
-            if last_item is None:
-                last_item = item
-            else:
-                item.join_group(last_item)
+            item = Gtk.CheckButton(label=label)
+            if last_item is not None:
+                item.set_group(last_item)
+            last_item = item
 
-            item.set_label(label)
-            item.set_active(active and sensitive)
+            item.set_active(label == oldlabel and sensitive)
             item.set_sensitive(sensitive)
             item.set_tooltip_text(tooltip or None)
             item.vmm_data = dev
             if sensitive:
-                item.connect("toggled", self._toggled_cb)
-            self._menu.add(item)
+                item.connect("toggled", self._on_toggled)
+            self._box.append(item)
+            self._items.append(item)
 
-        self._menu.show_all()
+    def _on_toggled(self, item):
+        if item.get_active():
+            self._menu.popdown()
+            self._toggled_cb(item)
 
     def activate_default(self):
-        for child in self._menu.get_children():
-            if child.get_sensitive() and hasattr(child, "toggled"):
-                child.toggled()
+        for child in self._items:
+            if child.get_sensitive():
+                if child.get_active():
+                    self._toggled_cb(child)
+                else:
+                    child.set_active(True)
                 return True
         return False
 
     def get_selected(self):
         row = self._get_selected_menu_item()
         if not row:
-            row = self._menu.get_children()[0]
+            row = self._items[0]
         return row.get_label(), row.vmm_data, row.get_tooltip_text()
 
     def get_menu(self):
@@ -338,9 +318,7 @@ class _ConsoleMenu(vmmGObject):
 
 
 class vmmConsolePages(vmmGObjectUI):
-    """
-    Handles all the complex UI handling dictated by the spice/vnc widgets
-    """
+    """Handles graphical SPICE and text console pages."""
 
     __gsignals__ = {
         "page-changed": (vmmGObjectUI.RUN_FIRST, None, []),
@@ -355,10 +333,6 @@ class vmmConsolePages(vmmGObjectUI):
         self.top_box = self.widget("console-pages")
         self._pointer_is_grabbed = False
 
-        # State for disabling modifiers when keyboard is grabbed
-        self._accel_groups = Gtk.accel_groups_from_object(self.topwin)
-        self._gtk_settings_accel = None
-        self._gtk_settings_mnemonic = None
 
         # Initialize display widget
         self._viewer = None
@@ -374,13 +348,8 @@ class vmmConsolePages(vmmGObjectUI):
         self.widget("console-overlay").add_overlay(
             self._overlay_toolbar_fullscreen.timed_revealer.get_overlay_widget()
         )
-
-        # When the gtk-vnc and spice-gtk widgets are in non-scaling mode, we
-        # make them fill the whole window, and they paint the non-VM areas of
-        # the viewer black. But when scaling is enabled, the viewer widget is
-        # constrained. This change makes sure the non-VM portions in that case
-        # are also colored black, rather than the default theme window color.
-        self.widget("console-gfx-viewport").modify_bg(Gtk.StateType.NORMAL, Gdk.Color(0, 0, 0))
+        # The viewport background shows around the viewer in scaling mode.
+        self.widget("console-gfx-viewport").add_css_class("vmm-console-background")
 
         self.widget("console-pages").set_show_tabs(False)
         self.widget("serial-pages").set_show_tabs(False)
@@ -394,14 +363,12 @@ class vmmConsolePages(vmmGObjectUI):
         # Signals are added by vmmVMWindow. Don't use connect_signals here
         # or it changes will be overwritten
 
-        self.builder.connect_signals(
-            {
-                "on_console_pages_switch_page": self._page_changed_cb,
-                "on_console_auth_password_activate": self._auth_login_cb,
-                "on_console_auth_login_clicked": self._auth_login_cb,
-                "on_console_connect_button_clicked": self._connect_button_clicked_cb,
-            }
-        )
+        self.connect_signals({
+            "on_console_pages_switch_page": self._page_changed_cb,
+            "on_console_auth_password_activate": self._auth_login_cb,
+            "on_console_auth_login_clicked": self._auth_login_cb,
+            "on_console_connect_button_clicked": self._connect_button_clicked_cb,
+        })
 
         self.widget("console-gfx-pages").connect("switch-page", self._page_changed_cb)
 
@@ -425,39 +392,12 @@ class vmmConsolePages(vmmGObjectUI):
     # Internal APIs #
     #################
 
-    def _disable_modifiers(self):
-        if self._gtk_settings_accel is not None:
-            return  # pragma: no cover
-
-        for g in self._accel_groups:
-            self.topwin.remove_accel_group(g)
-
-        settings = Gtk.Settings.get_default()
-        self._gtk_settings_accel = settings.get_property("gtk-menu-bar-accel")
-        settings.set_property("gtk-menu-bar-accel", None)
-
-        self._gtk_settings_mnemonic = settings.get_property("gtk-enable-mnemonics")
-        settings.set_property("gtk-enable-mnemonics", False)
-
-    def _enable_modifiers(self):
-        if self._gtk_settings_accel is None:
-            return
-
-        settings = Gtk.Settings.get_default()
-        settings.set_property("gtk-menu-bar-accel", self._gtk_settings_accel)
-        self._gtk_settings_accel = None
-
-        if self._gtk_settings_mnemonic is not None:
-            settings.set_property("gtk-enable-mnemonics", self._gtk_settings_mnemonic)
-
-        for g in self._accel_groups:
-            self.topwin.add_accel_group(g)
-
     def _do_send_key(self, src, keys):
         ignore = src
 
         if keys is not None:
             self._viewer.console_send_keys(keys)
+
 
     ###########################
     # Resize and scaling APIs #
@@ -485,7 +425,7 @@ class vmmConsolePages(vmmGObjectUI):
             log.debug("_set_size_to_vm but no valid sizing found")
             return
 
-        top_w, top_h = self.topwin.get_size()
+        top_w, top_h = self.topwin.get_width(), self.topwin.get_height()
         viewer_alloc = self.widget("console-gfx-scroll").get_allocation()
 
         valw = w + (top_w - viewer_alloc.width)
@@ -493,7 +433,7 @@ class vmmConsolePages(vmmGObjectUI):
 
         log.debug("_set_size_to_vm vm=(%s, %s) window=(%s, %s)", w, h, valw, valh)
         self.topwin.unmaximize()
-        self.topwin.resize(valw, valh)
+        self.topwin.set_default_size(valw, valh)
 
     ################
     # Scaling APIs #
@@ -652,17 +592,10 @@ class vmmConsolePages(vmmGObjectUI):
 
         log.debug("Starting connect process for %s", ginfo.logstring())
         try:
-            if ginfo.gtype == "vnc":
-                viewer_class = VNCViewer
-            elif ginfo.gtype == "spice":
-                # We do this here and not in the embed check, since user
-                # is probably expecting their spice console to work, so we
-                # should show an explicit failure
-                if SPICE_GTK_IMPORT_ERROR:
-                    raise RuntimeError("Error opening SPICE console: %s" % SPICE_GTK_IMPORT_ERROR)
-                viewer_class = SpiceViewer
+            if SPICE_GTK_IMPORT_ERROR:
+                raise RuntimeError("Error opening SPICE console: %s" % SPICE_GTK_IMPORT_ERROR)
+            self._viewer = SpiceViewer(self.vm, ginfo)
 
-            self._viewer = viewer_class(self.vm, ginfo)
             self._connect_viewer_signals()
 
             self._viewer.console_open()
@@ -691,7 +624,7 @@ class vmmConsolePages(vmmGObjectUI):
     ##########################
 
     def _viewer_add_display_cb(self, _src, display):
-        self.widget("console-gfx-viewport").add(display)
+        self.widget("console-gfx-viewport").set_child(display)
 
         # Sync initial settings
         self._sync_scaling_with_display()
@@ -705,32 +638,15 @@ class vmmConsolePages(vmmGObjectUI):
         self._pointer_is_grabbed = False
         self.emit("change-title")
 
-    def _viewer_keyboard_grab_cb(self, src):
-        self._viewer_sync_modifiers()
-
-    def _serial_focus_changed_cb(self, src, event):
-        self._viewer_sync_modifiers()
-
-    def _viewer_sync_modifiers(self):
-        serial_has_focus = any([s.has_focus() for s in self._serial_consoles])
-        viewer_keyboard_grab = self._viewer and self._viewer.console_has_keyboard_grab()
-
-        if serial_has_focus or viewer_keyboard_grab:
-            self._disable_modifiers()
-        else:
-            self._enable_modifiers()
-
     def _viewer_auth_error_cb(self, _src, errmsg, viewer_will_disconnect):
         errmsg = _("Viewer authentication error: %s") % errmsg
         self.err.val_err(errmsg)
 
         if viewer_will_disconnect:
-            # GtkVNC will disconnect after an auth error, so lets do it for
-            # them and re-init the viewer (which will be triggered by
-            # _refresh_vm_state if needed)
             self._activate_vm_unavailable_page(errmsg)
 
         self._refresh_vm_state()
+
 
     def _viewer_need_auth_cb(self, _src, withPassword, withUsername):
         self._activate_auth_page(withPassword, withUsername)
@@ -775,24 +691,16 @@ class vmmConsolePages(vmmGObjectUI):
         self._activate_gfx_unavailable_page(_("Viewer is disconnecting."))
         log.debug("Viewer disconnected cb")
 
-        # Make sure modifiers are set correctly
-        self._viewer_sync_modifiers()
-
         self._viewer_disconnected_set_page(errdetails, ssherr)
 
     def _viewer_connected_cb(self, _src):
         log.debug("Viewer connected cb")
         self._activate_gfx_viewer_page()
 
-        # Make sure modifiers are set correctly
-        self._viewer_sync_modifiers()
-
     def _connect_viewer_signals(self):
         self._viewer.connect("add-display-widget", self._viewer_add_display_cb)
         self._viewer.connect("pointer-grab", self._pointer_grabbed_cb)
         self._viewer.connect("pointer-ungrab", self._pointer_ungrabbed_cb)
-        self._viewer.connect("keyboard-grab", self._viewer_keyboard_grab_cb)
-        self._viewer.connect("keyboard-ungrab", self._viewer_keyboard_grab_cb)
         self._viewer.connect("connected", self._viewer_connected_cb)
         self._viewer.connect("disconnected", self._viewer_disconnected_cb)
         self._viewer.connect("auth-error", self._viewer_auth_error_cb)
@@ -826,7 +734,6 @@ class vmmConsolePages(vmmGObjectUI):
 
         if not serial:
             serial = vmmSerialConsole(self.vm, target_port, name)
-            serial.set_focus_callbacks(self._serial_focus_changed_cb, self._serial_focus_changed_cb)
 
             title = Gtk.Label(label=name)
             self.widget("serial-pages").append_page(serial.get_box(), title)

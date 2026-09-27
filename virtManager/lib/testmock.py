@@ -189,8 +189,6 @@ class CLITestOptionsClass:
 
     * firstrun-uri: If set, use this as the initial connection URI
         if we are doing firstrun testing
-    * fake-vnc-username: Fake VNC username auth request
-    * fake-systray: Enable the fake systray window
     * fake-virtbootstrap: Mock the virtBootstrap module, since getting
         it to actually work across fedora versions is hard
     * object-denylist=NAME: Make object initialize for that name
@@ -241,8 +239,6 @@ class CLITestOptionsClass:
         self.test_update_device_fail = _get("test-update-device-fail")
         self.disable_name_validation = _get("disable-name-validation")
         self.firstrun_uri = _get_value("firstrun-uri")
-        self.fake_vnc_username = _get("fake-vnc-username")
-        self.fake_systray = _get("fake-systray")
         self.object_denylist = _get_value("object-denylist")
         self.conn_crash = _get("conn-crash")
         self.fake_agent_event = _get_value("fake-agent-event")

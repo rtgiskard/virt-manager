@@ -1,5 +1,17 @@
 # Virtual Machine Manager News
 
+## GTK4 fork (unreleased)
+- Port the full graphical application and its UI resources to GTK4.
+- Use SpiceClientGtk-4.0 for the SPICE console and Vte-3.91 for serial consoles.
+- Replace GTK3 menu and tray APIs with GTK4 popovers and a native D-Bus
+  StatusNotifierItem. VNC graphical viewing is unavailable in this fork;
+  virt-install's VNC XML support is unchanged.
+- Ship the GTK4 AUR GUI, virtinst backend, and virt-install/virt-clone/virt-xml
+  tools from the same source revision; provide and conflict with virt-install
+  rather than mixing the development GUI with the distro's older backend.
+- Fix Boot Options refresh and clone, storage pool, and deletion dialog initialization
+  by emitting the GTK4 toggled signal instead of calling the removed GTK3 method.
+
 ## Release 5.1.0 (August 26, 2025)
 - cli: Support --cpu maximum (Andrea Bolognani)
 - Prefer maximum mode for many emulated guests (Andrea Bolognani)

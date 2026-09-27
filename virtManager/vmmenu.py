@@ -16,30 +16,33 @@ from .asyncjob import vmmAsyncJob
 ####################################################################
 
 
-class _VMMenu(Gtk.Menu):
+class _VMMenu(Gtk.Popover):
     def __init__(self, src, current_vm_cb, show_open=True):
-        Gtk.Menu.__init__(self)
+        Gtk.Popover.__init__(self)
         self._parent = src
         self._current_vm_cb = current_vm_cb
         self._show_open = show_open
-
+        self._items = {}
+        self._box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        self.set_child(self._box)
         self._init_state()
 
     def _add_action(self, label, widgetname, cb):
-        item = Gtk.MenuItem.new_with_mnemonic(label)
-
-        item.vmm_widget_name = widgetname
+        item = Gtk.Button.new_with_mnemonic(label)
+        item.set_has_frame(False)
+        self._items[widgetname] = item
         if cb:
-
-            def _cb(_menuitem):
-                _vm = self._current_vm_cb()
-                if _vm:
-                    return cb(self._parent, _vm)
-
-            item.connect("activate", _cb)
-
-        self.add(item)
+            def _cb(_button):
+                self.popdown()
+                vm = self._current_vm_cb()
+                if vm:
+                    cb(self._parent, vm)
+            item.connect("clicked", _cb)
+        self._box.append(item)
         return item
+
+    def _add_separator(self):
+        self._box.append(Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL))
 
     def _init_state(self):
         raise NotImplementedError()
@@ -49,20 +52,15 @@ class _VMMenu(Gtk.Menu):
 
 
 class VMShutdownMenu(_VMMenu):
-    """
-    Shutdown submenu for reboot, forceoff, reset, etc.
-    """
+    """Shutdown submenu for reboot, forceoff, reset, etc."""
 
     def _init_state(self):
         self._add_action(_("_Reboot"), "reboot", VMActionUI.reboot)
         self._add_action(_("_Shut Down"), "shutdown", VMActionUI.shutdown)
         self._add_action(_("F_orce Reset"), "reset", VMActionUI.reset)
         self._add_action(_("_Force Off"), "destroy", VMActionUI.destroy)
-        self.add(Gtk.SeparatorMenuItem())
+        self._add_separator()
         self._add_action(_("Sa_ve"), "save", VMActionUI.save)
-
-        self.get_accessible().set_name("vmm-shutdown-menu")
-        self.show_all()
 
     def update_widget_states(self, vm):
         statemap = {
@@ -72,36 +70,30 @@ class VMShutdownMenu(_VMMenu):
             "destroy": bool(vm and vm.is_destroyable()),
             "save": bool(vm and vm.is_destroyable()),
         }
-
-        for child in self.get_children():
-            name = getattr(child, "vmm_widget_name", None)
-            if name in statemap:
-                child.set_sensitive(statemap[name])
+        for name, sensitive in statemap.items():
+            self._items[name].set_sensitive(sensitive)
 
 
 class VMActionMenu(_VMMenu):
-    """
-    VM submenu for run, pause, shutdown, clone, etc
-    """
+    """VM submenu for run, pause, shutdown, clone, etc."""
 
     def _init_state(self):
         self._add_action(_("_Run"), "run", VMActionUI.run)
         self._add_action(_("_Pause"), "suspend", VMActionUI.suspend)
         self._add_action(_("R_esume"), "resume", VMActionUI.resume)
-        s = self._add_action(_("_Shut Down"), "shutdown", None)
-        s.set_submenu(VMShutdownMenu(self._parent, self._current_vm_cb))
-
-        self.add(Gtk.SeparatorMenuItem())
+        shutdown = Gtk.MenuButton(label=_("_Shut Down"), use_underline=True)
+        shutdown.set_has_frame(False)
+        self._items["shutdown"] = shutdown
+        self._shutdown_menu = VMShutdownMenu(self._parent, self._current_vm_cb)
+        shutdown.set_popover(self._shutdown_menu)
+        self._box.append(shutdown)
+        self._add_separator()
         self._add_action(_("Clone..."), "clone", VMActionUI.clone)
         self._add_action(_("Migrate..."), "migrate", VMActionUI.migrate)
         self._add_action(_("_Delete"), "delete", VMActionUI.delete)
-
         if self._show_open:
-            self.add(Gtk.SeparatorMenuItem())
+            self._add_separator()
             self._add_action(_("_Open"), "show", VMActionUI.show)
-
-        self.get_accessible().set_name("vm-action-menu")
-        self.show_all()
 
     def update_widget_states(self, vm):
         statemap = {
@@ -112,24 +104,15 @@ class VMActionMenu(_VMMenu):
             "migrate": bool(vm and vm.is_stoppable()),
             "clone": bool(vm and vm.is_cloneable()),
         }
-        vismap = {
-            "suspend": bool(vm and not vm.is_paused()),
-            "resume": bool(vm and vm.is_paused()),
-        }
-
-        for child in self.get_children():
-            name = getattr(child, "vmm_widget_name", None)
-            if child.get_submenu():
-                child.get_submenu().update_widget_states(vm)
-            if name in statemap:
-                child.set_sensitive(statemap[name])
-            if name in vismap:
-                child.set_visible(vismap[name])
+        for name, sensitive in statemap.items():
+            self._items[name].set_sensitive(sensitive)
+        self._items["suspend"].set_visible(bool(vm and not vm.is_paused()))
+        self._items["resume"].set_visible(bool(vm and vm.is_paused()))
+        self._shutdown_menu.update_widget_states(vm)
 
     def change_run_text(self, text):
-        for child in self.get_children():
-            if getattr(child, "vmm_widget_name", None) == "run":
-                child.get_child().set_label(text)
+        self._items["run"].set_label(text)
+
 
 
 class VMActionUI:

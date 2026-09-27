@@ -12,15 +12,13 @@ from gi.repository import GObject
 
 import gi
 
-gi.require_version("GtkVnc", "2.0")
-from gi.repository import GtkVnc
 
 try:
     SPICE_GTK_IMPORT_ERROR = None
     if "VIRTINST_TEST_SUITE_FAKE_NO_SPICE" in os.environ:
         raise ImportError("test suite faking no spice")
 
-    gi.require_version("SpiceClientGtk", "3.0")
+    gi.require_version("SpiceClientGtk", "4.0")
     from gi.repository import SpiceClientGtk
     from gi.repository import SpiceClientGLib
 except (ValueError, ImportError) as _SPICE_GTK_IMPORT_ERROR:
@@ -32,24 +30,6 @@ from .sshtunnels import SSHTunnels
 from ..baseclass import vmmGObject
 
 
-##################################
-# VNC/Spice abstraction handling #
-##################################
-
-_GTKVNC_SUPPORT_CACHE = {}
-
-
-def _gtkvnc_check_display_support(funcname):
-    if funcname not in _GTKVNC_SUPPORT_CACHE:
-        val = hasattr(GtkVnc.Display, funcname)
-        log.debug("GtkVnc.Display %s support=%s", funcname, val)
-        _GTKVNC_SUPPORT_CACHE[funcname] = val
-    return _GTKVNC_SUPPORT_CACHE[funcname]
-
-
-def _gtkvnc_supports_resizeguest():
-    return _gtkvnc_check_display_support("set_allow_resize")
-
 
 class Viewer(vmmGObject):
     """
@@ -58,7 +38,6 @@ class Viewer(vmmGObject):
 
     __gsignals__ = {
         "add-display-widget": (vmmGObject.RUN_FIRST, None, [object]),
-        "size-allocate": (vmmGObject.RUN_FIRST, None, [object]),
         "desktop-resolution-changed": (vmmGObject.RUN_FIRST, None, []),
         "pointer-grab": (vmmGObject.RUN_FIRST, None, []),
         "pointer-ungrab": (vmmGObject.RUN_FIRST, None, []),
@@ -86,8 +65,8 @@ class Viewer(vmmGObject):
     def _cleanup(self):
         self._close()
 
-        if self._display:
-            self._display.destroy()
+        if self._display and self._display.get_parent():
+            self._display.unparent()
         self._display = None
         self._vm = None
 
@@ -113,14 +92,12 @@ class Viewer(vmmGObject):
         self._display = display
         self._refresh_grab_keys()
 
-        self._display.connect("size-allocate", self._make_signal_proxy("size-allocate"))
-
         self.emit("add-display-widget", self._display)
-        self._display.realize()
 
         self._connect_display_signals()
 
         self._display.show()
+
 
     #########################
     # Generic internal APIs #
@@ -305,170 +282,8 @@ class Viewer(vmmGObject):
         return self._has_usb_redirection()
 
     def console_remove_display_from_widget(self, widget):
-        if self._display and self._display in widget.get_children():
-            widget.remove(self._display)
-
-
-####################
-# VNC viewer class #
-####################
-
-
-class VNCViewer(Viewer):
-    viewer_type = "vnc"
-
-    ###################
-    # Private helpers #
-    ###################
-
-    def _connect_display_signals(self):
-        self._display.connect("vnc-pointer-grab", self._make_signal_proxy("pointer-grab"))
-        self._display.connect("vnc-pointer-ungrab", self._make_signal_proxy("pointer-ungrab"))
-        self._display.connect("vnc-keyboard-grab", self._keyboard_grab_cb)
-        self._display.connect("vnc-keyboard-ungrab", self._keyboard_ungrab_cb)
-
-        self._display.connect("vnc-auth-credential", self._auth_credential)
-        self._display.connect("vnc-auth-failure", self._auth_failure_cb)
-        self._display.connect("vnc-initialized", self._connected_cb)
-        self._display.connect("vnc-disconnected", self._disconnected_cb)
-        self._display.connect("vnc-desktop-resize", self._desktop_resize_cb)
-
-    def _init_display(self):
-        display = GtkVnc.Display()
-
-        display.set_pointer_grab(True)
-
-        if _gtkvnc_check_display_support("set_keep_aspect_ratio"):
-            display.set_keep_aspect_ratio(True)
-
-        self._set_display(display)
-
-    def _keyboard_grab_cb(self, src):
-        self._keyboard_grab = True
-        self.emit("keyboard-grab")
-
-    def _keyboard_ungrab_cb(self, src):
-        self._keyboard_grab = False
-        self.emit("keyboard-ungrab")
-
-    def _connected_cb(self, ignore):
-        self._tunnels.unlock()
-        self.emit("connected")
-
-    def _disconnected_cb(self, ignore):
-        self._tunnels.unlock()
-        self._emit_disconnected()
-
-    def _desktop_resize_cb(self, src, w, h):
-        self._set_desktop_resolution(w, h)
-
-    def _auth_failure_cb(self, ignore, msg):
-        log.debug("VNC auth failure. msg=%s", msg)
-        self.emit("auth-error", msg, True)
-
-    def _auth_credential(self, src_ignore, credList):
-        values = []
-        for idx in range(int(credList.n_values)):
-            values.append(credList.get_nth(idx))
-
-        if self.config.CLITestOptions.fake_vnc_username:
-            values.append(GtkVnc.DisplayCredential.USERNAME)
-
-        withUsername = False
-        withPassword = False
-        for cred in values:
-            log.debug("Got credential request %s", cred)
-            if cred == GtkVnc.DisplayCredential.PASSWORD:
-                withPassword = True
-            elif cred == GtkVnc.DisplayCredential.USERNAME:
-                withUsername = True
-            elif cred == GtkVnc.DisplayCredential.CLIENTNAME:  # pragma: no cover
-                self._display.set_credential(cred, "libvirt-vnc")
-            else:  # pragma: no cover
-                errmsg = _(
-                    "Unable to provide requested credentials to the VNC server.\n"
-                    "The credential type %s is not supported"
-                ) % str(cred.value_name)
-                self.emit("auth-error", errmsg, True)
-                return
-
-        if withUsername or withPassword:
-            self.emit("need-auth", withPassword, withUsername)
-
-    def _sync_force_size(self):
-        force_size = not self._get_scaling() and not self._get_resizeguest()
-        self._display.set_force_size(force_size)
-
-    ###############################
-    # Private API implementations #
-    ###############################
-
-    def _close(self):
-        self._display.close()
-
-    def _is_open(self):
-        return self._display.is_open()
-
-    def _get_scaling(self):
-        if self._display:
-            return self._display.get_scaling()
-
-    def _set_scaling(self, scaling):
-        if self._display:
-            self._display.set_scaling(scaling)
-            self._sync_force_size()
-
-    def _set_grab_keys(self, keys):
-        seq = GtkVnc.GrabSequence.new(keys)
-        self._display.set_grab_keys(seq)
-
-    def _send_keys(self, keys):
-        return self._display.send_keys([Gdk.keyval_from_name(k) for k in keys])
-
-    def _set_username(self, cred):
-        self._display.set_credential(GtkVnc.DisplayCredential.USERNAME, cred)
-
-    def _set_password(self, cred):
-        self._display.set_credential(GtkVnc.DisplayCredential.PASSWORD, cred)
-
-    def _set_resizeguest(self, val):
-        if _gtkvnc_supports_resizeguest():
-            self._display.set_allow_resize(val)  # pylint: disable=no-member
-            self._sync_force_size()
-
-    def _get_resizeguest(self):
-        if _gtkvnc_supports_resizeguest():
-            return self._display.get_allow_resize()  # pylint: disable=no-member
-        return False  # pragma: no cover
-
-    def _get_resizeguest_warning(self):
-        if not _gtkvnc_supports_resizeguest():
-            return _("GTK-VNC viewer is too old")  # pragma: no cover
-
-    def _get_usb_widget(self):
-        return None  # pragma: no cover
-
-    def _has_usb_redirection(self):
-        return False
-
-    def _get_preferred_size(self):
-        return self._desktop_resolution
-
-    #######################
-    # Connection routines #
-    #######################
-
-    def _open(self):
-        self._init_display()
-        return Viewer._open(self)
-
-    def _open_host(self):
-        host, port, ignore = self._ginfo.get_conn_host()
-        log.debug("VNC connecting to host=%s port=%s", host, port)
-        self._display.open_host(host, port)
-
-    def _open_fd(self, fd):
-        self._display.open_fd(fd)
+        if self._display and self._display.get_parent() == widget:
+            widget.set_child(None)
 
 
 ######################
@@ -761,12 +576,4 @@ class SpiceViewer(Viewer):
         return True
 
     def _get_preferred_size(self):
-        if not self._display or self._get_scaling() or self._get_resizeguest():
-            return self._desktop_resolution
-
-        # When scaling and resizeguest disabled, this usually matches the
-        # VM resolution. But when host desktop scaling is used, spice will
-        # intentionally have different values here.
-        w = self._display.get_preferred_width()[1]
-        h = self._display.get_preferred_height()[1]
-        return (w, h)
+        return self._desktop_resolution
