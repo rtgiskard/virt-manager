@@ -88,6 +88,7 @@ class vmmManager(vmmGObjectUI):
         self.connmenu = Gtk.Popover()
         self._connmenu_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.connmenu.set_child(self._connmenu_box)
+        uiutil.init_menu(self.connmenu)
         self.connmenu_items = {}
 
         self.connect_signals(
@@ -278,10 +279,9 @@ class vmmManager(vmmGObjectUI):
 
     def init_context_menus(self):
         def add_to_menu(idx, text, cb):
-            item = Gtk.Button.new_with_mnemonic(text)
-            item.set_has_frame(False)
+            item = uiutil.new_menu_action_button(text)
             if cb:
-                item.connect("clicked", lambda button: (self.connmenu.popdown(), cb(button)))
+                item.connect("clicked", cb)
             self._connmenu_box.append(item)
             self.connmenu_items[idx] = item
 
@@ -826,12 +826,7 @@ class vmmManager(vmmGObjectUI):
             self.connmenu_items["connect"].set_sensitive(disconn)
             self.connmenu_items["delete"].set_sensitive(disconn)
             menu = self.connmenu
-        if not menu.get_parent():
-            menu.set_parent(self.widget("vm-list"))
-        rect = Gdk.Rectangle()
-        rect.x, rect.y, rect.width, rect.height = int(x), int(y), 1, 1
-        menu.set_pointing_to(rect)
-        menu.popup()
+        uiutil.popup_menu_at_widget(menu, self.widget("vm-list"), x, y)
 
     #################
     # Stats methods #

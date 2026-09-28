@@ -64,6 +64,86 @@ def test_manager_without_selection():
     """)
 
 
+def test_vm_menu_actions_dismiss_before_callback():
+    _run("""
+        import time
+        from virtManager.baseclass import _BuilderScope
+        from virtManager.lib import uiutil
+        builder = Gtk.Builder()
+        scope = _BuilderScope()
+        builder.set_scope(scope)
+        builder.add_from_file(buildconfig.BuildConfig.ui_dir + "/vmwindow.ui")
+        window = builder.get_object("vmm-vmwindow")
+        menu = builder.get_object("virtual_machine1_menu")
+        uiutil.init_menu(menu)
+        window.present()
+        def drain():
+            deadline = time.monotonic() + .15
+            while time.monotonic() < deadline:
+                GLib.MainContext.default().iteration(False)
+                time.sleep(.001)
+        drain()
+        for button, handler in (
+            ("details-menu-vm-screenshot", "on_details_menu_screenshot_activate"),
+            ("details-menu-usb-redirection", "on_details_menu_usb_redirection"),
+        ):
+            observed = []
+            scope.handlers[handler] = lambda _button: observed.append(menu.get_visible())
+            builder.get_object("details-vm-menu").popup()
+            drain()
+            assert menu.get_visible()
+            builder.get_object(button).emit("clicked")
+            assert observed == [False]
+        window.destroy()
+    """)
+
+
+def test_native_menu_dynamic_labels_and_nested_dismissal():
+    _run("""
+        import time
+        from virtManager.lib import uiutil
+
+        def drain():
+            until = time.monotonic() + .15
+            while time.monotonic() < until:
+                GLib.MainContext.default().iteration(False)
+                time.sleep(.001)
+
+        action = uiutil.new_menu_action_button("_Run")
+        inner_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        inner_box.append(action)
+        inner = Gtk.Popover(child=inner_box)
+        submenu = Gtk.MenuButton(label="_Actions", use_underline=True, popover=inner)
+        outer_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        outer_box.append(submenu)
+        outer = Gtk.Popover(child=outer_box)
+        anchor = Gtk.MenuButton(label="Menu", popover=outer)
+        window = Gtk.Window(child=anchor, default_width=300, default_height=150)
+        for menu in (inner, outer):
+            uiutil.init_menu(menu)
+        window.present()
+        drain()
+        anchor.popup()
+        drain()
+        submenu.set_label("_Renamed")
+        assert submenu.get_child().get_text() == "Renamed"
+        assert submenu.get_child().get_mnemonic_widget() == submenu
+        Gtk.Widget.set_direction(submenu, Gtk.TextDirection.RTL)
+        assert submenu.get_direction() == Gtk.ArrowType.LEFT
+        submenu.popup()
+        drain()
+        action.set_label("_Resume")
+        assert action.get_child().get_text() == "Resume"
+        observed = []
+        action.connect("clicked", lambda _button:
+                       observed.append((inner.get_visible(), outer.get_visible())))
+        assert inner.get_visible() and outer.get_visible()
+        action.emit("clicked")
+        assert observed == [(False, False)]
+        window.destroy()
+    """)
+
+
 @pytest.mark.skipif(
     not os.environ.get("VIRT_MANAGER_TEST_XDISPLAY"),
     reason="Set VIRT_MANAGER_TEST_XDISPLAY to the private compositor's XWayland display",

@@ -501,12 +501,13 @@ class vmmDetails(vmmGObjectUI):
         self._popupmenu = Gtk.Popover()
         box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self._popupmenu.set_child(box)
+        uiutil.init_menu(self._popupmenu)
 
-        addHW = Gtk.Button.new_with_mnemonic(_("_Add Hardware"))
-        addHW.connect("clicked", lambda _button: (self._popupmenu.popdown(), self._show_addhw()))
+        addHW = uiutil.new_menu_action_button(_("_Add Hardware"))
+        addHW.connect("clicked", lambda _button: self._show_addhw())
 
-        rmHW = Gtk.Button.new_with_mnemonic(_("_Remove Hardware"))
-        rmHW.connect("clicked", lambda _button: (self._popupmenu.popdown(), self._config_remove()))
+        rmHW = uiutil.new_menu_action_button(_("_Remove Hardware"))
+        rmHW.connect("clicked", lambda _button: self._config_remove())
 
         self._popupmenuitems = {"add": addHW, "remove": rmHW}
         for item in self._popupmenuitems.values():
@@ -834,12 +835,7 @@ class vmmDetails(vmmGObjectUI):
         rmdev.set_visible(self.widget("config-remove").get_visible())
         rmdev.set_sensitive(self.widget("config-remove").get_sensitive())
 
-        if not self._popupmenu.get_parent():
-            self._popupmenu.set_parent(widget)
-        rect = Gdk.Rectangle()
-        rect.x, rect.y, rect.width, rect.height = int(x), int(y), 1, 1
-        self._popupmenu.set_pointing_to(rect)
-        self._popupmenu.popup()
+        uiutil.popup_menu_at_widget(self._popupmenu, widget, x, y)
 
     def _set_hw_selection(self, page, _disable_apply=True):
         if _disable_apply:

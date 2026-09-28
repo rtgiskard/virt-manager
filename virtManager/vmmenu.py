@@ -9,7 +9,7 @@ from gi.repository import Gtk
 from virtinst import log
 
 from .asyncjob import vmmAsyncJob
-
+from .lib import uiutil
 
 ####################################################################
 # Build toolbar shutdown button menu (manager and details toolbar) #
@@ -25,18 +25,19 @@ class _VMMenu(Gtk.Popover):
         self._items = {}
         self._box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.set_child(self._box)
+        uiutil.init_menu(self)
         self._init_state()
 
     def _add_action(self, label, widgetname, cb):
-        item = Gtk.Button.new_with_mnemonic(label)
-        item.set_has_frame(False)
+        item = uiutil.new_menu_action_button(label)
         self._items[widgetname] = item
         if cb:
+
             def _cb(_button):
-                self.popdown()
                 vm = self._current_vm_cb()
                 if vm:
                     cb(self._parent, vm)
+
             item.connect("clicked", _cb)
         self._box.append(item)
         return item
@@ -82,7 +83,6 @@ class VMActionMenu(_VMMenu):
         self._add_action(_("_Pause"), "suspend", VMActionUI.suspend)
         self._add_action(_("R_esume"), "resume", VMActionUI.resume)
         shutdown = Gtk.MenuButton(label=_("_Shut Down"), use_underline=True)
-        shutdown.set_has_frame(False)
         self._items["shutdown"] = shutdown
         self._shutdown_menu = VMShutdownMenu(self._parent, self._current_vm_cb)
         shutdown.set_popover(self._shutdown_menu)
@@ -112,7 +112,6 @@ class VMActionMenu(_VMMenu):
 
     def change_run_text(self, text):
         self._items["run"].set_label(text)
-
 
 
 class VMActionUI:

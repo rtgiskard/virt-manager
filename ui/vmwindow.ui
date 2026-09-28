@@ -19,11 +19,13 @@
             <child>
               <object class="GtkMenuButton" id="file1">
                 <property name="visible">True</property>
+                <property name="has-frame">False</property>
+                <property name="direction">none</property>
                 <property name="label" translatable="1">_File</property>
                 <property name="use-underline">True</property>
                 <property name="popover"><object class="GtkPopover" id="file1_menu">
                     <property name="child"><object class="GtkBox" id="file1_menu-items"><property name="orientation">vertical</property><child>
-                      <object class="GtkButton" id="view_manager">
+                          <object class="VmmMenuActionButton" id="view_manager">
                         <property name="visible">True</property>
                         <property name="label" translatable="1">_View Manager</property>
                         <property name="use-underline">True</property>
@@ -36,7 +38,7 @@
                       </object>
                     </child>
                     <child>
-                      <object class="GtkButton" id="close4">
+                          <object class="VmmMenuActionButton" id="close4">
                         <property name="visible">True</property>
                         <property name="label" translatable="1">_Close</property>
                         <property name="use-underline">True</property>
@@ -44,7 +46,7 @@
                         </object>
                     </child>
                     <child>
-                      <object class="GtkButton" id="quit3">
+                          <object class="VmmMenuActionButton" id="quit3">
                         <property name="visible">True</property>
                         <property name="label" translatable="1">_Quit</property>
                         <property name="use-underline">True</property>
@@ -57,6 +59,8 @@
             <child>
               <object class="GtkMenuButton" id="details-vm-menu">
                 <property name="visible">True</property>
+                <property name="has-frame">False</property>
+                <property name="direction">none</property>
                 <property name="label" translatable="1">Virtual _Machine</property>
                 <property name="use-underline">True</property>
                 <property name="popover"><object class="GtkPopover" id="virtual_machine1_menu">
@@ -67,7 +71,7 @@
                       </object>
                     </child>
                     <child>
-                      <object class="GtkButton" id="details-menu-vm-screenshot">
+                          <object class="VmmMenuActionButton" id="details-menu-vm-screenshot">
                         <property name="visible">True</property>
                         <property name="label" translatable="1">_Take Screenshot</property>
                         <property name="use-underline">True</property>
@@ -75,7 +79,7 @@
                       </object>
                     </child>
                     <child>
-                      <object class="GtkButton" id="details-menu-usb-redirection">
+                          <object class="VmmMenuActionButton" id="details-menu-usb-redirection">
                         <property name="visible">True</property>
                         <property name="tooltip-text" translatable="1">Redirect host USB device to virtual machine with SPICE graphics.</property>
                         <property name="label" translatable="1">_Redirect USB device</property>
@@ -89,6 +93,8 @@
             <child>
               <object class="GtkMenuButton" id="view2">
                 <property name="visible">True</property>
+                <property name="has-frame">False</property>
+                <property name="direction">none</property>
                 <property name="label" translatable="1">_View</property>
                 <property name="use-underline">True</property>
                 <property name="popover"><object class="GtkPopover" id="view2_menu">
@@ -133,7 +139,7 @@
                       </object>
                     </child>
                     <child>
-                      <object class="GtkButton" id="detains-menu-view-size-to-vm">
+                          <object class="VmmMenuActionButton" id="detains-menu-view-size-to-vm">
                         <property name="visible">True</property>
                         <property name="label" translatable="1">_Resize to VM</property>
                         <property name="use-underline">True</property>
@@ -141,10 +147,12 @@
                       </object>
                     </child>
                     <child>
-                      <object class="GtkExpander" id="menuitem1">
+                          <object class="GtkMenuButton" id="menuitem1">
                         <property name="visible">True</property>
                         <property name="label" translatable="1">_Scale Display</property>
                         <property name="use-underline">True</property>
+                            <property name="popover">
+                              <object class="GtkPopover" id="view-scale-menu">
                         <property name="child"><object class="GtkBox" id="menu1"><property name="orientation">vertical</property><child>
                               <object class="GtkCheckButton" id="details-menu-view-scale-always">
                                 <property name="visible">True</property>
@@ -186,6 +194,8 @@
                               </object>
                             </child>
                           </object></property></object>
+                            </property>
+                          </object>
                     </child>
                     <child>
                       <object class="GtkMenuButton" id="details-menu-view-console-list">
@@ -222,6 +232,8 @@
             <child>
               <object class="GtkMenuButton" id="details-menu-send-key">
                 <property name="visible">True</property>
+                <property name="has-frame">False</property>
+                <property name="direction">none</property>
                 <property name="label" translatable="1">Send _Key</property>
                 <property name="use-underline">True</property>
               <property name="popover"><object class="GtkPopover" id="details-menu-send-key-popover"><property name="child"><object class="GtkBox" id="details-menu-send-key-popover-items"><property name="orientation">vertical</property></object></property></object></property></object>

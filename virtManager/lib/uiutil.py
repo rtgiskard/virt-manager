@@ -4,7 +4,7 @@
 # This work is licensed under the GNU GPLv2 or later.
 # See the COPYING file in the top-level directory.
 
-from gi.repository import Gtk
+from gi.repository import Gdk, Graphene, Gtk
 
 from virtinst import xmlutil
 
@@ -124,7 +124,102 @@ def set_list_selection(widget, value, column=0):
 # Misc functions #
 ##################
 
+def _dismiss_menu_action(button):
+    popover = button.get_ancestor(Gtk.Popover)
+    while popover is not None:
+        parent = popover.get_parent()
+        ancestor = parent.get_ancestor(Gtk.Popover) if parent is not None else None
+        popover.popdown()
+        popover = ancestor
 
+
+class vmmMenuActionButton(Gtk.Button):
+    """Gtk.Button whose first clicked handler dismisses its menu hierarchy."""
+
+    __gtype_name__ = "VmmMenuActionButton"
+
+    def __init__(self):
+        Gtk.Button.__init__(self)
+        # Install before Gtk.Builder or callers connect action handlers.
+        self.connect("clicked", _dismiss_menu_action)
+
+
+def new_menu_action_button(label):
+    button = vmmMenuActionButton()
+    button.set_label(label)
+    button.set_use_underline(True)
+    return button
+
+
+def _align_menu_row(row, *_args):
+    if isinstance(row, Gtk.MenuButton):
+        rtl = Gtk.Widget.get_direction(row) == Gtk.TextDirection.RTL
+        row.set_direction(Gtk.ArrowType.LEFT if rtl else Gtk.ArrowType.RIGHT)
+        text = row.get_label()
+        if text is not None:
+            # MenuButton's native label is not exposed by get_child(). Own the
+            # label instead, leaving the arrow and its spacing to the theme.
+            label = Gtk.Label(label=text)
+            label.set_mnemonic_widget(row)
+            row.set_child(label)
+            row.set_always_show_arrow(True)
+        label = row.get_child()
+        if isinstance(label, Gtk.Label):
+            label.set_use_underline(row.get_use_underline())
+            row.update_property([Gtk.AccessibleProperty.LABEL], [label.get_text()])
+    else:
+        label = row.get_child()
+
+    if isinstance(label, Gtk.Label):
+        # Logical alignment follows RTL without reaching into internal boxes.
+        label.set_halign(Gtk.Align.START)
+        label.set_hexpand(True)
+
+
+def _style_menu_rows(menu):
+    row = menu.get_child().get_first_child()
+    while row:
+        if isinstance(row, (Gtk.Button, Gtk.MenuButton, Gtk.CheckButton)):
+            if not row.has_css_class("vmm-menu-row"):
+                row.add_css_class("vmm-menu-row")
+                if isinstance(row, (Gtk.Button, Gtk.MenuButton)):
+                    row.set_has_frame(False)
+                    row.connect("notify::label", _align_menu_row)
+                    row.connect("notify::use-underline", _align_menu_row)
+                    row.connect("direction-changed", _align_menu_row)
+            # CheckButton keeps its native indicator and text layout. Action
+            # rows do not reserve a guessed-width checkbox column.
+            if not isinstance(row, Gtk.CheckButton):
+                _align_menu_row(row)
+        row = row.get_next_sibling()
+
+
+def init_menu(menu):
+    """Style static and rebuilt menu rows after their show handlers populate them."""
+    if getattr(menu, "_vmm_menu_initialized", False):
+        return
+    menu._vmm_menu_initialized = True
+    menu.add_css_class("vmm-menu")
+    menu.add_css_class("menu")
+    menu.set_has_arrow(False)
+    # Align dropdowns to their button's start and side submenus to its top,
+    # instead of centering a speech bubble around the triggering row.
+    menu.set_halign(Gtk.Align.START)
+    menu.set_valign(Gtk.Align.START)
+    menu.connect_after("show", _style_menu_rows)
+
+
+def popup_menu_at_widget(menu, widget, x=0, y=0):
+    # TreeView and VTE do not lay out arbitrary popover children. The window's
+    # content container does; translate the click from the source widget.
+    parent = widget.get_root().get_child()
+    if not menu.get_parent():
+        menu.set_parent(parent)
+    _ok, point = widget.compute_point(parent, Graphene.Point().init(x, y))
+    rect = Gdk.Rectangle()
+    rect.x, rect.y, rect.width, rect.height = int(point.x), int(point.y), 1, 1
+    menu.set_pointing_to(rect)
+    menu.popup()
 
 
 def set_grid_row_visible(child, visible):

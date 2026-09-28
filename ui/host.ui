@@ -21,15 +21,14 @@
             <child>
               <object class="GtkMenuButton" id="menuitem4">
                 <property name="visible">True</property>
-                <property name="can-focus">False</property>
+                <property name="has-frame">False</property>
+                <property name="direction">none</property>
                 <property name="label" translatable="1">_File</property>
                 <property name="use-underline">True</property>
                 <property name="popover"><object class="GtkPopover" id="menuitem4_menu">
-                    <property name="can-focus">False</property>
                     <property name="child"><object class="GtkBox" id="menuitem4_menu-items"><property name="orientation">vertical</property><child>
-                      <object class="GtkButton" id="menu-file-view-manager">
+                          <object class="VmmMenuActionButton" id="menu-file-view-manager">
                         <property name="visible">True</property>
-                        <property name="can-focus">False</property>
                         <property name="label" translatable="1">_View Manager</property>
                         <property name="use-underline">True</property>
                         <signal name="clicked" handler="on_menu_file_view_manager_activate" swapped="no"/>
@@ -42,18 +41,16 @@
                       </object>
                     </child>
                     <child>
-                      <object class="GtkButton" id="menu-file-close">
+                          <object class="VmmMenuActionButton" id="menu-file-close">
                         <property name="visible">True</property>
-                        <property name="can-focus">False</property>
                         <property name="label">_Close</property>
                         <property name="use-underline">True</property>
                         <signal name="clicked" handler="on_menu_file_close_activate" swapped="no"/>
                         </object>
                     </child>
                     <child>
-                      <object class="GtkButton" id="menu-file-quit">
+                          <object class="VmmMenuActionButton" id="menu-file-quit">
                         <property name="visible">True</property>
-                        <property name="can-focus">False</property>
                         <property name="label">_Quit</property>
                         <property name="use-underline">True</property>
                         <signal name="clicked" handler="on_menu_file_quit_activate" swapped="no"/>

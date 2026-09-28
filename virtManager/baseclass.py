@@ -19,6 +19,7 @@ from virtinst import log
 from virtinst import xmlutil
 
 from . import config
+from .lib import uiutil
 
 
 class vmmGObject(GObject.GObject):
@@ -333,7 +334,9 @@ class vmmGObjectUI(vmmGObject):
             self.builder.set_translation_domain("virt-manager")
             self.builder.add_from_file(uifile)
             for obj in self.builder.get_objects():
-                if isinstance(obj, Gtk.ComboBox):
+                if isinstance(obj, Gtk.Popover):
+                    uiutil.init_menu(obj)
+                elif isinstance(obj, Gtk.ComboBox):
                     obj.set_halign(Gtk.Align.START)
 
             if not topwin:
@@ -380,7 +383,12 @@ class vmmGObjectUI(vmmGObject):
             self._builder_signal_handlers.clear()
             self.builder = None
             if not self._external_topwin:
-                self.topwin.destroy()
+                if isinstance(self.topwin, Gtk.Popover):
+                    self.topwin.popdown()
+                    if self.topwin.get_parent():
+                        self.topwin.unparent()
+                else:
+                    self.topwin.destroy()
             self.topwin = None
             self._err = None
         except Exception:  # pragma: no cover

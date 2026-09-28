@@ -19,11 +19,13 @@
             <child>
               <object class="GtkMenuButton" id="menuitem4">
                 <property name="visible">True</property>
+                <property name="has-frame">False</property>
+                <property name="direction">none</property>
                 <property name="label" translatable="1">_File</property>
                 <property name="use-underline">True</property>
                 <property name="popover"><object class="GtkPopover" id="menuitem4_menu">
                     <property name="child"><object class="GtkBox" id="menuitem4_menu-items"><property name="orientation">vertical</property><child>
-                      <object class="GtkButton" id="open_connection">
+                          <object class="VmmMenuActionButton" id="open_connection">
                         <property name="visible">True</property>
                         <property name="label" translatable="1">_Add Connection...</property>
                         <property name="use-underline">True</property>
@@ -31,7 +33,7 @@
                       </object>
                     </child>
                     <child>
-                      <object class="GtkButton" id="menu-new-vm">
+                          <object class="VmmMenuActionButton" id="menu-new-vm">
                         <property name="visible">True</property>
                         <property name="label" translatable="1">_New Virtual Machine</property>
                         <property name="use-underline">True</property>
@@ -44,7 +46,7 @@
                       </object>
                     </child>
                     <child>
-                      <object class="GtkButton" id="menu_file_close">
+                          <object class="VmmMenuActionButton" id="menu_file_close">
                         <property name="visible">True</property>
                         <property name="label" translatable="1">_Close</property>
                         <property name="use-underline">True</property>
@@ -52,7 +54,7 @@
                         </object>
                     </child>
                     <child>
-                      <object class="GtkButton" id="menu_file_quit">
+                          <object class="VmmMenuActionButton" id="menu_file_quit">
                         <property name="visible">True</property>
                         <property name="label" translatable="1">_Quit</property>
                         <property name="use-underline">True</property>
@@ -65,11 +67,13 @@
             <child>
               <object class="GtkMenuButton" id="menuitem5">
                 <property name="visible">True</property>
+                <property name="has-frame">False</property>
+                <property name="direction">none</property>
                 <property name="label" translatable="1">_Edit</property>
                 <property name="use-underline">True</property>
                 <property name="popover"><object class="GtkPopover" id="menuitem5_menu">
                     <property name="child"><object class="GtkBox" id="menuitem5_menu-items"><property name="orientation">vertical</property><child>
-                      <object class="GtkButton" id="menu_host_details">
+                          <object class="VmmMenuActionButton" id="menu_host_details">
                         <property name="visible">True</property>
                         <property name="label" translatable="1">_Connection Details</property>
                         <property name="use-underline">True</property>
@@ -77,7 +81,7 @@
                       </object>
                     </child>
                     <child>
-                      <object class="GtkButton" id="menu_edit_details">
+                          <object class="VmmMenuActionButton" id="menu_edit_details">
                         <property name="visible">True</property>
                         <property name="label" translatable="1">_Virtual Machine Details</property>
                         <property name="use-underline">True</property>
@@ -85,7 +89,7 @@
                       </object>
                     </child>
                     <child>
-                      <object class="GtkButton" id="menu_edit_delete">
+                          <object class="VmmMenuActionButton" id="menu_edit_delete">
                         <property name="visible">True</property>
                         <property name="label" translatable="1">_Delete</property>
                         <property name="use-underline">True</property>
@@ -98,7 +102,7 @@
                       </object>
                     </child>
                     <child>
-                      <object class="GtkButton" id="menu_edit_preferences">
+                          <object class="VmmMenuActionButton" id="menu_edit_preferences">
                         <property name="visible">True</property>
                         <property name="label" translatable="1">_Preferences</property>
                         <property name="use-underline">True</property>
@@ -111,14 +115,18 @@
             <child>
               <object class="GtkMenuButton" id="menuitem6">
                 <property name="visible">True</property>
+                <property name="has-frame">False</property>
+                <property name="direction">none</property>
                 <property name="label" translatable="1">_View</property>
                 <property name="use-underline">True</property>
                 <property name="popover"><object class="GtkPopover" id="menuitem6_menu">
                     <property name="child"><object class="GtkBox" id="menuitem6_menu-items"><property name="orientation">vertical</property><child>
-                      <object class="GtkExpander" id="menuitem1">
+                          <object class="GtkMenuButton" id="menuitem1">
                         <property name="visible">True</property>
                         <property name="label" translatable="1">_Graph</property>
                         <property name="use-underline">True</property>
+                            <property name="popover">
+                              <object class="GtkPopover" id="view-graph-menu">
                         <property name="child"><object class="GtkBox" id="menu1"><property name="orientation">vertical</property><child>
                               <object class="GtkCheckButton" id="menu_view_stats_guest_cpu">
                                 <property name="visible">True</property>
@@ -163,6 +171,8 @@
                               </object>
                             </child>
                           </object></property></object>
+                            </property>
+                          </object>
                     </child>
                   </object></property></object>
                 </property></object>
@@ -170,11 +180,13 @@
             <child>
               <object class="GtkMenuButton" id="menuitem7">
                 <property name="visible">True</property>
+                <property name="has-frame">False</property>
+                <property name="direction">none</property>
                 <property name="label" translatable="1">_Help</property>
                 <property name="use-underline">True</property>
                 <property name="popover"><object class="GtkPopover" id="menuitem7_menu">
                     <property name="child"><object class="GtkBox" id="menuitem7_menu-items"><property name="orientation">vertical</property><child>
-                      <object class="GtkButton" id="menu_help_about">
+                          <object class="VmmMenuActionButton" id="menu_help_about">
                         <property name="visible">True</property>
                         <property name="label" translatable="1">_About</property>
                         <property name="use-underline">True</property>

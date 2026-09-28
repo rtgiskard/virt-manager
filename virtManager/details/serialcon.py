@@ -7,12 +7,12 @@
 # pylint: disable=wrong-import-order,ungrouped-imports
 import gi
 import libvirt
-from gi.repository import Gdk
 from gi.repository import Gtk
 
 from virtinst import log
 
 from ..baseclass import vmmGObject
+from ..lib import uiutil
 
 gi.require_version("Vte", "3.91")
 from gi.repository import Vte  # noqa: E402
@@ -248,12 +248,13 @@ class vmmSerialConsole(vmmGObject):
         self._serial_popup.update_property([Gtk.AccessibleProperty.LABEL], ["serial-popup-menu"])
         box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self._serial_popup.set_child(box)
+        uiutil.init_menu(self._serial_popup)
 
-        self._serial_copy = Gtk.Button.new_with_mnemonic(_("_Copy"))
+        self._serial_copy = uiutil.new_menu_action_button(_("_Copy"))
         self._serial_copy.connect("clicked", self._serial_copy_text)
         box.append(self._serial_copy)
 
-        self._serial_paste = Gtk.Button.new_with_mnemonic(_("_Paste"))
+        self._serial_paste = uiutil.new_menu_action_button(_("_Paste"))
         self._serial_paste.connect("clicked", self._serial_paste_text)
         box.append(self._serial_paste)
 
@@ -356,18 +357,11 @@ class vmmSerialConsole(vmmGObject):
         scrollbar.set_visible(adjustment.get_upper() > adjustment.get_page_size())
 
     def _show_serial_rcpopup(self, gesture, _press_count, x, y):
-        if not self._serial_popup.get_parent():
-            self._serial_popup.set_parent(self._vteterminal)
         self._serial_copy.set_sensitive(self._vteterminal.get_has_selection())
-        rect = Gdk.Rectangle()
-        rect.x, rect.y, rect.width, rect.height = int(x), int(y), 1, 1
-        self._serial_popup.set_pointing_to(rect)
-        self._serial_popup.popup()
+        uiutil.popup_menu_at_widget(self._serial_popup, self._vteterminal, x, y)
 
     def _serial_copy_text(self, src_ignore):
-        self._serial_popup.popdown()
         self._vteterminal.copy_clipboard()
 
     def _serial_paste_text(self, src_ignore):
-        self._serial_popup.popdown()
         self._vteterminal.paste_clipboard()

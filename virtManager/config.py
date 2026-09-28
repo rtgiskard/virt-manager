@@ -53,6 +53,26 @@ frame {
     padding: 8px;
 }
 
+popover.vmm-menu > contents {
+    padding: 4px;
+}
+
+popover.vmm-menu button.vmm-menu-row,
+popover.vmm-menu checkbutton.vmm-menu-row,
+popover.vmm-menu menubutton.vmm-menu-row > button {
+    min-height: 24px;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+popover.vmm-menu checkbutton.vmm-menu-row:hover {
+    background-color: alpha(@theme_fg_color, 0.08);
+}
+
+popover.vmm-menu separator {
+    margin: 4px 8px;
+}
+
 .vmm-toolbar {
     padding: 6px 8px;
     border-bottom: 1px solid alpha(@theme_fg_color, 0.10);

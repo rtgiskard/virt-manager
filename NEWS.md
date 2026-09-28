@@ -1,13 +1,17 @@
 # Virtual Machine Manager News
 
 ## GTK4 fork (unreleased)
+- Use public GTK label children and theme-native check indicators in menus,
+  removing guessed indicator spacing and private label-tree traversal. Preserve
+  dynamic labels, mnemonics, RTL submenus, and nested action dismissal.
 - Keep window close/quit shortcuts active even without a focused child, while
   retaining the guest keyboard-grab guard.
 - Initialize manager actions with no selection, preserve GTK 4.14 window loading,
   and restore manager Close/Quit and connection-window Quit shortcuts.
-- Right-align wizard and preferences actions while keeping hardware removal
-  separate from Apply/Cancel.
-- Add isolated GTK4 regressions for empty selections and real keyboard shortcuts. Run
+- Dismiss static VM menu actions before opening dialogs; right-align wizard and
+  preferences actions while keeping hardware removal separate from Apply/Cancel.
+- Add isolated GTK4 regressions for empty selections, dynamic native menus,
+  action dismissal, and real keyboard shortcuts. Run
   pytest tests/test_gtk4.py with VIRT_MANAGER_TEST_DISPLAY pointing to a private
   Wayland compositor; set VIRT_MANAGER_TEST_XDISPLAY to that compositor's
   XWayland display to include real XTest keyboard input (requires libXtst).
@@ -21,6 +25,8 @@
 - Replace GTK3 menu and tray APIs with GTK4 popovers and a native D-Bus
   StatusNotifierItem. VNC graphical viewing is unavailable in this fork;
   virt-install's VNC XML support is unchanged.
+- Dismiss GTK4 popover menus when their action buttons are activated, before
+  opening another window or dialog.
 - Restore keyboard focus for the GTK4 dialog action rows, snapshot mode
   choices, host File actions, VM shutdown buttons, and Preferences Close.
 - Anchor the operating-system search popover to its entry, support Down-arrow
@@ -32,6 +38,8 @@
 - Size new manager and VM detail windows for typical fractional-scale desktops
   without imposing a non-resizable guest display minimum; use native theme-aware
   menu, toolbar, action-row, and primary-button styling.
+- Render manager, connection, and VM menu bars as flat, arrowless native menu
+  buttons rather than framed dropdown controls, preserving menu mnemonics.
 - Hide installation-only actions in normal VM windows and initialize storage and
   snapshot mode radio buttons with one selected choice so switching remains exclusive.
 - Keep Run/Restore toolbar actions icon-only in manager and VM detail windows;
@@ -39,12 +47,23 @@
 - Ship the GTK4 AUR GUI, virtinst backend, and virt-install/virt-clone/virt-xml
   tools from the same source revision; provide and conflict with virt-install
   rather than mixing the development GUI with the distro's older backend.
+- Align action, checkbox, and radio rows consistently across GTK4 popover menus,
+  including dynamically populated console, storage, snapshot, and VM actions.
+- Open Scale Display and manager Graph options as side submenus instead of
+  expanding them inline; retain the existing action callbacks and selection groups.
 - Fix Boot Options refresh and clone, storage pool, and deletion dialog initialization
   by emitting the GTK4 toggled signal instead of calling the removed GTK3 method.
+- Give static and rebuilt popover action rows one dismissal owner, closing the
+  whole menu hierarchy before consumer callbacks while leaving checkbox and
+  submenu-opening interactions open.
+- Attach context menus to the window's layout-managed content rather than legacy
+  tree or terminal widgets, translating pointer coordinates into their parent space.
 - Let Boot Options groups take their natural height, bound boot and clone storage
   lists' scrolling heights, and keep the boot move buttons aligned at the top.
 - Use theme-native borders for clone and deletion lists; allow Preferences resizing
   and treat the storage-pool window dimensions as initial rather than minimum sizes.
+- Render menu popovers without callout arrows; align dropdowns to their menu
+  buttons and cascading submenus to the top of their triggering rows.
 - Configure editable combo boxes through their built-in entry, avoiding duplicate
   input fields and displaced dropdowns while preserving custom values and callbacks.
 - Use numeric value-change signals for spin buttons, preventing recursive CPU

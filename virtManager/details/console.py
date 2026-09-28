@@ -14,6 +14,7 @@ from .sshtunnels import ConnectionInfo
 from .viewers import SpiceViewer, SPICE_GTK_IMPORT_ERROR
 from ..baseclass import vmmGObject, vmmGObjectUI
 from ..lib.keyring import vmmKeyring
+from ..lib import uiutil
 
 
 # console-pages IDs
@@ -100,15 +101,14 @@ def build_keycombo_menu(on_send_key_fn):
     menu = Gtk.Popover()
     box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
     menu.set_child(box)
+    uiutil.init_menu(menu)
 
     def make_item(accel, combo):
         _valid, keyval, modifiers = Gtk.accelerator_parse(accel)
         name = Gtk.accelerator_get_label(keyval, modifiers)
-        item = Gtk.Button(label=name)
-        item.set_has_frame(False)
+        item = uiutil.new_menu_action_button(name)
 
         def send_key(button):
-            menu.popdown()
             on_send_key_fn(button, combo)
 
         item.connect("clicked", send_key)
@@ -185,6 +185,7 @@ class _ConsoleMenu(vmmGObject):
         self._menu = Gtk.Popover()
         self._box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self._menu.set_child(self._box)
+        uiutil.init_menu(self._menu)
         self._menu.connect("show", show_cb)
         self._toggled_cb = toggled_cb
         self._items = []
@@ -845,7 +846,6 @@ class vmmConsolePages(vmmGObjectUI):
 
     def vmwindow_get_viewer_is_visible(self):
         return self._viewer_is_visible()
-
 
     def vmwindow_has_keyboard_grab(self):
         return bool(self._viewer and self._viewer.console_has_keyboard_grab())

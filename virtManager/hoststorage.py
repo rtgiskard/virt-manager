@@ -3,7 +3,6 @@
 # This work is licensed under the GNU GPLv2 or later.
 # See the COPYING file in the top-level directory.
 
-from gi.repository import Gdk
 from gi.repository import Gtk
 from gi.repository import Pango
 
@@ -172,7 +171,8 @@ class vmmHostStorage(vmmGObjectUI):
         self._volmenu = Gtk.Popover()
         box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self._volmenu.set_child(box)
-        volCopyPath = Gtk.Button.new_with_mnemonic(_("Copy Volume Path"))
+        uiutil.init_menu(self._volmenu)
+        volCopyPath = uiutil.new_menu_action_button(_("Copy Volume Path"))
         volCopyPath.connect("clicked", self._vol_copy_path_cb)
         box.append(volCopyPath)
         click = Gtk.GestureClick(button=3)
@@ -511,7 +511,6 @@ class vmmHostStorage(vmmGObjectUI):
     ###########################
 
     def _vol_copy_path_cb(self, src):
-        self._volmenu.popdown()
         vol = self._current_vol()
         if not vol:
             return  # pragma: no cover
@@ -645,12 +644,7 @@ class vmmHostStorage(vmmGObjectUI):
         if hit is None:
             return
         widget.get_selection().select_path(hit[0])
-        if not self._volmenu.get_parent():
-            self._volmenu.set_parent(widget)
-        rect = Gdk.Rectangle()
-        rect.x, rect.y, rect.width, rect.height = int(x), int(y), 1, 1
-        self._volmenu.set_pointing_to(rect)
-        self._volmenu.popup()
+        uiutil.popup_menu_at_widget(self._volmenu, widget, x, y)
 
     def _cancel_clicked_cb(self, src):
         self.emit("cancel-clicked")

@@ -9,7 +9,6 @@ import glob
 import io
 import os
 
-from gi.repository import Gdk
 from gi.repository import GdkPixbuf
 from gi.repository import Gtk
 from gi.repository import Pango
@@ -497,13 +496,14 @@ class vmmSnapshotPage(vmmGObjectUI):
         menu = Gtk.Popover()
         box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         menu.set_child(box)
+        uiutil.init_menu(menu)
 
-        item = Gtk.Button.new_with_mnemonic(_("_Start snapshot"))
-        item.connect("clicked", lambda button: (menu.popdown(), self._on_start_clicked(button)))
+        item = uiutil.new_menu_action_button(_("_Start snapshot"))
+        item.connect("clicked", self._on_start_clicked)
         box.append(item)
 
-        item = Gtk.Button.new_with_mnemonic(_("_Delete snapshot"))
-        item.connect("clicked", lambda button: (menu.popdown(), self._on_delete_clicked(button)))
+        item = uiutil.new_menu_action_button(_("_Delete snapshot"))
+        item.connect("clicked", self._on_delete_clicked)
         box.append(item)
 
         self._snapmenu = menu
@@ -711,12 +711,7 @@ class vmmSnapshotPage(vmmGObjectUI):
         if hit is None:
             return
         widget.get_selection().select_path(hit[0])
-        if not self._snapmenu.get_parent():
-            self._snapmenu.set_parent(widget)
-        rect = Gdk.Rectangle()
-        rect.x, rect.y, rect.width, rect.height = int(x), int(y), 1, 1
-        self._snapmenu.set_pointing_to(rect)
-        self._snapmenu.popup()
+        uiutil.popup_menu_at_widget(self._snapmenu, widget, x, y)
 
     def close(self, ignore1=None, ignore2=None):
         if self._snapshot_new:
