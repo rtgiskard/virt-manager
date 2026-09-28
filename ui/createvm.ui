@@ -64,8 +64,7 @@
                       </object>
                     </child>
                   </object>
-                </child>
-              <property name="margin-start">6</property><property name="margin-end">6</property><property name="margin-top">6</property><property name="margin-bottom">6</property></object>
+                </child></object>
             </property>
             <style>
               <class name="vmm-header"/>
@@ -590,13 +589,13 @@ bar</property>
                                                 <property name="valign">center</property>
                                                 <property name="hexpand">1</property>
                                                 <property name="has-entry">1</property>
-                                                <property name="child">
+                                                <child internal-child="entry">
                                                   <object class="GtkEntry" id="install-url-entry">
                                                     <property name="focusable">1</property>
                                                     <signal name="activate" handler="on_install_url_entry_activate" swapped="no"/>
                                                     <signal name="changed" handler="on_install_url_entry_changed" swapped="no"/>
                                                     </object>
-                                                </property>
+                                                </child>
                                                 <layout>
                                                   <property name="column">0</property>
                                                   <property name="row">0</property>
@@ -905,7 +904,7 @@ connections is not yet supported.&lt;/small&gt;</property>
                                                       <object class="GtkComboBox" id="install-oscontainer-source-url-combo">
                                                         <property name="hexpand">1</property>
                                                         <property name="has-entry">1</property>
-                                                        <property name="child">
+                                                        <child internal-child="entry">
                                                           <object class="GtkEntry" id="install-oscontainer-source-url-entry">
                                                             <property name="focusable">1</property>
                                                             <property name="tooltip-text" translatable="1">Possible URL formats:
@@ -914,7 +913,7 @@ connections is not yet supported.&lt;/small&gt;</property>
  * virt-builder://template
 </property>
                                                             </object>
-                                                        </property>
+                                                        </child>
                                                         <layout>
                                                           <property name="column">1</property>
                                                           <property name="row">0</property>
@@ -1521,8 +1520,15 @@ connections is not yet supported.&lt;/small&gt;</property>
             <child>
               <object class="GtkBox" id="hbuttonbox1">
                 <property name="visible">True</property>
-                <property name="can-focus">False</property>
                 <property name="spacing">12</property>
+                <style>
+                  <class name="vmm-action-row"/>
+                </style>
+                <child>
+                  <object class="GtkBox">
+                    <property name="hexpand">1</property>
+                  </object>
+                </child>
                 <child>
                   <object class="GtkButton" id="create-cancel">
                     <property name="label" translatable="1">_Cancel</property>
@@ -1546,6 +1552,7 @@ connections is not yet supported.&lt;/small&gt;</property>
                   <object class="GtkButton" id="create-forward">
                     <property name="label" translatable="1">_Forward</property>
                     <property name="focusable">1</property>
+                    <property name="css-classes">suggested-action</property>
                     <property name="receives-default">1</property>
                     <property name="use-underline">1</property>
                     <signal name="clicked" handler="on_create_forward_clicked" swapped="no"/>
@@ -1556,6 +1563,7 @@ connections is not yet supported.&lt;/small&gt;</property>
                     <property name="visible">0</property>
                     <property name="label" translatable="1">_Finish</property>
                     <property name="focusable">1</property>
+                    <property name="css-classes">suggested-action</property>
                     <property name="receives-default">1</property>
                     <property name="use-underline">1</property>
                     <signal name="clicked" handler="on_create_finish_clicked" swapped="no"/>

@@ -3,8 +3,8 @@
   <requires lib="gtk" version="4.0"/>
   <object class="GtkWindow" id="vmm-vmwindow">
     <property name="title" translatable="1">Virtual Machine</property>
-    <property name="default-width">800</property>
-    <property name="default-height">600</property>
+    <property name="default-width">900</property>
+    <property name="default-height">640</property>
     <signal name="close-request" handler="on_vmm_details_delete_event" swapped="no"/>
     <property name="child">
       <object class="GtkBox" id="vbox2">
@@ -13,6 +13,9 @@
           <object class="GtkBox" id="details-menubar">
             <property name="valign">center</property>
             <property name="visible">True</property>
+            <style>
+              <class name="vmm-menubar"/>
+            </style>
             <child>
               <object class="GtkMenuButton" id="file1">
                 <property name="visible">True</property>
@@ -227,6 +230,9 @@
         </child>
         <child>
           <object class="GtkBox" id="toolbar-box">
+            <style>
+              <class name="vmm-toolbar"/>
+            </style>
             <child>
               <object class="GtkBox" id="details-toolbar">
                 <property name="css-classes">toolbar</property>
@@ -275,7 +281,6 @@
                 <child>
                   <object class="GtkButton" id="control-shutdown">
                     <property name="visible">True</property>
-                    <property name="can-focus">False</property>
                     <property name="tooltip-text" translatable="1">Shut down the virtual machine</property>
                     <property name="label" translatable="1">_Shut Down</property>
                     <property name="use-underline">True</property>
@@ -307,11 +312,13 @@
             </child>
             <child>
               <object class="GtkBox" id="customize-toolbar">
+                <property name="visible">False</property>
                 <property name="css-classes">toolbar</property>
                 <property name="hexpand">1</property>
                 <child>
                   <object class="GtkButton" id="details-finish-customize">
                     <property name="tooltip-text" translatable="1">Begin Installation</property>
+                    <property name="css-classes">suggested-action</property>
                     <property name="label" translatable="1">_Begin Installation</property>
                     <property name="use-underline">1</property>
                     <signal name="clicked" handler="on_details_customize_finish_clicked" swapped="no"/>

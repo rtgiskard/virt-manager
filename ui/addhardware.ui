@@ -222,11 +222,11 @@
                                         <child>
                                           <object class="GtkComboBox" id="controller-model">
                                             <property name="has-entry">1</property>
-                                            <property name="child">
+                                            <child internal-child="entry">
                                               <object class="GtkEntry" id="combobox-entry4">
                                                 <property name="focusable">1</property>
                                               </object>
-                                            </property>
+                                            </child>
                                             <layout>
                                               <property name="column">1</property>
                                               <property name="row">1</property>
@@ -237,11 +237,11 @@
                                           <object class="GtkComboBox" id="controller-type">
                                             <property name="has-entry">1</property>
                                             <signal name="changed" handler="on_controller_type_changed" swapped="no"/>
-                                            <property name="child">
+                                            <child internal-child="entry">
                                               <object class="GtkEntry">
                                                 <property name="focusable">1</property>
                                               </object>
-                                            </property>
+                                            </child>
                                             <layout>
                                               <property name="column">1</property>
                                               <property name="row">0</property>
@@ -351,11 +351,11 @@
                                               <object class="GtkComboBox" id="net-model">
                                                 <property name="halign">start</property>
                                                 <property name="has-entry">1</property>
-                                                <property name="child">
+                                                <child internal-child="entry">
                                                   <object class="GtkEntry" id="combobox-entry3">
                                                     <property name="focusable">1</property>
                                                   </object>
-                                                </property>
+                                                </child>
                                                 <layout>
                                                   <property name="column">1</property>
                                                   <property name="row">2</property>
@@ -449,11 +449,11 @@
                                         <child>
                                           <object class="GtkComboBox" id="sound-model">
                                             <property name="has-entry">1</property>
-                                            <property name="child">
+                                            <child internal-child="entry">
                                               <object class="GtkEntry">
                                                 <property name="focusable">1</property>
                                               </object>
-                                            </property>
+                                            </child>
                                             <layout>
                                               <property name="column">1</property>
                                               <property name="row">0</property>
@@ -619,12 +619,12 @@
                                             <property name="halign">start</property>
                                             <property name="has-entry">1</property>
                                             <signal name="changed" handler="on_char_target_name_changed" swapped="no"/>
-                                            <property name="child">
+                                            <child internal-child="entry">
                                               <object class="GtkEntry" id="combobox-entry">
                                                 <property name="focusable">1</property>
                                                 <property name="width-chars">20</property>
                                               </object>
-                                            </property>
+                                            </child>
                                             <layout>
                                               <property name="column">1</property>
                                               <property name="row">0</property>
@@ -678,11 +678,11 @@
                                           <object class="GtkComboBox" id="char-target-type">
                                             <property name="halign">start</property>
                                             <property name="has-entry">1</property>
-                                            <property name="child">
+                                            <child internal-child="entry">
                                               <object class="GtkEntry">
                                                 <property name="focusable">1</property>
                                               </object>
-                                            </property>
+                                            </child>
                                             <layout>
                                               <property name="column">1</property>
                                               <property name="row">2</property>
@@ -741,11 +741,11 @@
                                         <child>
                                           <object class="GtkComboBox" id="video-model">
                                             <property name="has-entry">1</property>
-                                            <property name="child">
+                                            <child internal-child="entry">
                                               <object class="GtkEntry">
                                                 <property name="focusable">1</property>
                                               </object>
-                                            </property>
+                                            </child>
                                             <layout>
                                               <property name="column">1</property>
                                               <property name="row">0</property>
@@ -986,11 +986,11 @@
                                         <child>
                                           <object class="GtkComboBox" id="panic-model">
                                             <property name="has-entry">1</property>
-                                            <property name="child">
+                                            <child internal-child="entry">
                                               <object class="GtkEntry">
                                                 <property name="focusable">1</property>
                                               </object>
-                                            </property>
+                                            </child>
                                             <layout>
                                               <property name="column">1</property>
                                               <property name="row">0</property>
@@ -1060,8 +1060,10 @@
         <child>
           <object class="GtkBox" id="hbuttonbox1">
             <property name="visible">True</property>
-            <property name="can-focus">False</property>
             <property name="spacing">12</property>
+            <style>
+              <class name="vmm-action-row"/>
+            </style>
             <child>
               <object class="GtkButton" id="create-cancel">
                 <property name="label" translatable="1">_Cancel</property>
@@ -1075,6 +1077,7 @@
               <object class="GtkButton" id="create-finish">
                 <property name="label" translatable="1">_Finish</property>
                 <property name="focusable">1</property>
+                <property name="css-classes">suggested-action</property>
                 <property name="receives-default">1</property>
                 <property name="use-underline">1</property>
                 <signal name="clicked" handler="on_create_finish_clicked" swapped="no"/>

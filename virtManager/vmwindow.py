@@ -80,9 +80,8 @@ class vmmVMWindow(vmmGObjectUI):
         # Set default window size
         w, h = self.vm.get_details_window_size()
         if w <= 0 or h <= 0:
-            self._set_initial_window_size()
-        else:
-            self.topwin.set_default_size(w, h)
+            w, h = 900, 640
+        self.topwin.set_default_size(w, h)
         self._window_size = None
 
         self._shutdownmenu = None
@@ -120,6 +119,10 @@ class vmmVMWindow(vmmGObjectUI):
             "on_details_menu_view_resizeguest_toggled": self._resizeguest_ui_changed_cb,
             "on_details_menu_view_autoconnect_activate": self._autoconnect_ui_changed_cb,
         })
+        if not self.is_customize_dialog:
+            self.bind_close_shortcut(
+                "<Control><Shift>w", lambda: not self._console.vmwindow_has_keyboard_grab()
+            )
 
         # Deliberately keep all this after signal connection
         self.vm.connect("state-changed", self._vm_state_changed_cb)
@@ -165,6 +168,7 @@ class vmmVMWindow(vmmGObjectUI):
             self.vm.set_details_window_size(*self._window_size)
 
         self.conn.disconnect_by_obj(self)
+        self.vm.disconnect_by_obj(self)
         self.vm = None
 
     def show(self):
@@ -182,26 +186,6 @@ class vmmVMWindow(vmmGObjectUI):
         if self._details.vmwindow_has_unapplied_changes():
             return
         self.emit("customize-finished", self.vm)
-
-    def _set_initial_window_size(self):
-        """
-        We want the window size for new windows to be 1280x800 viewer
-        size, plus whatever it takes to fit the toolbar+menubar, etc.
-        To achieve this, we force the display box to the desired size
-        with set_size_request, wait for the window to report it has
-        been resized, and then unset the hardcoded size request so
-        the user can manually resize the window however they want.
-        """
-        w = 1280
-        h = 800
-        hid = []
-
-        def win_cb(*_args):
-            self.widget("details-pages").set_size_request(-1, -1)
-            self.topwin.disconnect(hid[0])
-
-        self.widget("details-pages").set_size_request(w, h)
-        hid.append(self.topwin.connect("map", win_cb))
 
     def _vm_removed_cb(self, _conn, vm):
         if self.vm == vm:
@@ -365,7 +349,9 @@ class vmmVMWindow(vmmGObjectUI):
         strip_text = text.replace("_", "")
 
         self._vmmenu.change_run_text(text)
-        self.widget("control-run").set_label(strip_text)
+        button = self.widget("control-run")
+        button.set_tooltip_text(strip_text)
+        button.update_property([Gtk.AccessibleProperty.LABEL], [strip_text])
 
     def _refresh_title(self):
         title = _("%(vm-name)s on %(connection-name)s") % {

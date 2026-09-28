@@ -3,9 +3,8 @@
   <requires lib="gtk" version="4.0"/>
   <object class="GtkWindow" id="vmm-manager">
     <property name="title" translatable="1">Virtual Machine Manager</property>
-    <property name="default-width">550</property>
-    <property name="default-height">550</property>
-    <property name="gravity">center</property>
+    <property name="default-width">760</property>
+    <property name="default-height">560</property>
     <signal name="close-request" handler="on_vm_manager_delete_event" swapped="no"/>
     <property name="child">
       <object class="GtkBox" id="vbox1">
@@ -14,6 +13,9 @@
           <object class="GtkBox" id="menubar1">
             <property name="valign">center</property>
             <property name="visible">True</property>
+            <style>
+              <class name="vmm-menubar"/>
+            </style>
             <child>
               <object class="GtkMenuButton" id="menuitem4">
                 <property name="visible">True</property>
@@ -191,6 +193,9 @@
             <child>
               <object class="GtkBox" id="vm-toolbar">
                 <property name="css-classes">toolbar</property>
+                <style>
+                  <class name="vmm-toolbar"/>
+                </style>
                 <child>
                   <object class="GtkButton" id="vm-new">
                     <property name="has-tooltip">1</property>
@@ -239,7 +244,6 @@
                 <child>
                   <object class="GtkButton" id="vm-shutdown">
                     <property name="visible">True</property>
-                    <property name="can-focus">False</property>
                     <property name="has-tooltip">True</property>
                     <property name="tooltip-text" translatable="1">Shut down the virtual machine</property>
                     <property name="label" translatable="1">_Shut Down</property>

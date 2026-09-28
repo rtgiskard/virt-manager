@@ -192,7 +192,7 @@ class vmmMigrateDialog(vmmGObjectUI):
     # Listeners #
     #############
 
-    def _delete_event(self, ignore1, ignore2):
+    def _delete_event(self, _window):
         self.close()
         return 1
 

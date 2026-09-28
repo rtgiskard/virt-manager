@@ -216,6 +216,7 @@ class vmmSerialConsole(vmmGObject):
         self.vm.connect("state-changed", self._vm_status_changed)
 
     def _cleanup(self):
+        self.vm.disconnect_by_obj(self)
         self._datastream.cleanup()
         self._datastream = None
         if self._serial_popup.get_parent():

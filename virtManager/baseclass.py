@@ -323,6 +323,7 @@ class vmmGObjectUI(vmmGObject):
         vmmGObject.__init__(self)
         self._external_topwin = bool(topwin)
         self.__cleaned_up = False
+        self._builder_signal_handlers = {}
 
         if filename:
             uifile = os.path.join(self.config.get_ui_dir(), filename)
@@ -331,6 +332,9 @@ class vmmGObjectUI(vmmGObject):
             self.builder.set_scope(_BuilderScope())
             self.builder.set_translation_domain("virt-manager")
             self.builder.add_from_file(uifile)
+            for obj in self.builder.get_objects():
+                if isinstance(obj, Gtk.ComboBox):
+                    obj.set_halign(Gtk.Align.START)
 
             if not topwin:
                 self.topwin = self.widget(windowname)
@@ -345,6 +349,7 @@ class vmmGObjectUI(vmmGObject):
 
     def connect_signals(self, handlers):
         self.builder.get_scope().handlers.update(handlers)
+        self._builder_signal_handlers.update(handlers)
 
     def _get_err(self):
         if self._err is None:
@@ -368,6 +373,11 @@ class vmmGObjectUI(vmmGObject):
         try:
             self.close()
             vmmGObject.cleanup(self)
+            scope_handlers = self.builder.get_scope().handlers
+            for name, handler in self._builder_signal_handlers.items():
+                if scope_handlers.get(name) is handler:
+                    del scope_handlers[name]
+            self._builder_signal_handlers.clear()
             self.builder = None
             if not self._external_topwin:
                 self.topwin.destroy()
@@ -397,6 +407,27 @@ class vmmGObjectUI(vmmGObject):
             return False
 
         controller.connect("key-pressed", close_on_escape)
+        self.topwin.add_controller(controller)
+
+    def bind_close_shortcut(self, trigger, can_close=None, callback=None):
+        controller = Gtk.ShortcutController()
+        controller.set_scope(Gtk.ShortcutScope.GLOBAL)
+        controller.set_propagation_phase(Gtk.PropagationPhase.BUBBLE)
+
+        def activate(_widget, _args):
+            if can_close is not None and not can_close():
+                return False
+            if callback is None:
+                self.close()
+            else:
+                callback()
+            return True
+
+        controller.add_shortcut(
+            Gtk.Shortcut.new(
+                Gtk.ShortcutTrigger.parse_string(trigger), Gtk.CallbackAction.new(activate)
+            )
+        )
         self.topwin.add_controller(controller)
 
     def _set_cursor(self, cursor_type):

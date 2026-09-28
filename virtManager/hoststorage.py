@@ -113,6 +113,8 @@ class vmmHostStorage(vmmGObjectUI):
             self.conn.disconnect_by_obj(self)
         except Exception:  # pragma: no cover
             pass
+        for pool in self.conn.list_pools():
+            pool.disconnect_by_obj(self)
         self.conn = None
 
         if self._addpool:

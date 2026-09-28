@@ -97,8 +97,6 @@ class vmmCreateConn(vmmGObjectUI):
         pass
 
     def set_initial_state(self):
-        self.widget("connect").grab_default()
-
         combo = self.widget("hypervisor")
         # [connection ID, label]
         model = Gtk.ListStore(int, str)

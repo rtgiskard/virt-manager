@@ -37,8 +37,7 @@ GRAPH_LEN = 40
 ) = range(11)
 
 # Columns in the tree view
-(COL_NAME, COL_GUEST_CPU, COL_HOST_CPU, COL_MEM, COL_DISK, COL_NETWORK) = range(6)
-
+COL_NAME, COL_GUEST_CPU, COL_HOST_CPU, COL_MEM, COL_DISK, COL_NETWORK = range(6)
 
 
 def _cmp(a, b):
@@ -80,8 +79,7 @@ class vmmManager(vmmGObjectUI):
         self._cleanup_on_app_close()
 
         w, h = self.config.get_manager_window_size()
-        self.topwin.set_default_size(w or 550, h or 550)
-        self.prev_position = None
+        self.topwin.set_default_size(w or 760, h or 560)
         self._syncing_pause_state = False
         self._window_size = None
 
@@ -92,30 +90,34 @@ class vmmManager(vmmGObjectUI):
         self.connmenu.set_child(self._connmenu_box)
         self.connmenu_items = {}
 
-        self.connect_signals({
-            "on_menu_view_guest_cpu_usage_activate": self.toggle_stats_visible_guest_cpu,
-            "on_menu_view_host_cpu_usage_activate": self.toggle_stats_visible_host_cpu,
-            "on_menu_view_memory_usage_activate": self.toggle_stats_visible_memory_usage,
-            "on_menu_view_disk_io_activate": self.toggle_stats_visible_disk,
-            "on_menu_view_network_traffic_activate": self.toggle_stats_visible_network,
-            "on_vm_manager_delete_event": self.close,
-            "on_menu_file_add_connection_activate": self.open_newconn,
-            "on_menu_new_vm_activate": self.new_vm,
-            "on_menu_file_quit_activate": self.exit_app,
-            "on_menu_file_close_activate": self.close,
-            "on_vmm_close_clicked": self.close,
-            "on_vm_open_clicked": self.show_vm,
-            "on_vm_run_clicked": self.start_vm,
-            "on_vm_new_clicked": self.new_vm,
-            "on_vm_shutdown_clicked": self.poweroff_vm,
-            "on_vm_pause_clicked": self.pause_vm_button,
-            "on_menu_edit_details_activate": self.show_vm,
-            "on_menu_edit_delete_activate": self.do_delete,
-            "on_menu_host_details_activate": self.show_host,
-            "on_vm_list_row_activated": self.row_activated,
-            "on_menu_edit_preferences_activate": self.show_preferences,
-            "on_menu_help_about_activate": self.show_about,
-        })
+        self.connect_signals(
+            {
+                "on_menu_view_guest_cpu_usage_activate": self.toggle_stats_visible_guest_cpu,
+                "on_menu_view_host_cpu_usage_activate": self.toggle_stats_visible_host_cpu,
+                "on_menu_view_memory_usage_activate": self.toggle_stats_visible_memory_usage,
+                "on_menu_view_disk_io_activate": self.toggle_stats_visible_disk,
+                "on_menu_view_network_traffic_activate": self.toggle_stats_visible_network,
+                "on_vm_manager_delete_event": self.close,
+                "on_menu_file_add_connection_activate": self.open_newconn,
+                "on_menu_new_vm_activate": self.new_vm,
+                "on_menu_file_quit_activate": self.exit_app,
+                "on_menu_file_close_activate": self.close,
+                "on_vmm_close_clicked": self.close,
+                "on_vm_open_clicked": self.show_vm,
+                "on_vm_run_clicked": self.start_vm,
+                "on_vm_new_clicked": self.new_vm,
+                "on_vm_shutdown_clicked": self.poweroff_vm,
+                "on_vm_pause_clicked": self.pause_vm_button,
+                "on_menu_edit_details_activate": self.show_vm,
+                "on_menu_edit_delete_activate": self.do_delete,
+                "on_menu_host_details_activate": self.show_host,
+                "on_vm_list_row_activated": self.row_activated,
+                "on_menu_edit_preferences_activate": self.show_preferences,
+                "on_menu_help_about_activate": self.show_about,
+            }
+        )
+        self.bind_close_shortcut("<Control>w")
+        self.bind_close_shortcut("<Control>q", callback=self.exit_app)
 
         # There seem to be ref counting issues with calling
         # list.get_column, so avoid it
@@ -132,6 +134,7 @@ class vmmManager(vmmGObjectUI):
         self.init_context_menus()
 
         self.widget("vm-list").get_selection().connect("changed", self.update_current_selection)
+        self.update_current_selection()
         click = Gtk.GestureClick(button=3)
         click.connect("pressed", self.popup_vm_menu_button)
         self.widget("vm-list").add_controller(click)
@@ -151,11 +154,11 @@ class vmmManager(vmmGObjectUI):
         self._config_polling_change_cb(COL_NETWORK)
         self._config_polling_change_cb(COL_MEM)
 
-        connmanager = vmmConnectionManager.get_instance()
-        connmanager.connect("conn-added", self._conn_added)
-        connmanager.connect("conn-removed", self._conn_removed)
-        for conn in connmanager.conns.values():
-            self._conn_added(connmanager, conn)
+        self._connmanager = vmmConnectionManager.get_instance()
+        self._connmanager.connect("conn-added", self._conn_added)
+        self._connmanager.connect("conn-removed", self._conn_removed)
+        for conn in self._connmanager.conns.values():
+            self._conn_added(self._connmanager, conn)
 
     ##################
     # Common methods #
@@ -176,7 +179,6 @@ class vmmManager(vmmGObjectUI):
             return
 
         log.debug("Closing manager")
-        self.prev_position = None
         self._window_size = (self.topwin.get_width(), self.topwin.get_height())
         self.topwin.hide()
         vmmEngine.get_instance().decrement_window_counter()
@@ -184,6 +186,12 @@ class vmmManager(vmmGObjectUI):
         return 1
 
     def _cleanup(self):
+        self._connmanager.disconnect_by_obj(self)
+        for conn in self._connmanager.conns.values():
+            conn.disconnect_by_obj(self)
+            for vm in conn.list_vms():
+                vm.disconnect_by_obj(self)
+        self._connmanager = None
         self.diskcol = None
         self.guestcpucol = None
         self.memcol = None
@@ -744,7 +752,9 @@ class vmmManager(vmmGObjectUI):
         strip_text = text.replace("_", "")
 
         self.vmmenu.change_run_text(text)
-        self.widget("vm-run").set_label(strip_text)
+        button = self.widget("vm-run")
+        button.set_tooltip_text(strip_text)
+        button.update_property([Gtk.AccessibleProperty.LABEL], [strip_text])
 
     def update_current_selection(self, ignore=None):
         vm = self.current_vm()

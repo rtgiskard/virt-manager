@@ -48,10 +48,10 @@
           <object class="GtkComboBox" id="tpm-type">
             <property name="has-entry">1</property>
             <signal name="changed" handler="on_tpm_type_changed" swapped="no"/>
-            <property name="child">
+            <child internal-child="entry">
               <object class="GtkEntry">
               </object>
-            </property>
+            </child>
             <layout>
               <property name="column">1</property>
               <property name="row">0</property>
@@ -84,10 +84,10 @@
               <object class="GtkComboBox" id="tpm-model">
                 <property name="has-entry">1</property>
                 <signal name="changed" handler="on_tpm_model_changed" swapped="no"/>
-                <property name="child">
+                <child internal-child="entry">
                   <object class="GtkEntry">
                   </object>
-                </property>
+                </child>
                 <layout>
                   <property name="column">1</property>
                   <property name="row">0</property>
@@ -110,10 +110,10 @@
               <object class="GtkComboBox" id="tpm-version">
                 <property name="has-entry">1</property>
                 <signal name="changed" handler="on_tpm_version_changed" swapped="no"/>
-                <property name="child">
+                <child internal-child="entry">
                   <object class="GtkEntry">
                   </object>
-                </property>
+                </child>
                 <layout>
                   <property name="column">1</property>
                   <property name="row">1</property>

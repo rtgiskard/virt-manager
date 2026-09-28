@@ -54,6 +54,7 @@ class vmmMediaCombo(vmmGObjectUI):
         self.top_box.set_spacing(6)
         self.top_box.set_orientation(Gtk.Orientation.HORIZONTAL)
         self._combo = Gtk.ComboBox(has_entry=True)
+        self._combo.set_halign(Gtk.Align.START)
         self._combo.set_entry_text_column(self.MEDIA_FIELD_LABEL)
         self._combo.update_property([Gtk.AccessibleProperty.LABEL], ["media-combo"])
 
@@ -130,7 +131,7 @@ class vmmMediaCombo(vmmGObjectUI):
     def _on_entry_activated_cb(self, src):
         self.emit("activate", self._entry)
 
-    def _on_entry_icon_press_cb(self, src, icon_pos, event):
+    def _on_entry_icon_press_cb(self, src, icon_pos):
         self._entry.set_text("")
 
     def _iso_paths_changed_cb(self):

@@ -32,11 +32,14 @@ class vmmOSList(vmmGObjectUI):
         self.connect_signals({
             "on_include_eol_toggled": self._eol_toggled_cb,
             "on_os_name_activate": self._entry_activate_cb,
-            "on_os_name_key_press_event": self._key_press_cb,
             "on_os_name_search_changed": self._search_changed_cb,
             "on_os_name_stop_search": self._stop_search_cb,
             "on_os_list_row_activated": self._os_selected_cb,
         })
+        keys = Gtk.EventControllerKey()
+        keys.set_propagation_phase(Gtk.PropagationPhase.CAPTURE)
+        keys.connect("key-pressed", self._key_press_cb)
+        self.search_entry.add_controller(keys)
 
         self._init_state()
 
@@ -119,7 +122,8 @@ class vmmOSList(vmmGObjectUI):
         r = self.search_entry.get_allocation()
         self.topwin.set_size_request(r.width, 350)
 
-        self.topwin.set_relative_to(self.search_entry)
+        if not self.topwin.get_parent():
+            self.topwin.set_parent(self.search_entry)
         self.topwin.popup()
         self._set_default_selection()
 
@@ -137,11 +141,12 @@ class vmmOSList(vmmGObjectUI):
         if rows:
             self.select_os(model[rows[0]][0])
 
-    def _key_press_cb(self, src, event):
-        if Gdk.keyval_name(event.keyval) != "Down":
-            return
+    def _key_press_cb(self, _controller, keyval, _keycode, _state):
+        if keyval != Gdk.KEY_Down:
+            return False
         self._show_popover()
         self.widget("os-list").grab_focus()
+        return True
 
     def _eol_toggled_cb(self, src):
         self._filter_eol = not src.get_active()

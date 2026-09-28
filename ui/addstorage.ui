@@ -86,7 +86,6 @@
           <object class="GtkCheckButton" id="storage-select">
             <property name="focusable">1</property>
             <property name="halign">start</property>
-            <property name="active">1</property>
             <property name="group">storage-create</property>
             <signal name="toggled" handler="on_storage_select_toggled" swapped="no"/>
             <property name="child">
@@ -154,11 +153,11 @@
               <object class="GtkComboBox" id="disk-cache">
                 <property name="has-entry">1</property>
                 <signal name="changed" handler="on_disk_cache_combo_changed" swapped="no"/>
-                <property name="child">
+                <child internal-child="entry">
                   <object class="GtkEntry">
                     <property name="focusable">1</property>
                   </object>
-                </property>
+                </child>
                 <layout>
                   <property name="column">1</property>
                   <property name="row">4</property>
@@ -181,11 +180,11 @@
               <object class="GtkComboBox" id="disk-discard">
                 <property name="has-entry">1</property>
                 <signal name="changed" handler="on_disk_discard_combo_changed" swapped="no"/>
-                <property name="child">
+                <child internal-child="entry">
                   <object class="GtkEntry">
                     <property name="focusable">1</property>
                   </object>
-                </property>
+                </child>
                 <layout>
                   <property name="column">1</property>
                   <property name="row">5</property>

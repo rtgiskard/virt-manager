@@ -3,6 +3,7 @@
   <requires lib="gtk" version="4.0"/>
   <object class="GtkDialog" id="vmm-open-connection">
     <property name="title" translatable="1">Add Connection</property>
+    <property name="default-width">420</property>
     <property name="resizable">0</property>
     <property name="default-widget">connect</property>
     <signal name="close-request" handler="on_vmm_open_connection_delete_event" swapped="no"/>
@@ -10,6 +11,10 @@
       <object class="GtkBox" id="dialog-vbox2">
         <property name="orientation">vertical</property>
         <property name="spacing">6</property>
+        <property name="margin-start">6</property>
+        <property name="margin-end">6</property>
+        <property name="margin-top">6</property>
+        <property name="margin-bottom">6</property>
         <child>
           <object class="GtkGrid" id="table1">
             <property name="row-spacing">6</property>
@@ -213,7 +218,9 @@ are very limited. &lt;/small&gt;</property>
     <child internal-child="action_area">
       <object class="GtkBox" id="dialog-action_area2">
         <property name="visible">True</property>
-        <property name="can-focus">False</property>
+        <style>
+          <class name="vmm-action-row"/>
+        </style>
         <child>
           <object class="GtkButton" id="cancel">
             <property name="label" translatable="1">_Cancel</property>
@@ -225,6 +232,7 @@ are very limited. &lt;/small&gt;</property>
         <child>
           <object class="GtkButton" id="connect">
             <property name="label" translatable="1">Co_nnect</property>
+            <property name="css-classes">suggested-action</property>
             <property name="focusable">1</property>
             <property name="receives-default">1</property>
             <property name="use-underline">1</property>
@@ -232,6 +240,5 @@ are very limited. &lt;/small&gt;</property>
           </object>
           </child>
       </object>
-    </child>
-  <property name="margin-start">6</property><property name="margin-end">6</property><property name="margin-top">6</property><property name="margin-bottom">6</property></object>
+    </child></object>
 </interface>

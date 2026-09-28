@@ -20,19 +20,62 @@ CSSDATA = """
     color: @insensitive_fg_color;
 }
 
-/* Text on the blue header in our wizards */
+/* Theme-aware wizard hierarchy without a hardcoded header color. */
 .vmm-header-text {
-    color: white;
+    color: @theme_fg_color;
+    font-weight: 600;
 }
 
-/* Subtext on the blue header in our wizards */
 .vmm-header-subtext {
-    color: #59B0E2;
+    color: @theme_fg_color;
+    opacity: 0.72;
 }
 
-/* The blue header */
 .vmm-header {
-    background-color: #0072A8;
+    background-color: alpha(@theme_selected_bg_color, 0.10);
+    border-bottom: 1px solid alpha(@theme_fg_color, 0.12);
+    padding: 12px 16px;
+}
+
+.vmm-menubar {
+    padding: 2px 6px;
+    border-bottom: 1px solid alpha(@theme_fg_color, 0.10);
+}
+
+.vmm-menubar > menubutton > button {
+    min-width: 0;
+    min-height: 0;
+    padding: 3px 6px;
+    margin: 0;
+}
+
+frame {
+    padding: 8px;
+}
+
+.vmm-toolbar {
+    padding: 6px 8px;
+    border-bottom: 1px solid alpha(@theme_fg_color, 0.10);
+}
+
+.vmm-toolbar button {
+    min-width: 24px;
+    min-height: 24px;
+    padding: 4px;
+}
+
+.vmm-toolbar separator {
+    margin: 4px 6px;
+}
+
+.vmm-action-row {
+    padding: 12px 16px;
+    border-top: 1px solid alpha(@theme_fg_color, 0.10);
+}
+
+.vmm-action-row button {
+    min-height: 24px;
+    padding: 4px 14px;
 }
 
 /* Show black borders around scaled SPICE displays. */

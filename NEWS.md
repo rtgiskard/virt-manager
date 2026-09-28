@@ -1,16 +1,57 @@
 # Virtual Machine Manager News
 
 ## GTK4 fork (unreleased)
+- Keep window close/quit shortcuts active even without a focused child, while
+  retaining the guest keyboard-grab guard.
+- Initialize manager actions with no selection, preserve GTK 4.14 window loading,
+  and restore manager Close/Quit and connection-window Quit shortcuts.
+- Right-align wizard and preferences actions while keeping hardware removal
+  separate from Apply/Cancel.
+- Add isolated GTK4 regressions for empty selections and real keyboard shortcuts. Run
+  pytest tests/test_gtk4.py with VIRT_MANAGER_TEST_DISPLAY pointing to a private
+  Wayland compositor; set VIRT_MANAGER_TEST_XDISPLAY to that compositor's
+  XWayland display to include real XTest keyboard input (requires libXtst).
+- Keep window and dialog padding on their content containers, not top-level
+  widgets, to avoid transparent right and bottom strips while preserving spacing.
+- Left-align all combo boxes at their natural width, including editable and
+  media selectors, so dropdown arrows stay beside the field rather than at the
+  far edge of an expanded row.
 - Port the full graphical application and its UI resources to GTK4.
 - Use SpiceClientGtk-4.0 for the SPICE console and Vte-3.91 for serial consoles.
 - Replace GTK3 menu and tray APIs with GTK4 popovers and a native D-Bus
   StatusNotifierItem. VNC graphical viewing is unavailable in this fork;
   virt-install's VNC XML support is unchanged.
+- Restore keyboard focus for the GTK4 dialog action rows, snapshot mode
+  choices, host File actions, VM shutdown buttons, and Preferences Close.
+- Anchor the operating-system search popover to its entry, support Down-arrow
+  keyboard navigation, and detach it safely during wizard cleanup.
+- Preserve Builder-connected machine selection callbacks while updating guest
+  capabilities in the create wizard; release its connection signal on teardown.
+- Disconnect host storage, networks, manager, and VM detail listeners before
+  cleaning up their connection and guest objects.
+- Size new manager and VM detail windows for typical fractional-scale desktops
+  without imposing a non-resizable guest display minimum; use native theme-aware
+  menu, toolbar, action-row, and primary-button styling.
+- Hide installation-only actions in normal VM windows and initialize storage and
+  snapshot mode radio buttons with one selected choice so switching remains exclusive.
+- Keep Run/Restore toolbar actions icon-only in manager and VM detail windows;
+  update tooltips and accessible labels without replacing the playback icon.
 - Ship the GTK4 AUR GUI, virtinst backend, and virt-install/virt-clone/virt-xml
   tools from the same source revision; provide and conflict with virt-install
   rather than mixing the development GUI with the distro's older backend.
 - Fix Boot Options refresh and clone, storage pool, and deletion dialog initialization
   by emitting the GTK4 toggled signal instead of calling the removed GTK3 method.
+- Let Boot Options groups take their natural height, bound boot and clone storage
+  lists' scrolling heights, and keep the boot move buttons aligned at the top.
+- Use theme-native borders for clone and deletion lists; allow Preferences resizing
+  and treat the storage-pool window dimensions as initial rather than minimum sizes.
+- Configure editable combo boxes through their built-in entry, avoiding duplicate
+  input fields and displaced dropdowns while preserving custom values and callbacks.
+- Use numeric value-change signals for spin buttons, preventing recursive CPU
+  topology refreshes when opening the hardware details page.
+- Fix GTK4 migration-window close and removable-media clear-icon callbacks;
+  restore host and VM window close shortcuts without intercepting grabbed guest keys.
+- Keep menu-bar buttons compact and give frames consistent 8px content padding.
 
 ## Release 5.1.0 (August 26, 2025)
 - cli: Support --cpu maximum (Andrea Bolognani)

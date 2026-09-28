@@ -9,6 +9,10 @@
       <object class="GtkBox" id="dialog-vbox2">
         <property name="orientation">vertical</property>
         <property name="spacing">2</property>
+        <property name="margin-start">5</property>
+        <property name="margin-end">5</property>
+        <property name="margin-top">5</property>
+        <property name="margin-bottom">5</property>
         <child>
           <object class="GtkBox" id="vbox2">
             <property name="orientation">vertical</property>
@@ -132,7 +136,6 @@
             </child>
             <child>
               <object class="GtkGrid" id="table3">
-                <property name="vexpand">1</property>
                 <property name="row-spacing">6</property>
                 <property name="column-spacing">6</property>
                 <child>
@@ -199,7 +202,9 @@
     <child internal-child="action_area">
       <object class="GtkBox" id="dialog-action_area2">
         <property name="visible">True</property>
-        <property name="can-focus">False</property>
+        <style>
+          <class name="vmm-action-row"/>
+        </style>
         <child>
           <object class="GtkButton" id="change-storage-cancel">
             <property name="label" translatable="1">_Cancel</property>
@@ -219,8 +224,7 @@
           </object>
           </child>
       </object>
-    </child>
-  <property name="margin-start">5</property><property name="margin-end">5</property><property name="margin-top">5</property><property name="margin-bottom">5</property></object>
+    </child></object>
   <object class="GtkWindow" id="vmm-clone">
     <property name="title" translatable="1">Clone Virtual Machine</property>
     <signal name="close-request" handler="on_clone_delete_event" swapped="no"/>
@@ -372,7 +376,9 @@
                             <property name="column-spacing">6</property>
                             <child>
                               <object class="GtkScrolledWindow" id="storage-scroll">
-                                <property name="height-request">200</property>
+                                <property name="min-content-height">100</property>
+                                <property name="max-content-height">200</property>
+                                <property name="propagate-natural-height">1</property>
                                 <property name="focusable">1</property>
                                 <property name="hexpand">1</property>
                                 <property name="vexpand">1</property>
@@ -470,7 +476,9 @@ like change passwords or static IPs, please see the virt-sysprep(1) tool.&lt;/sp
             <child>
               <object class="GtkBox" id="hbuttonbox1">
                 <property name="visible">True</property>
-                <property name="can-focus">False</property>
+                <style>
+                  <class name="vmm-action-row"/>
+                </style>
                 <property name="spacing">12</property>
                 <child>
                   <object class="GtkButton" id="clone-cancel">

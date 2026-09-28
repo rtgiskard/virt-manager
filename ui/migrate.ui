@@ -423,7 +423,6 @@ If 'temporary' is selected, the migration is considered only a temporary move: t
             <child>
               <object class="GtkBox" id="hbuttonbox1">
                 <property name="visible">True</property>
-                <property name="can-focus">False</property>
                 <property name="spacing">6</property>
                 <child>
                   <object class="GtkButton" id="migrate-cancel">

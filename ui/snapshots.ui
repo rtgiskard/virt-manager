@@ -314,7 +314,6 @@
             <child>
               <object class="GtkBox" id="buttonbox1">
                 <property name="visible">True</property>
-                <property name="can-focus">False</property>
                 <property name="spacing">6</property>
                 <child>
                   <object class="GtkButton" id="snapshot-apply">

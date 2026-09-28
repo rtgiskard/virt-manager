@@ -150,7 +150,6 @@
                     <child>
                       <object class="GtkBox" id="snapshot-new-mode-box">
                         <property name="visible">True</property>
-                        <property name="can-focus">False</property>
                         <child>
                           <object class="GtkCheckButton" id="snapshot-new-mode-external">
                             <property name="label" translatable="1">_external</property>
@@ -165,7 +164,6 @@
                             <property name="label" translatable="1">_internal</property>
                             <property name="focusable">1</property>
                             <property name="use-underline">1</property>
-                            <property name="active">1</property>
                             <property name="group">snapshot-new-mode-external</property>
                           <property name="hexpand">1</property></object>
                           </child>
@@ -204,11 +202,11 @@
                           <object class="GtkComboBox" id="snapshot-new-memory-path">
                             <property name="hexpand">1</property>
                             <property name="has-entry">1</property>
-                            <property name="child">
+                            <child internal-child="entry">
                               <object class="GtkEntry">
                                 <property name="focusable">1</property>
                               </object>
-                            </property>
+                            </child>
                           </object>
                         </child>
                       </object>
@@ -220,7 +218,6 @@
             <child>
               <object class="GtkBox" id="buttonbox2">
                 <property name="visible">True</property>
-                <property name="can-focus">False</property>
                 <property name="spacing">6</property>
                 <child>
                   <object class="GtkButton" id="snapshot-new-cancel">

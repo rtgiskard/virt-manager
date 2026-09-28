@@ -61,6 +61,9 @@ class vmmHostNets(vmmGObjectUI):
     #######################
 
     def _cleanup(self):
+        self.conn.disconnect_by_obj(self)
+        for net in self.conn.list_nets():
+            net.disconnect_by_obj(self)
         self.conn = None
 
         if self._addnet:
@@ -105,7 +108,7 @@ class vmmHostNets(vmmGObjectUI):
         netCol.add_attribute(net_txt, "text", 1)
         netCol.add_attribute(net_txt, "sensitive", 4)
         netCol.add_attribute(net_img, "icon-name", 2)
-        netCol.add_attribute(net_img, "stock-size", 3)
+        netCol.add_attribute(net_img, "icon-size", 3)
         self.widget("net-list").append_column(netCol)
         netListModel.set_sort_column_id(1, Gtk.SortType.ASCENDING)
 

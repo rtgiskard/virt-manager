@@ -2,8 +2,8 @@
 <interface>
   <requires lib="gtk" version="4.0"/>
   <object class="GtkWindow" id="vmm-create-pool">
-    <property name="width-request">400</property>
-    <property name="height-request">400</property>
+    <property name="default-width">400</property>
+    <property name="default-height">400</property>
     <property name="title" translatable="1">Add a New Storage Pool</property>
     <signal name="close-request" handler="on_vmm_create_pool_delete_event" swapped="no"/>
     <property name="child">
@@ -51,7 +51,6 @@
             <property name="spacing">18</property>
             <child>
               <object class="GtkBox" id="pool-details-align">
-                <property name="vexpand">1</property>
                 <child>
                   <object class="GtkGrid" id="pool-details">
                     <property name="valign">start</property>
@@ -171,12 +170,12 @@
                     <child>
                       <object class="GtkComboBox" id="pool-source-path">
                         <property name="has-entry">1</property>
-                        <property name="child">
+                        <child internal-child="entry">
                           <object class="GtkEntry">
                             <property name="focusable">1</property>
                             <property name="width-chars">25</property>
                             </object>
-                        </property>
+                        </child>
                         <layout>
                           <property name="column">1</property>
                           <property name="row">7</property>
@@ -210,12 +209,12 @@
                       <object class="GtkComboBox" id="pool-format">
                         <property name="halign">start</property>
                         <property name="has-entry">1</property>
-                        <property name="child">
+                        <child internal-child="entry">
                           <object class="GtkEntry">
                             <property name="focusable">1</property>
                             <property name="width-chars">10</property>
                           </object>
-                        </property>
+                        </child>
                         <layout>
                           <property name="column">1</property>
                           <property name="row">4</property>
@@ -297,11 +296,11 @@
                     <child>
                       <object class="GtkComboBoxText" id="pool-source-name">
                         <property name="has-entry">1</property>
-                        <property name="child">
+                        <child internal-child="entry">
                           <object class="GtkEntry" id="pool-source-name-text">
                             <property name="focusable">1</property>
                             </object>
-                        </property>
+                        </child>
                         <layout>
                           <property name="column">1</property>
                           <property name="row">6</property>
@@ -336,7 +335,9 @@
             <child>
               <object class="GtkBox" id="hbuttonbox1">
                 <property name="visible">True</property>
-                <property name="can-focus">False</property>
+                <style>
+                  <class name="vmm-action-row"/>
+                </style>
                 <property name="spacing">12</property>
                 <child>
                   <object class="GtkButton" id="pool-cancel">

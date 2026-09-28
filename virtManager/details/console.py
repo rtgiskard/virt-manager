@@ -846,6 +846,10 @@ class vmmConsolePages(vmmGObjectUI):
     def vmwindow_get_viewer_is_visible(self):
         return self._viewer_is_visible()
 
+
+    def vmwindow_has_keyboard_grab(self):
+        return bool(self._viewer and self._viewer.console_has_keyboard_grab())
+
     def vmwindow_get_resizeguest_tooltip(self):
         return self._viewer_get_resizeguest_tooltip()
 

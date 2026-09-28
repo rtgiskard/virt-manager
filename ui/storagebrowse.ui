@@ -9,10 +9,10 @@
     <signal name="close-request" handler="on_vmm_storage_browse_delete_event" swapped="no"/>
     <property name="child">
       <object class="GtkBox" id="storage-align">
+    <property name="margin-start">6</property><property name="margin-end">6</property><property name="margin-top">6</property><property name="margin-bottom">6</property>
         <child>
           <placeholder/>
         </child>
       </object>
-    </property>
-    <property name="margin-start">6</property><property name="margin-end">6</property><property name="margin-top">6</property><property name="margin-bottom">6</property></object>
+    </property></object>
 </interface>

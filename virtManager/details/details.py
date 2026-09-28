@@ -471,6 +471,7 @@ class vmmDetails(vmmGObjectUI):
         self._mediacombo = None
 
         self.conn.disconnect_by_obj(self)
+        self.vm.disconnect_by_obj(self)
         self.vm = None
         if self._popupmenu.get_parent():
             self._popupmenu.unparent()

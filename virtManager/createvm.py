@@ -185,6 +185,7 @@ class vmmCreateVM(vmmGObjectUI):
 
         self.conn = None
         self._capsinfo = None
+        self._populating_machine = False
 
         self._gdata = None
 
@@ -268,6 +269,8 @@ class vmmCreateVM(vmmGObjectUI):
         self._gdata = None
 
     def _cleanup(self):
+        if self.conn:
+            self.conn.disconnect_by_obj(self)
         if self._storage_browser:
             self._storage_browser.cleanup()
             self._storage_browser = None
@@ -841,7 +844,7 @@ class vmmCreateVM(vmmGObjectUI):
         if defmachine and defmachine in machines:
             default = machines.index(defmachine)
 
-        self.widget("machine").disconnect_by_func(self._machine_changed)
+        self._populating_machine = True
         try:
             model.clear()
             for m in machines:
@@ -852,7 +855,7 @@ class vmmCreateVM(vmmGObjectUI):
             if show:
                 self.widget("machine").set_active(default)
         finally:
-            self.widget("machine").connect("changed", self._machine_changed)
+            self._populating_machine = False
 
     def _populate_conn_list(self, urihint=None):
         conn_list = self.widget("create-conn")
@@ -1112,7 +1115,8 @@ class vmmCreateVM(vmmGObjectUI):
         self._set_page_num_text(0)
 
     def _machine_changed(self, ignore):
-        self._set_caps_state()
+        if not self._populating_machine:
+            self._set_caps_state()
 
     def _xen_type_changed(self, ignore):
         os_type = uiutil.get_list_selection(self.widget("xen-type"), column=1)

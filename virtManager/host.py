@@ -53,15 +53,19 @@ class vmmHost(vmmGObjectUI):
         self._hostnets = None
         self._init_net_state()
 
-        self.connect_signals({
-            "on_menu_file_view_manager_activate": self._view_manager_cb,
-            "on_menu_file_quit_activate": self._exit_app_cb,
-            "on_menu_file_close_activate": self.close,
-            "on_vmm_host_delete_event": self.close,
-            "on_host_page_switch": self._page_changed_cb,
-            "on_overview_name_changed": self._overview_name_changed_cb,
-            "on_config_autoconnect_toggled": self._autoconnect_toggled_cb,
-        })
+        self.connect_signals(
+            {
+                "on_menu_file_view_manager_activate": self._view_manager_cb,
+                "on_menu_file_quit_activate": self._exit_app_cb,
+                "on_menu_file_close_activate": self.close,
+                "on_vmm_host_delete_event": self.close,
+                "on_host_page_switch": self._page_changed_cb,
+                "on_overview_name_changed": self._overview_name_changed_cb,
+                "on_config_autoconnect_toggled": self._autoconnect_toggled_cb,
+            }
+        )
+        self.bind_close_shortcut("<Control>w")
+        self.bind_close_shortcut("<Control>q", callback=self._exit_app_cb)
         self.topwin.connect("notify::default-width", self._window_resized_cb)
         self.topwin.connect("notify::default-height", self._window_resized_cb)
 
@@ -103,6 +107,7 @@ class vmmHost(vmmGObjectUI):
     def _cleanup(self):
         if self._window_size:
             self.conn.set_details_window_size(*self._window_size)
+        self.conn.disconnect_by_obj(self)
 
         self.conn = None
 
@@ -191,7 +196,7 @@ class vmmHost(vmmGObjectUI):
 
         vmmManager.get_instance(self).show()
 
-    def _exit_app_cb(self, src):
+    def _exit_app_cb(self, src=None):
         vmmEngine.get_instance().exit_app()
 
     def _window_resized_cb(self, src, event):

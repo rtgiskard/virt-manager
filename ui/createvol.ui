@@ -140,12 +140,12 @@
                                 <property name="halign">start</property>
                                 <property name="has-entry">1</property>
                                 <signal name="changed" handler="on_vol_format_changed" swapped="no"/>
-                                <property name="child">
+                                <child internal-child="entry">
                                   <object class="GtkEntry" id="vol-format-entry">
                                     <property name="focusable">1</property>
                                     <property name="width-chars">10</property>
                                   </object>
-                                </property>
+                                </child>
                                 <layout>
                                   <property name="column">1</property>
                                   <property name="row">1</property>
@@ -315,7 +315,6 @@
             <child>
               <object class="GtkBox" id="hbuttonbox1">
                 <property name="visible">True</property>
-                <property name="can-focus">False</property>
                 <property name="spacing">6</property>
                 <child>
                   <object class="GtkButton" id="vol-cancel">

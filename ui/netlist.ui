@@ -110,11 +110,11 @@
         <property name="hexpand">1</property>
         <property name="has-entry">1</property>
         <signal name="changed" handler="on_net_portgroup_changed" swapped="no"/>
-        <property name="child">
+        <child internal-child="entry">
           <object class="GtkEntry" id="combobox-entry2">
             <property name="focusable">1</property>
           </object>
-        </property>
+        </child>
         <layout>
           <property name="column">1</property>
           <property name="row">3</property>

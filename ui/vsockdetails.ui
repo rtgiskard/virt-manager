@@ -51,7 +51,7 @@
             <property name="numeric">1</property>
             <property name="update-policy">if-valid</property>
             <property name="value">5900</property>
-            <signal name="changed" handler="on_vsock_cid_changed" swapped="no"/>
+            <signal name="value-changed" handler="on_vsock_cid_changed" swapped="no"/>
             </object>
         </child>
       </object>

@@ -564,7 +564,7 @@
                                         <property name="margin-top">3</property>
                                         <child>
                                           <object class="GtkScrolledWindow" id="scrolledwindow6">
-                                            <property name="height-request">200</property>
+                                            <property name="min-content-height">200</property>
                                             <property name="focusable">1</property>
                                             <property name="hexpand">1</property>
                                             <property name="propagate-natural-width">1</property>
@@ -884,7 +884,7 @@
                                                     <property name="numeric">1</property>
                                                     <property name="update-policy">if-valid</property>
                                                     <property name="value">2</property>
-                                                    <signal name="changed" handler="on_cpu_vcpus_changed" swapped="no"/>
+                                                    <signal name="value-changed" handler="on_cpu_vcpus_changed" swapped="no"/>
                                                     <layout>
                                                       <property name="column">1</property>
                                                       <property name="row">1</property>
@@ -974,11 +974,11 @@
                                                 <property name="hexpand">1</property>
                                                 <property name="has-entry">1</property>
                                                 <signal name="changed" handler="on_cpu_model_changed" swapped="no"/>
-                                                <property name="child">
+                                                <child internal-child="entry">
                                                   <object class="GtkEntry" id="cpu-model-text">
                                                     <property name="focusable">1</property>
                                                   </object>
-                                                </property>
+                                                </child>
                                                 <layout>
                                                   <property name="column">1</property>
                                                   <property name="row">1</property>
@@ -1079,7 +1079,7 @@
                                                     <property name="text" translatable="1">1</property>
                                                     <property name="adjustment">adjustment3</property>
                                                     <property name="value">1</property>
-                                                    <signal name="changed" handler="on_cpu_sockets_changed" swapped="no"/>
+                                                    <signal name="value-changed" handler="on_cpu_sockets_changed" swapped="no"/>
                                                     <layout>
                                                       <property name="column">1</property>
                                                       <property name="row">0</property>
@@ -1095,7 +1095,7 @@
                                                     <property name="text" translatable="1">1</property>
                                                     <property name="adjustment">adjustment4</property>
                                                     <property name="value">1</property>
-                                                    <signal name="changed" handler="on_cpu_cores_changed" swapped="no"/>
+                                                    <signal name="value-changed" handler="on_cpu_cores_changed" swapped="no"/>
                                                     <layout>
                                                       <property name="column">1</property>
                                                       <property name="row">1</property>
@@ -1111,7 +1111,7 @@
                                                     <property name="text" translatable="1">1</property>
                                                     <property name="adjustment">adjustment5</property>
                                                     <property name="value">1</property>
-                                                    <signal name="changed" handler="on_cpu_threads_changed" swapped="no"/>
+                                                    <signal name="value-changed" handler="on_cpu_threads_changed" swapped="no"/>
                                                     <layout>
                                                       <property name="column">1</property>
                                                       <property name="row">2</property>
@@ -1236,7 +1236,7 @@
                                                     <property name="numeric">1</property>
                                                     <property name="update-policy">if-valid</property>
                                                     <property name="value">50</property>
-                                                    <signal name="changed" handler="on_mem_memory_changed" swapped="no"/>
+                                                    <signal name="value-changed" handler="on_mem_memory_changed" swapped="no"/>
                                                     </object>
                                                 </child>
                                                 <child>
@@ -1265,7 +1265,7 @@
                                                     <property name="numeric">1</property>
                                                     <property name="update-policy">if-valid</property>
                                                     <property name="value">50</property>
-                                                    <signal name="changed" handler="on_mem_maxmem_changed" swapped="no"/>
+                                                    <signal name="value-changed" handler="on_mem_maxmem_changed" swapped="no"/>
                                                     </object>
                                                 </child>
                                                 <child>
@@ -1654,7 +1654,6 @@
                                             </child>
                                             <child>
                                               <object class="GtkGrid" id="table2">
-                                                <property name="vexpand">1</property>
                                                 <property name="halign">start</property>
                                                 <property name="hexpand">0</property>
                                                 <property name="row-spacing">6</property>
@@ -1662,7 +1661,9 @@
                                                 <child>
                                                   <object class="GtkScrolledWindow" id="scrolledwindow3">
                                                     <property name="width-request">125</property>
-                                                    <property name="height-request">125</property>
+                                                    <property name="min-content-height">80</property>
+                                                    <property name="max-content-height">160</property>
+                                                    <property name="propagate-natural-height">1</property>
                                                     <property name="focusable">1</property>
                                                     <property name="hscrollbar-policy">never</property>
                                                     <property name="child">
@@ -1888,11 +1889,11 @@
                                                             <property name="halign">start</property>
                                                             <property name="has-entry">1</property>
                                                             <signal name="changed" handler="on_disk_bus_combo_changed" swapped="no"/>
-                                                            <property name="child">
+                                                            <child internal-child="entry">
                                                               <object class="GtkEntry" id="disk-bus-text">
                                                                 <property name="focusable">1</property>
                                                               </object>
-                                                            </property>
+                                                            </child>
                                                           </object>
                                                         </child>
                                                         <child>
@@ -2003,11 +2004,11 @@
                                                 <property name="hexpand">0</property>
                                                 <property name="has-entry">1</property>
                                                 <signal name="changed" handler="on_network_model_combo_changed" swapped="no"/>
-                                                <property name="child">
+                                                <child internal-child="entry">
                                                   <object class="GtkEntry" id="network-model-text">
                                                     <property name="focusable">1</property>
                                                   </object>
-                                                </property>
+                                                </child>
                                                 <layout>
                                                   <property name="column">1</property>
                                                   <property name="row">1</property>
@@ -2296,11 +2297,11 @@
                                               <object class="GtkComboBox" id="sound-model">
                                                 <property name="has-entry">1</property>
                                                 <signal name="changed" handler="on_sound_model_combo_changed" swapped="no"/>
-                                                <property name="child">
+                                                <child internal-child="entry">
                                                   <object class="GtkEntry" id="sound-model-text">
                                                     <property name="focusable">1</property>
                                                   </object>
-                                                </property>
+                                                </child>
                                                 <layout>
                                                   <property name="column">1</property>
                                                   <property name="row">0</property>
@@ -2666,11 +2667,11 @@
                                           <object class="GtkComboBox" id="video-model">
                                             <property name="has-entry">1</property>
                                             <signal name="changed" handler="on_video_model_combo_changed" swapped="no"/>
-                                            <property name="child">
+                                            <child internal-child="entry">
                                               <object class="GtkEntry" id="video-model-text">
                                                 <property name="focusable">1</property>
                                               </object>
-                                            </property>
+                                            </child>
                                             <layout>
                                               <property name="column">1</property>
                                               <property name="row">0</property>
@@ -2765,11 +2766,11 @@
                                               <object class="GtkComboBox" id="watchdog-action">
                                                 <property name="has-entry">1</property>
                                                 <signal name="changed" handler="on_watchdog_action_combo_changed" swapped="no"/>
-                                                <property name="child">
+                                                <child internal-child="entry">
                                                   <object class="GtkEntry" id="watchdog-action-text">
                                                     <property name="focusable">1</property>
                                                   </object>
-                                                </property>
+                                                </child>
                                                 <layout>
                                                   <property name="column">1</property>
                                                   <property name="row">1</property>
@@ -2780,11 +2781,11 @@
                                               <object class="GtkComboBox" id="watchdog-model">
                                                 <property name="has-entry">1</property>
                                                 <signal name="changed" handler="on_watchdog_model_combo_changed" swapped="no"/>
-                                                <property name="child">
+                                                <child internal-child="entry">
                                                   <object class="GtkEntry" id="watchdog-model-text">
                                                     <property name="focusable">1</property>
                                                   </object>
-                                                </property>
+                                                </child>
                                                 <layout>
                                                   <property name="column">1</property>
                                                   <property name="row">0</property>
@@ -2849,11 +2850,11 @@
                                           <object class="GtkComboBox" id="controller-model">
                                             <property name="has-entry">1</property>
                                             <signal name="changed" handler="on_controller_model_combo_changed" swapped="no"/>
-                                            <property name="child">
+                                            <child internal-child="entry">
                                               <object class="GtkEntry" id="controller-model-text">
                                                 <property name="focusable">1</property>
                                               </object>
-                                            </property>
+                                            </child>
                                             <layout>
                                               <property name="column">1</property>
                                               <property name="row">1</property>
@@ -2919,7 +2920,7 @@
                                               <object class="GtkScrolledWindow" id="controller-device-scroll">
                                                 <property name="vexpand">1</property>
                                                 <property name="width-request">270</property>
-                                                <property name="height-request">100</property>
+                                                <property name="min-content-height">100</property>
                                                 <property name="focusable">1</property>
                                                 <property name="child">
                                                   <object class="GtkTreeView" id="controller-device-list">
@@ -3014,12 +3015,12 @@
                                               <object class="GtkComboBox" id="smartcard-mode">
                                                 <property name="has-entry">1</property>
                                                 <signal name="changed" handler="on_smartcard_mode_combo_changed" swapped="no"/>
-                                                <property name="child">
+                                                <child internal-child="entry">
                                                   <object class="GtkEntry" id="smartcard-mode-text">
                                                     <property name="name">smartcard-mode-text</property>
                                                     <property name="focusable">1</property>
                                                   </object>
-                                                </property>
+                                                </child>
                                                 <layout>
                                                   <property name="column">1</property>
                                                   <property name="row">0</property>
@@ -3320,14 +3321,21 @@
         <child>
           <object class="GtkBox" id="hbuttonbox3">
             <property name="visible">True</property>
-            <property name="can-focus">False</property>
             <property name="spacing">12</property>
+            <style>
+              <class name="vmm-action-row"/>
+            </style>
             <child>
               <object class="GtkButton" id="config-remove">
                 <property name="label" translatable="1">_Remove</property>
                 <property name="focusable">1</property>
                 <property name="use-underline">1</property>
                 <signal name="clicked" handler="on_config_remove_clicked" swapped="no"/>
+              </object>
+            </child>
+            <child>
+              <object class="GtkBox">
+                <property name="hexpand">1</property>
                 </object>
               </child>
             <child>
@@ -3344,6 +3352,7 @@
                 <property name="label" translatable="1">_Apply</property>
                 <property name="sensitive">0</property>
                 <property name="focusable">1</property>
+                <property name="css-classes">suggested-action</property>
                 <property name="use-underline">1</property>
                 <signal name="clicked" handler="on_config_apply_clicked" swapped="no"/>
                 </object>
