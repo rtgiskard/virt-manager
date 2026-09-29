@@ -56,6 +56,8 @@
 - Give static and rebuilt popover action rows one dismissal owner, closing the
   whole menu hierarchy before consumer callbacks while leaving checkbox and
   submenu-opening interactions open.
+- Follow GTK's light/dark theme in the XML editor, update GtkSource 5 palettes
+  when the system preference changes, and release theme listeners on cleanup.
 - Attach context menus to the window's layout-managed content rather than legacy
   tree or terminal widgets, translating pointer coordinates into their parent space.
 - Let Boot Options groups take their natural height, bound boot and clone storage

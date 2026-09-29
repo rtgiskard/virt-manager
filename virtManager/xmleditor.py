@@ -51,6 +51,8 @@ class vmmXMLEditor(vmmGObjectUI):
         self._srcxml = ""
         self._srcview = None
         self._srcbuff = None
+        self._theme_settings = None
+        self._theme_handles = []
         self._init_ui()
 
         self.details_changed = False
@@ -60,6 +62,10 @@ class vmmXMLEditor(vmmGObjectUI):
         )
 
     def _cleanup(self):
+        for handle in self._theme_handles:
+            self._theme_settings.disconnect(handle)
+        self._theme_handles.clear()
+        self._theme_settings = None
         self._srcview.unparent()
         self._srcbuff = None
 
@@ -80,6 +86,17 @@ class vmmXMLEditor(vmmGObjectUI):
             lang = GtkSource.LanguageManager.get_default().get_language("xml")
             self._srcbuff.set_language(lang)
             self._srcbuff.set_highlight_syntax(True)
+            self._theme_settings = self._srcview.get_settings()
+            for prop in (
+                "gtk-theme-name",
+                "gtk-application-prefer-dark-theme",
+                "gtk-interface-color-scheme",
+            ):
+                if self._theme_settings.find_property(prop):
+                    self._theme_handles.append(
+                        self._theme_settings.connect("notify::" + prop, self._update_style_scheme)
+                    )
+            self._update_style_scheme()
         else:
             self._srcview = Gtk.TextView()
             self._srcbuff = self._srcview.get_buffer()
@@ -98,6 +115,21 @@ class vmmXMLEditor(vmmGObjectUI):
     ####################
     # Internal helpers #
     ####################
+
+
+    def _update_style_scheme(self, *_args):
+        settings = self._theme_settings
+        theme = os.environ.get("GTK_THEME") or settings.get_property("gtk-theme-name")
+        dark = settings.get_property("gtk-application-prefer-dark-theme") or theme.lower().endswith(
+            ("-dark", ":dark")
+        )
+        if settings.find_property("gtk-interface-color-scheme"):
+            dark = dark or (
+                settings.get_property("gtk-interface-color-scheme") == Gtk.InterfaceColorScheme.DARK
+            )
+        manager = GtkSource.StyleSchemeManager.get_default()
+        self._srcbuff.set_style_scheme(manager.get_scheme("Adwaita-dark" if dark else "Adwaita"))
+
 
     def _reselect_page(self, pagenum):
         # Setting _curpage first will shortcircuit our page changed callback
