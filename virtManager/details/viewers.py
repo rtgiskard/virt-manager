@@ -9,6 +9,7 @@ import os
 
 from gi.repository import Gdk
 from gi.repository import GObject
+from gi.repository import Gtk
 
 import gi
 
@@ -576,4 +577,11 @@ class SpiceViewer(Viewer):
         return True
 
     def _get_preferred_size(self):
-        return self._desktop_resolution
+        if not self._display or self._get_scaling() or self._get_resizeguest():
+            return self._desktop_resolution
+
+        # With scaling and resizeguest disabled, SPICE requests the guest
+        # resolution in host logical pixels, including host desktop scaling.
+        w = self._display.measure(Gtk.Orientation.HORIZONTAL, -1)[1]
+        h = self._display.measure(Gtk.Orientation.VERTICAL, -1)[1]
+        return (w, h)
