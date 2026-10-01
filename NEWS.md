@@ -5,6 +5,8 @@
   actions target the clicked row, including lists with column headers.
 - Fix GTK4 storage-browser construction and use logical SPICE widget sizes for
   Resize to VM on HiDPI displays when scaling and guest autoresize are disabled.
+- Restore native F10 menu activation in manager and connection windows, and
+  expose the current text direction to D-Bus tray menu hosts.
 - Use public GTK label children and theme-native check indicators in menus,
   removing guessed indicator spacing and private label-tree traversal. Preserve
   dynamic labels, mnemonics, RTL submenus, and nested action dismissal.

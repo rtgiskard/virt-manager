@@ -22,6 +22,7 @@
               <object class="GtkMenuButton" id="menuitem4">
                 <property name="visible">True</property>
                 <property name="has-frame">False</property>
+                <property name="primary">True</property>
                 <property name="direction">none</property>
                 <property name="label" translatable="1">_File</property>
                 <property name="use-underline">True</property>

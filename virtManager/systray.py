@@ -3,10 +3,11 @@
 # This work is licensed under the GNU GPLv2 or later.
 # See the COPYING file in the top-level directory.
 
-"""GTK-independent StatusNotifierItem tray for the GTK4 application."""
+"""StatusNotifierItem tray for the GTK4 application."""
 
 from gi.repository import Gio
 from gi.repository import GLib
+from gi.repository import Gtk
 
 from virtinst import log
 
@@ -429,7 +430,9 @@ class _StatusNotifier:
     def _menu_property(self, _bus, _sender, _path, _interface, name):
         values = {
             "Version": ("u", 3),
-            "TextDirection": ("s", "ltr"),
+            "TextDirection": (
+                "s", "rtl" if Gtk.Widget.get_default_direction() == Gtk.TextDirection.RTL else "ltr"
+            ),
             "Status": ("s", "normal"),
             "IconThemePath": ("as", []),
         }

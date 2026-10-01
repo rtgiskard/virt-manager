@@ -307,6 +307,21 @@ def test_storage_browser_embeds_storage_controls():
         conn.cleanup()
     """)
 
+def test_tray_uses_current_text_direction():
+    _run("""
+        from virtManager.systray import _StatusNotifier
+        class Menu:
+            def items(self):
+                return []
+        tray = _StatusNotifier(Menu())
+        for direction, expected in ((Gtk.TextDirection.RTL, "rtl"),
+                                    (Gtk.TextDirection.LTR, "ltr")):
+            Gtk.Widget.set_default_direction(direction)
+            value = tray._menu_property(None, None, None, None, "TextDirection")
+            assert value.unpack() == expected
+        tray.close()
+    """)
+
 def test_context_menu_targets_clicked_row_with_headers():
     _run("""
         import time
