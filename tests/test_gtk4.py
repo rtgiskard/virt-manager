@@ -53,6 +53,68 @@ config.vmmConfig.get_instance(buildconfig.BuildConfig, CLITestOptionsClass(["dis
     assert result.returncode == 0, result.stdout + result.stderr
 
 
+def test_tray_stale_layout_events():
+    _run("""
+        import os
+        import time
+        from virtManager.systray import _StatusNotifier, _MENU_PATH, _MENU_INTERFACE
+
+        invoked = []
+        class Menu:
+            entries = []
+            def items(self):
+                return self.entries
+        menu = Menu()
+        def entry(key, enabled=True):
+            return (key, lambda: invoked.append(key), enabled, (), key)
+        menu.entries = [entry("a"), entry("b")]
+        tray = _StatusNotifier(menu)
+        client = Gio.DBusConnection.new_for_address_sync(
+            os.environ["DBUS_SESSION_BUS_ADDRESS"],
+            (Gio.DBusConnectionFlags.AUTHENTICATION_CLIENT
+             | Gio.DBusConnectionFlags.MESSAGE_BUS_CONNECTION),
+            None, None,
+        )
+        def call(method, args):
+            completed = []
+            def finished(bus, result):
+                completed.append(bus.call_finish(result))
+            client.call(tray._bus.get_unique_name(), _MENU_PATH, _MENU_INTERFACE.name,
+                        method, args, None, Gio.DBusCallFlags.NONE, 5000, None, finished)
+            deadline = time.monotonic() + 6
+            while not completed:
+                assert time.monotonic() < deadline
+                GLib.MainContext.default().iteration(False)
+                time.sleep(.001)
+            return completed[0].unpack()
+        def layout_ids():
+            _revision, layout = call("GetLayout", GLib.Variant("(iias)", (0, -1, [])))
+            return {child[1]["label"]: child[0] for child in layout[2]}
+        def click(item_id):
+            call("Event", GLib.Variant("(isvu)", (item_id, "clicked", GLib.Variant("s", ""), 0)))
+        original = layout_ids()
+        menu.entries = [entry("c"), entry("b"), entry("a")]
+        tray.refresh()
+        reordered = layout_ids()
+        assert reordered["a"] == original["a"]
+        assert reordered["b"] == original["b"]
+        click(original["b"])
+        assert invoked == ["b"]
+        menu.entries = [entry("c"), entry("a", False)]
+        tray.refresh()
+        click(original["b"])
+        click(original["a"])
+        assert invoked == ["b"]
+        menu.entries.append(entry("b"))
+        tray.refresh()
+        assert layout_ids()["b"] != original["b"]
+        click(original["b"])
+        assert invoked == ["b"]
+        client.close_sync(None)
+        tray.close()
+    """)
+
+
 def test_manager_without_selection():
     _run("""
         from virtManager.manager import vmmManager
@@ -95,6 +157,33 @@ def test_vm_menu_actions_dismiss_before_callback():
             builder.get_object(button).emit("clicked")
             assert observed == [False]
         window.destroy()
+    """)
+
+
+def test_tray_cleanup_releases_signal_owners():
+    _run("""
+        import gc
+        import weakref
+        from virtManager.connmanager import vmmConnectionManager
+        from virtManager.systray import _TrayMenu
+
+        manager = vmmConnectionManager.get_instance()
+        manager.add_conn("test:///default")
+        menu = _TrayMenu(lambda: None)
+        reference = weakref.ref(menu)
+        menu.cleanup()
+        del menu
+        gc.collect()
+        assert reference() is None
+        # Teardown also works after the connection manager's singleton has
+        # been cleared by normal application exit.
+        menu = _TrayMenu(lambda: None)
+        manager.cleanup()
+        menu.cleanup()
+        reference = weakref.ref(menu)
+        del menu
+        gc.collect()
+        assert reference() is None
     """)
 
 

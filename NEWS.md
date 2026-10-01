@@ -6,12 +6,18 @@
   dynamic labels, mnemonics, RTL submenus, and nested action dismissal.
 - Keep window close/quit shortcuts active even without a focused child, while
   retaining the guest keyboard-grab guard.
+- Release tray menu signal subscriptions on cleanup. Cancel pending tray
+  registration on watcher replacement or shutdown, ignore stale completions,
+  and avoid registering again while a request is pending or already accepted.
+- Keep tray menu IDs stable across sorting and state changes; never reuse removed
+  IDs, so delayed host-menu events cannot target another VM or action. Share VM
+  action availability between window menus and the tray.
 - Initialize manager actions with no selection, preserve GTK 4.14 window loading,
   and restore manager Close/Quit and connection-window Quit shortcuts.
 - Dismiss static VM menu actions before opening dialogs; right-align wizard and
   preferences actions while keeping hardware removal separate from Apply/Cancel.
-- Add isolated GTK4 regressions for empty selections, dynamic native menus,
-  action dismissal, and real keyboard shortcuts. Run
+- Add isolated GTK4 regressions for stale D-Bus events, signal cleanup, empty
+  selections, dynamic native menus, and real keyboard shortcuts. Run
   pytest tests/test_gtk4.py with VIRT_MANAGER_TEST_DISPLAY pointing to a private
   Wayland compositor; set VIRT_MANAGER_TEST_XDISPLAY to that compositor's
   XWayland display to include real XTest keyboard input (requires libXtst).

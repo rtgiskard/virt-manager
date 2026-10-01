@@ -14,7 +14,6 @@ from . import vmmenu
 from .baseclass import vmmGObject
 from .connmanager import vmmConnectionManager
 
-
 _ITEM_PATH = "/org/virt_manager/StatusNotifierItem"
 _MENU_PATH = "/org/virt_manager/StatusNotifierMenu"
 _WATCHER = "org.kde.StatusNotifierWatcher"
@@ -107,12 +106,20 @@ class _TrayMenu(vmmGObject):
         self.topwin = None  # Parent for VMActionUI error dialogs
         self._changed = changed
         manager = vmmConnectionManager.get_instance()
+        self._manager = manager
         manager.connect("conn-added", self._conn_added)
         manager.connect("conn-removed", self._conn_removed)
         for conn in manager.conns.values():
             self._conn_added(manager, conn)
 
     def _cleanup(self):
+        manager = self._manager
+        manager.disconnect_by_obj(self)
+        for conn in manager.conns.values():
+            conn.disconnect_by_obj(self)
+            for vm in conn.list_vms():
+                vm.disconnect_by_obj(self)
+        self._manager = None
         self._changed = None
 
     def _conn_added(self, _manager, conn):
@@ -137,34 +144,42 @@ class _TrayMenu(vmmGObject):
         self._changed()
 
     def _vm_actions(self, vm):
-        def action(label, method, enabled=True):
+        states = vmmenu.vm_action_states(vm)
+
+        def action(label, method):
+            name = method.__name__
             return (
                 label.replace("_", "", 1),
                 lambda method=method, vm=vm: method(self, vm),
-                enabled,
+                states[name],
                 (),
+                name,
             )
 
         shutdown = (
-            _("_Shut Down").replace("_", "", 1), None, vm.is_stoppable(), (
-                action(_("_Reboot"), vmmenu.VMActionUI.reboot, vm.is_stoppable()),
-                action(_("_Shut Down"), vmmenu.VMActionUI.shutdown, vm.is_stoppable()),
-                action(_("F_orce Reset"), vmmenu.VMActionUI.reset, vm.is_stoppable()),
-                action(_("_Force Off"), vmmenu.VMActionUI.destroy, vm.is_destroyable()),
-                action(_("Sa_ve"), vmmenu.VMActionUI.save, vm.is_destroyable()),
+            _("_Shut Down").replace("_", "", 1),
+            None,
+            states["shutdown"],
+            (
+                action(_("_Reboot"), vmmenu.VMActionUI.reboot),
+                action(_("_Shut Down"), vmmenu.VMActionUI.shutdown),
+                action(_("F_orce Reset"), vmmenu.VMActionUI.reset),
+                action(_("_Force Off"), vmmenu.VMActionUI.destroy),
+                action(_("Sa_ve"), vmmenu.VMActionUI.save),
             ),
+            "shutdown",
         )
         actions = [
-            action(_("_Run"), vmmenu.VMActionUI.run, vm.is_runable()),
-            action(_("_Pause"), vmmenu.VMActionUI.suspend, vm.is_stoppable()),
-            action(_("R_esume"), vmmenu.VMActionUI.resume, vm.is_paused()),
+            action(_("_Run"), vmmenu.VMActionUI.run),
+            action(_("_Pause"), vmmenu.VMActionUI.suspend),
+            action(_("R_esume"), vmmenu.VMActionUI.resume),
             shutdown,
-            action(_("Clone..."), vmmenu.VMActionUI.clone, vm.is_cloneable()),
-            action(_("Migrate..."), vmmenu.VMActionUI.migrate, vm.is_stoppable()),
+            action(_("Clone..."), vmmenu.VMActionUI.clone),
+            action(_("Migrate..."), vmmenu.VMActionUI.migrate),
             action(_("_Delete"), vmmenu.VMActionUI.delete),
             action(_("_Open"), vmmenu.VMActionUI.show),
         ]
-        if not vm.is_paused():
+        if not states["resume"]:
             actions.pop(2)
         else:
             actions.pop(1)
@@ -180,25 +195,40 @@ class _TrayMenu(vmmGObject):
         for conn in connections:
             uri = conn.get_uri()
             children = [
-                (vm.get_name_or_title(), None, True, self._vm_actions(vm))
+                (vm.get_name_or_title(), None, True, self._vm_actions(vm), vm.get_uuid())
                 for vm in sorted(conn.list_vms(), key=lambda vm: vm.get_name_or_title().casefold())
             ]
             if conn.is_active():
-                children.append((
-                    _("_Disconnect").replace("_", "", 1),
-                    lambda uri=uri: _disconnect(uri), True, (),
-                ))
+                children.append(
+                    (
+                        _("_Disconnect").replace("_", "", 1),
+                        lambda uri=uri: _disconnect(uri),
+                        True,
+                        (),
+                        "disconnect",
+                    )
+                )
             else:
-                children.append((
-                    _("_Connect").replace("_", "", 1),
-                    lambda uri=uri: _connect(uri), True, (),
-                ))
-            result.append((conn.get_pretty_desc(), None, True, tuple(children)))
-        result.append((
-            _("_Show Virtual Machine Manager").replace("_", "", 1),
-            _toggle_manager, True, (),
-        ))
-        result.append((_("_Quit").replace("_", "", 1), self._exit_app, True, ()))
+                children.append(
+                    (
+                        _("_Connect").replace("_", "", 1),
+                        lambda uri=uri: _connect(uri),
+                        True,
+                        (),
+                        "connect",
+                    )
+                )
+            result.append((conn.get_pretty_desc(), None, True, tuple(children), uri))
+        result.append(
+            (
+                _("_Show Virtual Machine Manager").replace("_", "", 1),
+                _toggle_manager,
+                True,
+                (),
+                "manager",
+            )
+        )
+        result.append((_("_Quit").replace("_", "", 1), self._exit_app, True, (), "quit"))
         return result
 
     def _exit_app(self):
@@ -216,9 +246,12 @@ class _StatusNotifier:
         self._visible = False
         self._watcher = False
         self._is_registered = False
+        self._registration = None
         self._revision = 0
         self._nodes = {}
         self._children = {}
+        self._node_ids = {}
+        self._next_id = 0
         self._item_id = self._bus.register_object(
             _ITEM_PATH, _ITEM_INTERFACE, self._item_method, self._item_property, None
         )
@@ -227,11 +260,16 @@ class _StatusNotifier:
         )
         self.refresh()
         self._watch_id = Gio.bus_watch_name(
-            Gio.BusType.SESSION, _WATCHER, Gio.BusNameWatcherFlags.NONE,
-            self._watcher_appeared, self._watcher_vanished,
+            Gio.BusType.SESSION,
+            _WATCHER,
+            Gio.BusNameWatcherFlags.NONE,
+            self._watcher_appeared,
+            self._watcher_vanished,
         )
 
     def close(self):
+        self._watcher = False
+        self._cancel_registration()
         Gio.bus_unwatch_name(self._watch_id)
         self._bus.unregister_object(self._item_id)
         self._bus.unregister_object(self._menu_id)
@@ -251,59 +289,96 @@ class _StatusNotifier:
 
     def _status_changed(self):
         self._bus.emit_signal(
-            None, _ITEM_PATH, _ITEM_INTERFACE.name, "NewStatus",
+            None,
+            _ITEM_PATH,
+            _ITEM_INTERFACE.name,
+            "NewStatus",
             GLib.Variant("(s)", ("Active" if self._visible else "Passive",)),
         )
 
-    def _watcher_appeared(self, _bus, _name, _owner):
-        self._watcher = True
+    def _watcher_appeared(self, _bus, _name, owner):
+        self._cancel_registration()
+        self._watcher = owner
         if self._visible:
             self._register()
 
     def _watcher_vanished(self, _bus, _name):
         self._watcher = False
+        self._cancel_registration()
+
+    def _cancel_registration(self):
+        if self._registration is not None:
+            self._registration.cancel()
+            self._registration = None
         self._is_registered = False
 
     def _register(self):
+        if self._registration is not None or self._is_registered:
+            return
+        self._registration = Gio.Cancellable()
         try:
             self._bus.call(
-                _WATCHER, "/StatusNotifierWatcher", _WATCHER,
-                "RegisterStatusNotifierItem", GLib.Variant("(s)", (_ITEM_PATH,)),
-                None, Gio.DBusCallFlags.NONE, -1, None,
-                self._registered, None,
+                self._watcher,
+                "/StatusNotifierWatcher",
+                _WATCHER,
+                "RegisterStatusNotifierItem",
+                GLib.Variant("(s)", (_ITEM_PATH,)),
+                None,
+                Gio.DBusCallFlags.NONE,
+                -1,
+                self._registration,
+                self._registered,
+                self._registration,
             )
         except GLib.Error:
+            self._registration = None
             log.exception("Could not register system tray icon")
 
-    def _registered(self, bus, result, _data):
+    def _registered(self, bus, result, registration):
+        current = registration is self._registration
+        if current:
+            self._registration = None
         try:
             bus.call_finish(result)
-            self._is_registered = True
-        except GLib.Error:
-            log.exception("Could not register system tray icon")
-            self._is_registered = False
+        except GLib.Error as error:
+            if current and not error.matches(Gio.io_error_quark(), Gio.IOErrorEnum.CANCELLED):
+                log.exception("Could not register system tray icon")
+        else:
+            if current:
+                self._is_registered = True
 
     def refresh(self):
-        self._nodes = {0: ("", None, True, ())}
-        self._children = {}
-        next_id = 0
+        nodes = {0: ("", None, True, (), "root")}
+        children = {}
+        node_ids = {}
 
-        def add(parent, entries):
-            nonlocal next_id
+        def add(parent, path, entries):
             ids = []
             for entry in entries:
-                next_id += 1
-                item_id = next_id
-                self._nodes[item_id] = entry
+                key = path + (entry[4],)
+                item_id = self._node_ids.get(key)
+                if item_id is None:
+                    self._next_id += 1
+                    item_id = self._next_id
+                node_ids[key] = item_id
+                nodes[item_id] = entry
                 ids.append(item_id)
                 if entry[3]:
-                    add(item_id, entry[3])
-            self._children[parent] = ids
+                    add(item_id, key, entry[3])
+            children[parent] = ids
 
-        add(0, self._menu.items())
+        add(0, (), self._menu.items())
+        # Only live identities are retained. Deleted IDs are never reused, so
+        # events from a host's old layout cannot target a different action.
+        self._nodes = nodes
+        self._children = children
+        self._node_ids = node_ids
         self._revision += 1
         self._bus.emit_signal(
-            None, _MENU_PATH, _MENU_INTERFACE.name, "LayoutUpdated",
+            None,
+            _MENU_PATH,
+            _MENU_INTERFACE.name,
+            "LayoutUpdated",
             GLib.Variant("(ui)", (self._revision, 0)),
         )
 
@@ -327,7 +402,7 @@ class _StatusNotifier:
         reply.return_value(None)
 
     def _properties(self, item_id):
-        label, callback, enabled, children = self._nodes[item_id]
+        label, _callback, enabled, children, _key = self._nodes[item_id]
         if item_id == 0:
             return {"children-display": GLib.Variant("s", "submenu")}
         props = {"label": GLib.Variant("s", label)}
@@ -344,15 +419,19 @@ class _StatusNotifier:
         children = []
         if depth != 0:
             for child_id in self._children.get(item_id, []):
-                children.append(GLib.Variant(
-                    "(ia{sv}av)", self._layout(child_id, depth - 1 if depth > 0 else -1, names)
-                ))
+                children.append(
+                    GLib.Variant(
+                        "(ia{sv}av)", self._layout(child_id, depth - 1 if depth > 0 else -1, names)
+                    )
+                )
         return (item_id, props, children)
 
     def _menu_property(self, _bus, _sender, _path, _interface, name):
         values = {
-            "Version": ("u", 3), "TextDirection": ("s", "ltr"),
-            "Status": ("s", "normal"), "IconThemePath": ("as", []),
+            "Version": ("u", 3),
+            "TextDirection": ("s", "ltr"),
+            "Status": ("s", "normal"),
+            "IconThemePath": ("as", []),
         }
         signature, value = values[name]
         return GLib.Variant(signature, value)
@@ -369,9 +448,9 @@ class _StatusNotifier:
             if item_id not in self._nodes:
                 reply.return_dbus_error("com.canonical.dbusmenu.Error.UnknownItem", str(item_id))
                 return
-            reply.return_value(GLib.Variant(
-                "(u(ia{sv}av))", (self._revision, self._layout(item_id, depth, names))
-            ))
+            reply.return_value(
+                GLib.Variant("(u(ia{sv}av))", (self._revision, self._layout(item_id, depth, names)))
+            )
         elif name == "GetGroupProperties":
             ids, names = params
             result = []
@@ -415,10 +494,15 @@ class vmmSystray(vmmGObject):
         try:
             bus = Gio.bus_get_sync(Gio.BusType.SESSION, None)
             result = bus.call_sync(
-                "org.freedesktop.DBus", "/org/freedesktop/DBus",
-                "org.freedesktop.DBus", "NameHasOwner",
-                GLib.Variant("(s)", (_WATCHER,)), GLib.VariantType.new("(b)"),
-                Gio.DBusCallFlags.NONE, -1, None,
+                "org.freedesktop.DBus",
+                "/org/freedesktop/DBus",
+                "org.freedesktop.DBus",
+                "NameHasOwner",
+                GLib.Variant("(s)", (_WATCHER,)),
+                GLib.VariantType.new("(b)"),
+                Gio.DBusCallFlags.NONE,
+                -1,
+                None,
             )
             if result.unpack()[0]:
                 return None

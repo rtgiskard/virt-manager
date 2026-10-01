@@ -16,6 +16,26 @@ from .lib import uiutil
 ####################################################################
 
 
+def vm_action_states(vm):
+    """Availability shared by window menus and the D-Bus tray."""
+    stoppable = bool(vm and vm.is_stoppable())
+    destroyable = bool(vm and vm.is_destroyable())
+    return {
+        "run": bool(vm and vm.is_runable()),
+        "suspend": stoppable,
+        "resume": bool(vm and vm.is_paused()),
+        "shutdown": stoppable,
+        "reboot": stoppable,
+        "reset": stoppable,
+        "destroy": destroyable,
+        "save": destroyable,
+        "clone": bool(vm and vm.is_cloneable()),
+        "migrate": stoppable,
+        "delete": bool(vm),
+        "show": bool(vm),
+    }
+
+
 class _VMMenu(Gtk.Popover):
     def __init__(self, src, current_vm_cb, show_open=True):
         Gtk.Popover.__init__(self)
@@ -64,15 +84,9 @@ class VMShutdownMenu(_VMMenu):
         self._add_action(_("Sa_ve"), "save", VMActionUI.save)
 
     def update_widget_states(self, vm):
-        statemap = {
-            "reboot": bool(vm and vm.is_stoppable()),
-            "shutdown": bool(vm and vm.is_stoppable()),
-            "reset": bool(vm and vm.is_stoppable()),
-            "destroy": bool(vm and vm.is_destroyable()),
-            "save": bool(vm and vm.is_destroyable()),
-        }
-        for name, sensitive in statemap.items():
-            self._items[name].set_sensitive(sensitive)
+        states = vm_action_states(vm)
+        for name, item in self._items.items():
+            item.set_sensitive(states[name])
 
 
 class VMActionMenu(_VMMenu):
@@ -96,18 +110,11 @@ class VMActionMenu(_VMMenu):
             self._add_action(_("_Open"), "show", VMActionUI.show)
 
     def update_widget_states(self, vm):
-        statemap = {
-            "run": bool(vm and vm.is_runable()),
-            "shutdown": bool(vm and vm.is_stoppable()),
-            "suspend": bool(vm and vm.is_stoppable()),
-            "resume": bool(vm and vm.is_paused()),
-            "migrate": bool(vm and vm.is_stoppable()),
-            "clone": bool(vm and vm.is_cloneable()),
-        }
-        for name, sensitive in statemap.items():
-            self._items[name].set_sensitive(sensitive)
-        self._items["suspend"].set_visible(bool(vm and not vm.is_paused()))
-        self._items["resume"].set_visible(bool(vm and vm.is_paused()))
+        states = vm_action_states(vm)
+        for name, item in self._items.items():
+            item.set_sensitive(states[name])
+        self._items["suspend"].set_visible(bool(vm and not states["resume"]))
+        self._items["resume"].set_visible(states["resume"])
         self._shutdown_menu.update_widget_states(vm)
 
     def change_run_text(self, text):
