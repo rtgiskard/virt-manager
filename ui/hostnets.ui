@@ -26,7 +26,7 @@
                     <signal name="changed" handler="on_net_list_changed" swapped="no"/>
                   </object>
                 </child>
-                </object>
+              </object>
             </property>
           </object>
         </property>
@@ -351,7 +351,7 @@
                 <property name="child">
                   <object class="GtkLabel" id="network-error-label">
                     <property name="label">some error here</property>
-                    </object>
+                  </object>
                 </property>
                 <property name="tab">
                   <object class="GtkLabel" id="label21">
@@ -362,7 +362,11 @@
             </child>
           </object>
         </property>
-      <property name="margin-start">3</property><property name="margin-end">3</property><property name="margin-top">3</property><property name="margin-bottom">3</property></object>
+        <property name="margin-start">3</property>
+        <property name="margin-end">3</property>
+        <property name="margin-top">3</property>
+        <property name="margin-bottom">3</property>
+      </object>
     </child>
     <child>
       <object class="GtkBox" id="hbox15">
@@ -380,7 +384,7 @@
                     <property name="icon-name">list-add</property>
                   </object>
                 </child>
-                </object>
+              </object>
             </child>
             <child>
               <object class="GtkButton" id="net-start">
@@ -393,7 +397,7 @@
                     <property name="icon-name">media-playback-start</property>
                   </object>
                 </child>
-                </object>
+              </object>
             </child>
             <child>
               <object class="GtkButton" id="net-stop">
@@ -406,7 +410,7 @@
                     <property name="icon-name">process-stop</property>
                   </object>
                 </child>
-                </object>
+              </object>
             </child>
             <child>
               <object class="GtkButton" id="net-delete">
@@ -419,7 +423,7 @@
                     <property name="icon-name">edit-delete</property>
                   </object>
                 </child>
-                </object>
+              </object>
             </child>
           </object>
         </child>
@@ -436,7 +440,15 @@
             </child>
           </object>
         </child>
-      <property name="margin-start">3</property><property name="margin-end">3</property><property name="margin-top">3</property><property name="margin-bottom">3</property></object>
+        <property name="margin-start">3</property>
+        <property name="margin-end">3</property>
+        <property name="margin-top">3</property>
+        <property name="margin-bottom">3</property>
+      </object>
     </child>
-    <property name="margin-start">3</property><property name="margin-end">3</property><property name="margin-top">3</property><property name="margin-bottom">3</property></object>
+    <property name="margin-start">3</property>
+    <property name="margin-end">3</property>
+    <property name="margin-top">3</property>
+    <property name="margin-bottom">3</property>
+  </object>
 </interface>

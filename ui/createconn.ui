@@ -228,7 +228,7 @@ are very limited. &lt;/small&gt;</property>
             <property name="use-underline">1</property>
             <signal name="clicked" handler="on_cancel_clicked" swapped="no"/>
           </object>
-          </child>
+        </child>
         <child>
           <object class="GtkButton" id="connect">
             <property name="label" translatable="1">Co_nnect</property>
@@ -238,7 +238,8 @@ are very limited. &lt;/small&gt;</property>
             <property name="use-underline">1</property>
             <signal name="clicked" handler="on_connect_clicked" swapped="no"/>
           </object>
-          </child>
+        </child>
       </object>
-    </child></object>
+    </child>
+  </object>
 </interface>

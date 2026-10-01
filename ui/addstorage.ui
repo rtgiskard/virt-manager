@@ -114,14 +114,14 @@
                     <property name="mnemonic-widget">storage-browse</property>
                   </object>
                 </child>
-                </object>
+              </object>
             </child>
             <child>
               <object class="GtkEntry" id="storage-entry">
                 <property name="hexpand">1</property>
                 <property name="focusable">1</property>
                 <property name="width-chars">25</property>
-                </object>
+              </object>
             </child>
           </object>
         </child>

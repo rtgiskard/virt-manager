@@ -6,6 +6,8 @@
   dynamic labels, mnemonics, RTL submenus, and nested action dismissal.
 - Keep window close/quit shortcuts active even without a focused child, while
   retaining the guest keyboard-grab guard.
+- Normalize UI XML indentation and structural tags without changing properties,
+  translations, element order, or the global 8px frame padding.
 - Release tray menu signal subscriptions on cleanup. Cancel pending tray
   registration on watcher replacement or shutdown, ignore stale completions,
   and avoid registering again while a request is pending or already accepted.

@@ -89,9 +89,9 @@
                     <signal name="changed" handler="on_hw_list_changed" swapped="no"/>
                   </object>
                 </child>
-                </object>
+              </object>
             </property>
-            </object>
+          </object>
         </child>
         <child>
           <object class="GtkButton" id="add-hardware-button">
@@ -100,7 +100,7 @@
             <property name="focusable">1</property>
             <property name="use-underline">1</property>
             <signal name="clicked" handler="on_add_hardware_button_clicked" swapped="no"/>
-            </object>
+          </object>
         </child>
       </object>
     </child>
@@ -277,7 +277,11 @@
                                                 </layout>
                                               </object>
                                             </child>
-                                          <property name="margin-start">3</property><property name="margin-end">3</property><property name="margin-top">3</property><property name="margin-bottom">3</property></object>
+                                            <property name="margin-start">3</property>
+                                            <property name="margin-end">3</property>
+                                            <property name="margin-top">3</property>
+                                            <property name="margin-bottom">3</property>
+                                          </object>
                                         </child>
                                       </object>
                                     </property>
@@ -437,7 +441,7 @@
                                                   <object class="GtkComboBox" id="machine-type">
                                                     <property name="halign">start</property>
                                                     <signal name="changed" handler="on_machine_type_changed" swapped="no"/>
-                                                    </object>
+                                                  </object>
                                                 </child>
                                                 <child>
                                                   <object class="GtkLabel" id="machine-type-label">
@@ -469,7 +473,11 @@
                                                 </child>
                                               </object>
                                             </child>
-                                          <property name="margin-start">3</property><property name="margin-end">3</property><property name="margin-top">3</property><property name="margin-bottom">3</property></object>
+                                            <property name="margin-start">3</property>
+                                            <property name="margin-end">3</property>
+                                            <property name="margin-top">3</property>
+                                            <property name="margin-bottom">3</property>
+                                          </object>
                                         </child>
                                       </object>
                                     </property>
@@ -481,7 +489,7 @@
                                     </child>
                                   </object>
                                 </child>
-                                </object>
+                              </object>
                             </property>
                             <property name="tab">
                               <object class="GtkLabel" id="label10">
@@ -542,7 +550,11 @@
                                             <child>
                                               <placeholder/>
                                             </child>
-                                          <property name="margin-start">3</property><property name="margin-end">3</property><property name="margin-top">3</property><property name="margin-bottom">3</property></object>
+                                            <property name="margin-start">3</property>
+                                            <property name="margin-end">3</property>
+                                            <property name="margin-top">3</property>
+                                            <property name="margin-bottom">3</property>
+                                          </object>
                                         </child>
                                       </object>
                                     </property>
@@ -574,7 +586,7 @@
                                                 <child internal-child="selection">
                                                   <object class="GtkTreeSelection"/>
                                                 </child>
-                                                </object>
+                                              </object>
                                             </property>
                                           </object>
                                         </child>
@@ -637,7 +649,7 @@
                                     </child>
                                   </object>
                                 </child>
-                                </object>
+                              </object>
                             </property>
                             <property name="tab">
                               <object class="GtkLabel" id="label14">
@@ -805,7 +817,7 @@
                                     </child>
                                   </object>
                                 </child>
-                                </object>
+                              </object>
                             </property>
                             <property name="tab">
                               <object class="GtkLabel" id="label7">
@@ -915,7 +927,11 @@
                                                     </child>
                                                   </object>
                                                 </child>
-                                              <property name="margin-start">3</property><property name="margin-end">3</property><property name="margin-top">3</property><property name="margin-bottom">3</property></object>
+                                                <property name="margin-start">3</property>
+                                                <property name="margin-end">3</property>
+                                                <property name="margin-top">3</property>
+                                                <property name="margin-bottom">3</property>
+                                              </object>
                                             </child>
                                           </object>
                                         </child>
@@ -1142,7 +1158,7 @@
                                     </child>
                                   </object>
                                 </child>
-                                </object>
+                              </object>
                             </property>
                             <property name="tab">
                               <object class="GtkLabel" id="label53">
@@ -1237,7 +1253,7 @@
                                                     <property name="update-policy">if-valid</property>
                                                     <property name="value">50</property>
                                                     <signal name="value-changed" handler="on_mem_memory_changed" swapped="no"/>
-                                                    </object>
+                                                  </object>
                                                 </child>
                                                 <child>
                                                   <object class="GtkLabel" id="label306">
@@ -1266,7 +1282,7 @@
                                                     <property name="update-policy">if-valid</property>
                                                     <property name="value">50</property>
                                                     <signal name="value-changed" handler="on_mem_maxmem_changed" swapped="no"/>
-                                                    </object>
+                                                  </object>
                                                 </child>
                                                 <child>
                                                   <object class="GtkLabel" id="label346">
@@ -1293,7 +1309,11 @@
                                             <child>
                                               <placeholder/>
                                             </child>
-                                          <property name="margin-start">3</property><property name="margin-end">3</property><property name="margin-top">3</property><property name="margin-bottom">3</property></object>
+                                            <property name="margin-start">3</property>
+                                            <property name="margin-end">3</property>
+                                            <property name="margin-top">3</property>
+                                            <property name="margin-bottom">3</property>
+                                          </object>
                                         </child>
                                       </object>
                                     </property>
@@ -1305,7 +1325,7 @@
                                     </child>
                                   </object>
                                 </child>
-                                </object>
+                              </object>
                             </property>
                             <property name="tab">
                               <object class="GtkLabel" id="label54">
@@ -1501,7 +1521,7 @@
                                                             <property name="focusable">1</property>
                                                             <property name="receives-default">1</property>
                                                             <signal name="clicked" handler="on_boot_initrd_browse_clicked" swapped="no"/>
-                                                            </object>
+                                                          </object>
                                                         </child>
                                                       </object>
                                                     </child>
@@ -1528,7 +1548,7 @@
                                                             <property name="focusable">1</property>
                                                             <property name="receives-default">1</property>
                                                             <signal name="clicked" handler="on_boot_kernel_browse_clicked" swapped="no"/>
-                                                            </object>
+                                                          </object>
                                                         </child>
                                                       </object>
                                                     </child>
@@ -1596,7 +1616,7 @@
                                                             <property name="focusable">1</property>
                                                             <property name="receives-default">1</property>
                                                             <signal name="clicked" handler="on_boot_dtb_browse_clicked" swapped="no"/>
-                                                            </object>
+                                                          </object>
                                                         </child>
                                                       </object>
                                                     </child>
@@ -1703,7 +1723,7 @@
                                                             <property name="icon-name">go-up</property>
                                                           </object>
                                                         </child>
-                                                        </object>
+                                                      </object>
                                                     </child>
                                                     <child>
                                                       <object class="GtkButton" id="boot-movedown">
@@ -1718,7 +1738,7 @@
                                                             <property name="icon-name">go-down</property>
                                                           </object>
                                                         </child>
-                                                        </object>
+                                                      </object>
                                                     </child>
                                                   </object>
                                                 </child>
@@ -1740,7 +1760,7 @@
                                     </layout>
                                   </object>
                                 </child>
-                                </object>
+                              </object>
                             </property>
                             <property name="tab">
                               <object class="GtkLabel" id="boot-options-lbl">
@@ -1828,7 +1848,7 @@
                                                             <property name="label">pathlabel</property>
                                                             <property name="selectable">1</property>
                                                             <property name="ellipsize">start</property>
-                                                            </object>
+                                                          </object>
                                                         </child>
                                                         <child>
                                                           <object class="GtkBox" id="disk-source-box">
@@ -1903,7 +1923,11 @@
                                                         </child>
                                                       </object>
                                                     </child>
-                                                  <property name="margin-start">3</property><property name="margin-end">3</property><property name="margin-top">3</property><property name="margin-bottom">3</property></object>
+                                                    <property name="margin-start">3</property>
+                                                    <property name="margin-end">3</property>
+                                                    <property name="margin-top">3</property>
+                                                    <property name="margin-bottom">3</property>
+                                                  </object>
                                                 </child>
                                                 <child>
                                                   <object class="GtkBox" id="storage-advanced-align">
@@ -1924,7 +1948,7 @@
                                         </child>
                                       </object>
                                     </child>
-                                    </object>
+                                  </object>
                                 </property>
                                 <property name="end-widget">
                                   <object class="GtkBox">
@@ -2058,7 +2082,7 @@
                                                   <object class="GtkEntry" id="network-mac-entry">
                                                     <property name="focusable">1</property>
                                                     <signal name="changed" handler="on_network_mac_entry_changed" swapped="no"/>
-                                                    </object>
+                                                  </object>
                                                 </child>
                                               </object>
                                             </child>
@@ -2126,7 +2150,11 @@
                                                 </layout>
                                               </object>
                                             </child>
-                                          <property name="margin-start">3</property><property name="margin-end">3</property><property name="margin-top">3</property><property name="margin-bottom">3</property></object>
+                                            <property name="margin-start">3</property>
+                                            <property name="margin-end">3</property>
+                                            <property name="margin-top">3</property>
+                                            <property name="margin-bottom">3</property>
+                                          </object>
                                         </child>
                                       </object>
                                     </property>
@@ -2138,7 +2166,7 @@
                                     </child>
                                   </object>
                                 </child>
-                                </object>
+                              </object>
                             </property>
                             <property name="tab">
                               <object class="GtkLabel" id="label56">
@@ -2208,7 +2236,11 @@
                                                 </layout>
                                               </object>
                                             </child>
-                                          <property name="margin-start">3</property><property name="margin-end">3</property><property name="margin-top">3</property><property name="margin-bottom">3</property></object>
+                                            <property name="margin-start">3</property>
+                                            <property name="margin-end">3</property>
+                                            <property name="margin-top">3</property>
+                                            <property name="margin-bottom">3</property>
+                                          </object>
                                         </child>
                                       </object>
                                     </property>
@@ -2220,7 +2252,7 @@
                                     </child>
                                   </object>
                                 </child>
-                                </object>
+                              </object>
                             </property>
                             <property name="tab">
                               <object class="GtkLabel" id="label401">
@@ -2254,7 +2286,7 @@
                                     </child>
                                   </object>
                                 </child>
-                                </object>
+                              </object>
                             </property>
                             <property name="tab">
                               <object class="GtkLabel" id="label500">
@@ -2308,7 +2340,11 @@
                                                 </layout>
                                               </object>
                                             </child>
-                                          <property name="margin-start">3</property><property name="margin-end">3</property><property name="margin-top">3</property><property name="margin-bottom">3</property></object>
+                                            <property name="margin-start">3</property>
+                                            <property name="margin-end">3</property>
+                                            <property name="margin-top">3</property>
+                                            <property name="margin-bottom">3</property>
+                                          </object>
                                         </child>
                                       </object>
                                     </property>
@@ -2320,7 +2356,7 @@
                                     </child>
                                   </object>
                                 </child>
-                                </object>
+                              </object>
                             </property>
                             <property name="tab">
                               <object class="GtkLabel" id="label440">
@@ -2512,7 +2548,11 @@
                                                 </layout>
                                               </object>
                                             </child>
-                                          <property name="margin-start">3</property><property name="margin-end">3</property><property name="margin-top">3</property><property name="margin-bottom">3</property></object>
+                                            <property name="margin-start">3</property>
+                                            <property name="margin-end">3</property>
+                                            <property name="margin-top">3</property>
+                                            <property name="margin-bottom">3</property>
+                                          </object>
                                         </child>
                                       </object>
                                     </property>
@@ -2524,7 +2564,7 @@
                                     </child>
                                   </object>
                                 </child>
-                                </object>
+                              </object>
                             </property>
                             <property name="tab">
                               <object class="GtkLabel" id="label501">
@@ -2628,7 +2668,7 @@
                                     </child>
                                   </object>
                                 </child>
-                                </object>
+                              </object>
                             </property>
                             <property name="tab">
                               <object class="GtkLabel" id="label16">
@@ -2710,7 +2750,7 @@
                                     </child>
                                   </object>
                                 </child>
-                                </object>
+                              </object>
                             </property>
                             <property name="tab">
                               <object class="GtkLabel" id="label26">
@@ -2804,7 +2844,7 @@
                                     </child>
                                   </object>
                                 </child>
-                                </object>
+                              </object>
                             </property>
                             <property name="tab">
                               <object class="GtkLabel" id="label36">
@@ -2944,7 +2984,7 @@
                                     <property name="use-markup">1</property>
                                   </object>
                                 </child>
-                                </object>
+                              </object>
                             </property>
                             <property name="tab">
                               <object class="GtkLabel" id="label47">
@@ -2973,7 +3013,7 @@
                                     <property name="use-markup">1</property>
                                   </object>
                                 </child>
-                                </object>
+                              </object>
                             </property>
                             <property name="tab">
                               <object class="GtkLabel" id="label63">
@@ -3027,7 +3067,11 @@
                                                 </layout>
                                               </object>
                                             </child>
-                                          <property name="margin-start">3</property><property name="margin-end">3</property><property name="margin-top">3</property><property name="margin-bottom">3</property></object>
+                                            <property name="margin-start">3</property>
+                                            <property name="margin-end">3</property>
+                                            <property name="margin-top">3</property>
+                                            <property name="margin-bottom">3</property>
+                                          </object>
                                         </child>
                                       </object>
                                     </property>
@@ -3039,7 +3083,7 @@
                                     </child>
                                   </object>
                                 </child>
-                                </object>
+                              </object>
                             </property>
                             <property name="tab">
                               <object class="GtkLabel" id="label76">
@@ -3101,7 +3145,11 @@
                                             </layout>
                                           </object>
                                         </child>
-                                      <property name="margin-start">3</property><property name="margin-end">3</property><property name="margin-top">3</property><property name="margin-bottom">3</property></object>
+                                        <property name="margin-start">3</property>
+                                        <property name="margin-end">3</property>
+                                        <property name="margin-top">3</property>
+                                        <property name="margin-bottom">3</property>
+                                      </object>
                                     </child>
                                   </object>
                                 </property>
@@ -3111,7 +3159,7 @@
                                     <property name="use-markup">1</property>
                                   </object>
                                 </child>
-                                </object>
+                              </object>
                             </property>
                             <property name="tab">
                               <object class="GtkLabel" id="label515">
@@ -3147,7 +3195,7 @@
                                     </child>
                                   </object>
                                 </child>
-                                </object>
+                              </object>
                             </property>
                             <property name="tab">
                               <object class="GtkLabel" id="label182">
@@ -3209,7 +3257,11 @@
                                             </layout>
                                           </object>
                                         </child>
-                                      <property name="margin-start">3</property><property name="margin-end">3</property><property name="margin-top">3</property><property name="margin-bottom">3</property></object>
+                                        <property name="margin-start">3</property>
+                                        <property name="margin-end">3</property>
+                                        <property name="margin-top">3</property>
+                                        <property name="margin-bottom">3</property>
+                                      </object>
                                     </child>
                                   </object>
                                 </property>
@@ -3219,7 +3271,7 @@
                                     <property name="use-markup">1</property>
                                   </object>
                                 </child>
-                                </object>
+                              </object>
                             </property>
                             <property name="tab">
                               <object class="GtkLabel" id="label81">
@@ -3272,7 +3324,7 @@
                                     <property name="use-markup">1</property>
                                   </object>
                                 </child>
-                                </object>
+                              </object>
                             </property>
                             <property name="tab">
                               <object class="GtkLabel" id="label93">
@@ -3301,7 +3353,7 @@
                                     <property name="use-markup">1</property>
                                   </object>
                                 </child>
-                                </object>
+                              </object>
                             </property>
                             <property name="tab">
                               <object class="GtkLabel" id="label95">
@@ -3336,8 +3388,8 @@
             <child>
               <object class="GtkBox">
                 <property name="hexpand">1</property>
-                </object>
-              </child>
+              </object>
+            </child>
             <child>
               <object class="GtkButton" id="config-cancel">
                 <property name="label" translatable="1">_Cancel</property>
@@ -3345,8 +3397,8 @@
                 <property name="receives-default">1</property>
                 <property name="use-underline">1</property>
                 <signal name="clicked" handler="on_config_cancel_clicked" swapped="no"/>
-                </object>
-              </child>
+              </object>
+            </child>
             <child>
               <object class="GtkButton" id="config-apply">
                 <property name="label" translatable="1">_Apply</property>
@@ -3355,11 +3407,15 @@
                 <property name="css-classes">suggested-action</property>
                 <property name="use-underline">1</property>
                 <signal name="clicked" handler="on_config_apply_clicked" swapped="no"/>
-                </object>
-              </child>
+              </object>
+            </child>
           </object>
         </child>
       </object>
     </child>
-  <property name="margin-start">12</property><property name="margin-end">12</property><property name="margin-top">12</property><property name="margin-bottom">12</property></object>
+    <property name="margin-start">12</property>
+    <property name="margin-end">12</property>
+    <property name="margin-top">12</property>
+    <property name="margin-bottom">12</property>
+  </object>
 </interface>

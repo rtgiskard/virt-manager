@@ -189,9 +189,17 @@
                     </layout>
                   </object>
                 </child>
-              <property name="margin-start">6</property><property name="margin-end">6</property><property name="margin-top">6</property><property name="margin-bottom">6</property></object>
+                <property name="margin-start">6</property>
+                <property name="margin-end">6</property>
+                <property name="margin-top">6</property>
+                <property name="margin-bottom">6</property>
+              </object>
             </child>
-          <property name="margin-start">6</property><property name="margin-end">6</property><property name="margin-top">6</property><property name="margin-bottom">6</property></object>
+            <property name="margin-start">6</property>
+            <property name="margin-end">6</property>
+            <property name="margin-top">6</property>
+            <property name="margin-bottom">6</property>
+          </object>
         </child>
       </object>
     </child>
@@ -213,7 +221,7 @@
             <property name="use-underline">1</property>
             <signal name="clicked" handler="on_change_storage_cancel_clicked" swapped="no"/>
           </object>
-          </child>
+        </child>
         <child>
           <object class="GtkButton" id="change-storage-ok">
             <property name="label" translatable="1">_OK</property>
@@ -222,9 +230,10 @@
             <property name="use-underline">1</property>
             <signal name="clicked" handler="on_change_storage_ok_clicked" swapped="no"/>
           </object>
-          </child>
+        </child>
       </object>
-    </child></object>
+    </child>
+  </object>
   <object class="GtkWindow" id="vmm-clone">
     <property name="title" translatable="1">Clone Virtual Machine</property>
     <signal name="close-request" handler="on_clone_delete_event" swapped="no"/>
@@ -259,7 +268,11 @@
                     </child>
                   </object>
                 </child>
-              <property name="margin-start">6</property><property name="margin-end">6</property><property name="margin-top">6</property><property name="margin-bottom">6</property></object>
+                <property name="margin-start">6</property>
+                <property name="margin-end">6</property>
+                <property name="margin-top">6</property>
+                <property name="margin-bottom">6</property>
+              </object>
             </property>
             <style>
               <class name="vmm-header"/>
@@ -390,7 +403,7 @@
                                         <signal name="changed" handler="on_storage_selection_changed" swapped="no"/>
                                       </object>
                                     </child>
-                                    </object>
+                                  </object>
                                 </property>
                                 <layout>
                                   <property name="column">0</property>
@@ -488,7 +501,7 @@ like change passwords or static IPs, please see the virt-sysprep(1) tool.&lt;/sp
                     <property name="use-underline">1</property>
                     <signal name="clicked" handler="on_clone_cancel_clicked" swapped="no"/>
                   </object>
-                  </child>
+                </child>
                 <child>
                   <object class="GtkButton" id="clone-ok">
                     <property name="label" translatable="1">C_lone</property>
@@ -497,10 +510,14 @@ like change passwords or static IPs, please see the virt-sysprep(1) tool.&lt;/sp
                     <property name="use-underline">1</property>
                     <signal name="clicked" handler="on_clone_ok_clicked" swapped="no"/>
                   </object>
-                  </child>
+                </child>
               </object>
             </child>
-          <property name="margin-start">12</property><property name="margin-end">12</property><property name="margin-top">12</property><property name="margin-bottom">12</property></object>
+            <property name="margin-start">12</property>
+            <property name="margin-end">12</property>
+            <property name="margin-top">12</property>
+            <property name="margin-bottom">12</property>
+          </object>
         </child>
       </object>
     </property>

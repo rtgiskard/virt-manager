@@ -64,7 +64,8 @@
                       </object>
                     </child>
                   </object>
-                </child></object>
+                </child>
+              </object>
             </property>
             <style>
               <class name="vmm-header"/>
@@ -283,7 +284,7 @@
                                       <object class="GtkComboBox" id="create-conn">
                                         <property name="width-request">400</property>
                                         <signal name="changed" handler="on_create_conn_changed" swapped="no"/>
-                                        </object>
+                                      </object>
                                     </child>
                                     <child>
                                       <object class="GtkLabel" id="create-conn-label">
@@ -552,7 +553,7 @@ bar</property>
                                                 <property name="receives-default">1</property>
                                                 <property name="use-underline">1</property>
                                                 <signal name="clicked" handler="on_install_iso_browse_clicked" swapped="no"/>
-                                                </object>
+                                              </object>
                                             </child>
                                           </object>
                                         </child>
@@ -594,7 +595,7 @@ bar</property>
                                                     <property name="focusable">1</property>
                                                     <signal name="activate" handler="on_install_url_entry_activate" swapped="no"/>
                                                     <signal name="changed" handler="on_install_url_entry_changed" swapped="no"/>
-                                                    </object>
+                                                  </object>
                                                 </child>
                                                 <layout>
                                                   <property name="column">0</property>
@@ -709,7 +710,7 @@ User shouldn't see this.</property>
                                                     <property name="hexpand">1</property>
                                                     <property name="focusable">1</property>
                                                     <property name="invisible-char">●</property>
-                                                    </object>
+                                                  </object>
                                                 </child>
                                                 <child>
                                                   <object class="GtkButton" id="install-import-browse">
@@ -718,7 +719,7 @@ User shouldn't see this.</property>
                                                     <property name="receives-default">1</property>
                                                     <property name="use-underline">1</property>
                                                     <signal name="clicked" handler="on_install_import_browse_clicked" swapped="no"/>
-                                                    </object>
+                                                  </object>
                                                 </child>
                                               </object>
                                             </child>
@@ -784,7 +785,7 @@ User shouldn't see this.</property>
                                                 <property name="receives-default">1</property>
                                                 <property name="use-underline">1</property>
                                                 <signal name="clicked" handler="on_install_app_browse_clicked" swapped="no"/>
-                                                </object>
+                                              </object>
                                             </child>
                                           </object>
                                         </child>
@@ -833,7 +834,7 @@ User shouldn't see this.</property>
                                                     <property name="receives-default">1</property>
                                                     <property name="use-underline">1</property>
                                                     <signal name="clicked" handler="on_install_oscontainer_browse_clicked" swapped="no"/>
-                                                    </object>
+                                                  </object>
                                                 </child>
                                               </object>
                                             </child>
@@ -912,7 +913,7 @@ connections is not yet supported.&lt;/small&gt;</property>
  * docker://registry:port/image:tag
  * virt-builder://template
 </property>
-                                                            </object>
+                                                          </object>
                                                         </child>
                                                         <layout>
                                                           <property name="column">1</property>
@@ -999,7 +1000,11 @@ connections is not yet supported.&lt;/small&gt;</property>
                                                     </child>
                                                   </object>
                                                 </child>
-                                              <property name="margin-start">10</property><property name="margin-end">10</property><property name="margin-top">10</property><property name="margin-bottom">10</property></object>
+                                                <property name="margin-start">10</property>
+                                                <property name="margin-end">10</property>
+                                                <property name="margin-top">10</property>
+                                                <property name="margin-bottom">10</property>
+                                              </object>
                                             </child>
                                             <child>
                                               <object class="GtkBox" id="install-oscontainer-rootpw-box">
@@ -1016,7 +1021,7 @@ connections is not yet supported.&lt;/small&gt;</property>
                                                     <property name="focusable">1</property>
                                                     <property name="visibility">0</property>
                                                     <property name="invisible-char">●</property>
-                                                    </object>
+                                                  </object>
                                                 </child>
                                               </object>
                                             </child>
@@ -1203,7 +1208,7 @@ connections is not yet supported.&lt;/small&gt;</property>
                                             <property name="width-chars">7</property>
                                             <property name="adjustment">adjustment2</property>
                                             <property name="climb-rate">1</property>
-                                            </object>
+                                          </object>
                                         </child>
                                         <child>
                                           <object class="GtkLabel" id="phys-cpu-label">
@@ -1537,7 +1542,7 @@ connections is not yet supported.&lt;/small&gt;</property>
                     <property name="use-underline">1</property>
                     <signal name="clicked" handler="on_create_cancel_clicked" swapped="no"/>
                   </object>
-                  </child>
+                </child>
                 <child>
                   <object class="GtkButton" id="create-back">
                     <property name="label" translatable="1">_Back</property>
@@ -1547,7 +1552,7 @@ connections is not yet supported.&lt;/small&gt;</property>
                     <property name="use-underline">1</property>
                     <signal name="clicked" handler="on_create_back_clicked" swapped="no"/>
                   </object>
-                  </child>
+                </child>
                 <child>
                   <object class="GtkButton" id="create-forward">
                     <property name="label" translatable="1">_Forward</property>
@@ -1557,7 +1562,7 @@ connections is not yet supported.&lt;/small&gt;</property>
                     <property name="use-underline">1</property>
                     <signal name="clicked" handler="on_create_forward_clicked" swapped="no"/>
                   </object>
-                  </child>
+                </child>
                 <child>
                   <object class="GtkButton" id="create-finish">
                     <property name="visible">0</property>
@@ -1568,10 +1573,14 @@ connections is not yet supported.&lt;/small&gt;</property>
                     <property name="use-underline">1</property>
                     <signal name="clicked" handler="on_create_finish_clicked" swapped="no"/>
                   </object>
-                  </child>
+                </child>
               </object>
             </child>
-          <property name="margin-start">12</property><property name="margin-end">12</property><property name="margin-top">12</property><property name="margin-bottom">12</property></object>
+            <property name="margin-start">12</property>
+            <property name="margin-end">12</property>
+            <property name="margin-top">12</property>
+            <property name="margin-bottom">12</property>
+          </object>
         </child>
       </object>
     </property>

@@ -46,7 +46,7 @@
                 <property name="visibility">0</property>
                 <property name="invisible-char">●</property>
                 <signal name="changed" handler="on_graphics_password_changed" swapped="no"/>
-                </object>
+              </object>
             </child>
             <child>
               <object class="GtkCheckButton" id="graphics-visibility-chk">
@@ -126,7 +126,7 @@
             <property name="halign">start</property>
             <property name="use-underline">1</property>
             <signal name="toggled" handler="on_graphics_port_auto_toggled" swapped="no"/>
-            </object>
+          </object>
         </child>
         <child>
           <object class="GtkSpinButton" id="graphics-port">
@@ -140,7 +140,7 @@
             <property name="update-policy">if-valid</property>
             <property name="value">5900</property>
             <signal name="value-changed" handler="on_graphics_port_changed" swapped="no"/>
-            </object>
+          </object>
         </child>
       </object>
     </child>

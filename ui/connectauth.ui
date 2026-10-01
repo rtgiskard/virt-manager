@@ -80,8 +80,9 @@
             <property name="receives-default">1</property>
             <property name="use-underline">1</property>
             <signal name="clicked" handler="on_connectauth_cancel_clicked" swapped="no"/>
-          <property name="hexpand">1</property></object>
-          </child>
+            <property name="hexpand">1</property>
+          </object>
+        </child>
         <child>
           <object class="GtkButton" id="connectauth-ok">
             <property name="label" translatable="1">_OK</property>
@@ -89,8 +90,10 @@
             <property name="receives-default">1</property>
             <property name="use-underline">1</property>
             <signal name="clicked" handler="on_connectauth_ok_clicked" swapped="no"/>
-          <property name="hexpand">1</property></object>
-          </child>
+            <property name="hexpand">1</property>
+          </object>
+        </child>
       </object>
-    </child></object>
+    </child>
+  </object>
 </interface>

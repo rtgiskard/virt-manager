@@ -7,7 +7,7 @@
     <signal name="activate" handler="on_os_name_activate" swapped="no"/>
     <signal name="search-changed" handler="on_os_name_search_changed" swapped="no"/>
     <signal name="stop-search" handler="on_os_name_stop_search" swapped="no"/>
-    </object>
+  </object>
   <object class="GtkPopover" id="vmm-oslist">
     <property name="autohide">0</property>
     <property name="child">
@@ -53,7 +53,7 @@ Try selecting a similar distro or version, or use one of the 'Generic' options.<
                 <child internal-child="selection">
                   <object class="GtkTreeSelection"/>
                 </child>
-                </object>
+              </object>
             </property>
           </object>
         </child>
@@ -63,9 +63,13 @@ Try selecting a similar distro or version, or use one of the 'Generic' options.<
             <property name="focusable">1</property>
             <property name="halign">start</property>
             <signal name="toggled" handler="on_include_eol_toggled" swapped="no"/>
-            </object>
+          </object>
         </child>
       </object>
     </property>
-    <property name="margin-start">6</property><property name="margin-end">6</property><property name="margin-top">6</property><property name="margin-bottom">6</property></object>
+    <property name="margin-start">6</property>
+    <property name="margin-end">6</property>
+    <property name="margin-top">6</property>
+    <property name="margin-bottom">6</property>
+  </object>
 </interface>

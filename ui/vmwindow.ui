@@ -23,38 +23,45 @@
                 <property name="direction">none</property>
                 <property name="label" translatable="1">_File</property>
                 <property name="use-underline">True</property>
-                <property name="popover"><object class="GtkPopover" id="file1_menu">
-                    <property name="child"><object class="GtkBox" id="file1_menu-items"><property name="orientation">vertical</property><child>
+                <property name="popover">
+                  <object class="GtkPopover" id="file1_menu">
+                    <property name="child">
+                      <object class="GtkBox" id="file1_menu-items">
+                        <property name="orientation">vertical</property>
+                        <child>
                           <object class="VmmMenuActionButton" id="view_manager">
-                        <property name="visible">True</property>
-                        <property name="label" translatable="1">_View Manager</property>
-                        <property name="use-underline">True</property>
-                        <signal name="clicked" handler="on_details_menu_view_manager_activate" swapped="no"/>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkSeparator" id="separator15">
-                        <property name="visible">True</property>
-                      </object>
-                    </child>
-                    <child>
+                            <property name="visible">True</property>
+                            <property name="label" translatable="1">_View Manager</property>
+                            <property name="use-underline">True</property>
+                            <signal name="clicked" handler="on_details_menu_view_manager_activate" swapped="no"/>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkSeparator" id="separator15">
+                            <property name="visible">True</property>
+                          </object>
+                        </child>
+                        <child>
                           <object class="VmmMenuActionButton" id="close4">
-                        <property name="visible">True</property>
-                        <property name="label" translatable="1">_Close</property>
-                        <property name="use-underline">True</property>
-                        <signal name="clicked" handler="on_details_menu_close_activate" swapped="no"/>
-                        </object>
-                    </child>
-                    <child>
+                            <property name="visible">True</property>
+                            <property name="label" translatable="1">_Close</property>
+                            <property name="use-underline">True</property>
+                            <signal name="clicked" handler="on_details_menu_close_activate" swapped="no"/>
+                          </object>
+                        </child>
+                        <child>
                           <object class="VmmMenuActionButton" id="quit3">
-                        <property name="visible">True</property>
-                        <property name="label" translatable="1">_Quit</property>
-                        <property name="use-underline">True</property>
-                        <signal name="clicked" handler="on_details_menu_quit_activate" swapped="no"/>
-                        </object>
-                    </child>
-                  </object></property></object>
-                </property></object>
+                            <property name="visible">True</property>
+                            <property name="label" translatable="1">_Quit</property>
+                            <property name="use-underline">True</property>
+                            <signal name="clicked" handler="on_details_menu_quit_activate" swapped="no"/>
+                          </object>
+                        </child>
+                      </object>
+                    </property>
+                  </object>
+                </property>
+              </object>
             </child>
             <child>
               <object class="GtkMenuButton" id="details-vm-menu">
@@ -63,32 +70,39 @@
                 <property name="direction">none</property>
                 <property name="label" translatable="1">Virtual _Machine</property>
                 <property name="use-underline">True</property>
-                <property name="popover"><object class="GtkPopover" id="virtual_machine1_menu">
+                <property name="popover">
+                  <object class="GtkPopover" id="virtual_machine1_menu">
                     <signal name="show" handler="on_details_menu_virtual_manager_activate" swapped="no"/>
-                    <property name="child"><object class="GtkBox" id="virtual_machine1_menu-items"><property name="orientation">vertical</property><child>
-                      <object class="GtkSeparator" id="separator2">
-                        <property name="visible">True</property>
-                      </object>
-                    </child>
-                    <child>
+                    <property name="child">
+                      <object class="GtkBox" id="virtual_machine1_menu-items">
+                        <property name="orientation">vertical</property>
+                        <child>
+                          <object class="GtkSeparator" id="separator2">
+                            <property name="visible">True</property>
+                          </object>
+                        </child>
+                        <child>
                           <object class="VmmMenuActionButton" id="details-menu-vm-screenshot">
-                        <property name="visible">True</property>
-                        <property name="label" translatable="1">_Take Screenshot</property>
-                        <property name="use-underline">True</property>
-                        <signal name="clicked" handler="on_details_menu_screenshot_activate" swapped="no"/>
-                      </object>
-                    </child>
-                    <child>
+                            <property name="visible">True</property>
+                            <property name="label" translatable="1">_Take Screenshot</property>
+                            <property name="use-underline">True</property>
+                            <signal name="clicked" handler="on_details_menu_screenshot_activate" swapped="no"/>
+                          </object>
+                        </child>
+                        <child>
                           <object class="VmmMenuActionButton" id="details-menu-usb-redirection">
-                        <property name="visible">True</property>
-                        <property name="tooltip-text" translatable="1">Redirect host USB device to virtual machine with SPICE graphics.</property>
-                        <property name="label" translatable="1">_Redirect USB device</property>
-                        <property name="use-underline">True</property>
-                        <signal name="clicked" handler="on_details_menu_usb_redirection" swapped="no"/>
+                            <property name="visible">True</property>
+                            <property name="tooltip-text" translatable="1">Redirect host USB device to virtual machine with SPICE graphics.</property>
+                            <property name="label" translatable="1">_Redirect USB device</property>
+                            <property name="use-underline">True</property>
+                            <signal name="clicked" handler="on_details_menu_usb_redirection" swapped="no"/>
+                          </object>
+                        </child>
                       </object>
-                    </child>
-                  </object></property></object>
-                </property></object>
+                    </property>
+                  </object>
+                </property>
+              </object>
             </child>
             <child>
               <object class="GtkMenuButton" id="view2">
@@ -97,137 +111,158 @@
                 <property name="direction">none</property>
                 <property name="label" translatable="1">_View</property>
                 <property name="use-underline">True</property>
-                <property name="popover"><object class="GtkPopover" id="view2_menu">
-                    <property name="child"><object class="GtkBox" id="view2_menu-items"><property name="orientation">vertical</property><child>
-                      <object class="GtkCheckButton" id="details-menu-view-console">
-                        <property name="visible">True</property>
-                        <property name="label" translatable="1">_Console</property>
-                        <property name="use-underline">True</property>
-                        <property name="active">True</property>
-                        <signal name="toggled" handler="on_details_menu_view_console_toggled" swapped="no"/>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkCheckButton" id="details-menu-view-details">
-                        <property name="visible">True</property>
-                        <property name="label" translatable="1">_Details</property>
-                        <property name="use-underline">True</property>
-                        <property name="group">details-menu-view-console</property>
-                        <signal name="toggled" handler="on_details_menu_view_details_toggled" swapped="no"/>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkCheckButton" id="details-menu-view-snapshots">
-                        <property name="visible">True</property>
-                        <property name="label" translatable="1">Sna_pshots</property>
-                        <property name="use-underline">True</property>
-                        <property name="group">details-menu-view-console</property>
-                        <signal name="toggled" handler="on_details_menu_view_snapshots_toggled" swapped="no"/>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkSeparator" id="menuitem2">
-                        <property name="visible">True</property>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkCheckButton" id="details-menu-view-fullscreen">
-                        <property name="visible">True</property>
-                        <property name="label" translatable="1">_Fullscreen</property>
-                        <property name="use-underline">True</property>
-                        <signal name="toggled" handler="on_details_menu_view_fullscreen_activate" swapped="no"/>
-                      </object>
-                    </child>
-                    <child>
+                <property name="popover">
+                  <object class="GtkPopover" id="view2_menu">
+                    <property name="child">
+                      <object class="GtkBox" id="view2_menu-items">
+                        <property name="orientation">vertical</property>
+                        <child>
+                          <object class="GtkCheckButton" id="details-menu-view-console">
+                            <property name="visible">True</property>
+                            <property name="label" translatable="1">_Console</property>
+                            <property name="use-underline">True</property>
+                            <property name="active">True</property>
+                            <signal name="toggled" handler="on_details_menu_view_console_toggled" swapped="no"/>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkCheckButton" id="details-menu-view-details">
+                            <property name="visible">True</property>
+                            <property name="label" translatable="1">_Details</property>
+                            <property name="use-underline">True</property>
+                            <property name="group">details-menu-view-console</property>
+                            <signal name="toggled" handler="on_details_menu_view_details_toggled" swapped="no"/>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkCheckButton" id="details-menu-view-snapshots">
+                            <property name="visible">True</property>
+                            <property name="label" translatable="1">Sna_pshots</property>
+                            <property name="use-underline">True</property>
+                            <property name="group">details-menu-view-console</property>
+                            <signal name="toggled" handler="on_details_menu_view_snapshots_toggled" swapped="no"/>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkSeparator" id="menuitem2">
+                            <property name="visible">True</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkCheckButton" id="details-menu-view-fullscreen">
+                            <property name="visible">True</property>
+                            <property name="label" translatable="1">_Fullscreen</property>
+                            <property name="use-underline">True</property>
+                            <signal name="toggled" handler="on_details_menu_view_fullscreen_activate" swapped="no"/>
+                          </object>
+                        </child>
+                        <child>
                           <object class="VmmMenuActionButton" id="detains-menu-view-size-to-vm">
-                        <property name="visible">True</property>
-                        <property name="label" translatable="1">_Resize to VM</property>
-                        <property name="use-underline">True</property>
-                        <signal name="clicked" handler="on_details_menu_view_size_to_vm_activate" swapped="no"/>
-                      </object>
-                    </child>
-                    <child>
+                            <property name="visible">True</property>
+                            <property name="label" translatable="1">_Resize to VM</property>
+                            <property name="use-underline">True</property>
+                            <signal name="clicked" handler="on_details_menu_view_size_to_vm_activate" swapped="no"/>
+                          </object>
+                        </child>
+                        <child>
                           <object class="GtkMenuButton" id="menuitem1">
-                        <property name="visible">True</property>
-                        <property name="label" translatable="1">_Scale Display</property>
-                        <property name="use-underline">True</property>
+                            <property name="visible">True</property>
+                            <property name="label" translatable="1">_Scale Display</property>
+                            <property name="use-underline">True</property>
                             <property name="popover">
                               <object class="GtkPopover" id="view-scale-menu">
-                        <property name="child"><object class="GtkBox" id="menu1"><property name="orientation">vertical</property><child>
-                              <object class="GtkCheckButton" id="details-menu-view-scale-always">
-                                <property name="visible">True</property>
-                                <property name="label" translatable="1">_Always</property>
-                                <property name="use-underline">True</property>
-                                <property name="active">True</property>
-                                <signal name="toggled" handler="on_details_menu_view_scale_always_toggled" swapped="no"/>
+                                <property name="child">
+                                  <object class="GtkBox" id="menu1">
+                                    <property name="orientation">vertical</property>
+                                    <child>
+                                      <object class="GtkCheckButton" id="details-menu-view-scale-always">
+                                        <property name="visible">True</property>
+                                        <property name="label" translatable="1">_Always</property>
+                                        <property name="use-underline">True</property>
+                                        <property name="active">True</property>
+                                        <signal name="toggled" handler="on_details_menu_view_scale_always_toggled" swapped="no"/>
+                                      </object>
+                                    </child>
+                                    <child>
+                                      <object class="GtkCheckButton" id="details-menu-view-scale-fullscreen">
+                                        <property name="visible">True</property>
+                                        <property name="label" translatable="1">_Only when Fullscreen</property>
+                                        <property name="use-underline">True</property>
+                                        <property name="group">details-menu-view-scale-always</property>
+                                        <signal name="toggled" handler="on_details_menu_view_scale_fullscreen_toggled" swapped="no"/>
+                                      </object>
+                                    </child>
+                                    <child>
+                                      <object class="GtkCheckButton" id="details-menu-view-scale-never">
+                                        <property name="visible">True</property>
+                                        <property name="label" translatable="1">_Never</property>
+                                        <property name="use-underline">True</property>
+                                        <property name="group">details-menu-view-scale-always</property>
+                                        <signal name="toggled" handler="on_details_menu_view_scale_never_toggled" swapped="no"/>
+                                      </object>
+                                    </child>
+                                    <child>
+                                      <object class="GtkSeparator" id="menuitem3">
+                                        <property name="visible">True</property>
+                                      </object>
+                                    </child>
+                                    <child>
+                                      <object class="GtkCheckButton" id="details-menu-view-resizeguest">
+                                        <property name="visible">True</property>
+                                        <property name="label" translatable="1">Auto _resize VM with window</property>
+                                        <property name="use-underline">True</property>
+                                        <signal name="toggled" handler="on_details_menu_view_resizeguest_toggled" swapped="no"/>
+                                      </object>
+                                    </child>
+                                  </object>
+                                </property>
                               </object>
-                            </child>
-                            <child>
-                              <object class="GtkCheckButton" id="details-menu-view-scale-fullscreen">
-                                <property name="visible">True</property>
-                                <property name="label" translatable="1">_Only when Fullscreen</property>
-                                <property name="use-underline">True</property>
-                                <property name="group">details-menu-view-scale-always</property>
-                                <signal name="toggled" handler="on_details_menu_view_scale_fullscreen_toggled" swapped="no"/>
-                              </object>
-                            </child>
-                            <child>
-                              <object class="GtkCheckButton" id="details-menu-view-scale-never">
-                                <property name="visible">True</property>
-                                <property name="label" translatable="1">_Never</property>
-                                <property name="use-underline">True</property>
-                                <property name="group">details-menu-view-scale-always</property>
-                                <signal name="toggled" handler="on_details_menu_view_scale_never_toggled" swapped="no"/>
-                              </object>
-                            </child>
-                            <child>
-                              <object class="GtkSeparator" id="menuitem3">
-                                <property name="visible">True</property>
-                              </object>
-                            </child>
-                            <child>
-                              <object class="GtkCheckButton" id="details-menu-view-resizeguest">
-                                <property name="visible">True</property>
-                                <property name="label" translatable="1">Auto _resize VM with window</property>
-                                <property name="use-underline">True</property>
-                                <signal name="toggled" handler="on_details_menu_view_resizeguest_toggled" swapped="no"/>
-                              </object>
-                            </child>
-                          </object></property></object>
                             </property>
                           </object>
-                    </child>
-                    <child>
-                      <object class="GtkMenuButton" id="details-menu-view-console-list">
-                        <property name="visible">True</property>
-                        <property name="label" translatable="1">Co_nsoles</property>
-                        <property name="use-underline">True</property>
-                      <property name="popover"><object class="GtkPopover" id="details-menu-view-console-list-popover"><property name="child"><object class="GtkBox" id="details-menu-view-console-list-popover-items"><property name="orientation">vertical</property></object></property></object></property></object>
-                    </child>
-                    <child>
-                      <object class="GtkCheckButton" id="details-menu-view-autoconnect">
-                        <property name="visible">True</property>
-                        <property name="label" translatable="1">_Autoconnect</property>
-                        <property name="use-underline">True</property>
-                        <signal name="toggled" handler="on_details_menu_view_autoconnect_activate" swapped="no"/>
+                        </child>
+                        <child>
+                          <object class="GtkMenuButton" id="details-menu-view-console-list">
+                            <property name="visible">True</property>
+                            <property name="label" translatable="1">Co_nsoles</property>
+                            <property name="use-underline">True</property>
+                            <property name="popover">
+                              <object class="GtkPopover" id="details-menu-view-console-list-popover">
+                                <property name="child">
+                                  <object class="GtkBox" id="details-menu-view-console-list-popover-items">
+                                    <property name="orientation">vertical</property>
+                                  </object>
+                                </property>
+                              </object>
+                            </property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkCheckButton" id="details-menu-view-autoconnect">
+                            <property name="visible">True</property>
+                            <property name="label" translatable="1">_Autoconnect</property>
+                            <property name="use-underline">True</property>
+                            <signal name="toggled" handler="on_details_menu_view_autoconnect_activate" swapped="no"/>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkSeparator" id="separator7">
+                            <property name="visible">True</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkCheckButton" id="details-menu-view-toolbar">
+                            <property name="visible">True</property>
+                            <property name="label" translatable="1">T_oolbar</property>
+                            <property name="use-underline">True</property>
+                            <property name="active">True</property>
+                            <signal name="toggled" handler="on_details_menu_view_toolbar_activate" swapped="no"/>
+                          </object>
+                        </child>
                       </object>
-                    </child>
-                    <child>
-                      <object class="GtkSeparator" id="separator7">
-                        <property name="visible">True</property>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkCheckButton" id="details-menu-view-toolbar">
-                        <property name="visible">True</property>
-                        <property name="label" translatable="1">T_oolbar</property>
-                        <property name="use-underline">True</property>
-                        <property name="active">True</property>
-                        <signal name="toggled" handler="on_details_menu_view_toolbar_activate" swapped="no"/>
-                      </object>
-                    </child>
-                  </object></property></object>
-                </property></object>
+                    </property>
+                  </object>
+                </property>
+              </object>
             </child>
             <child>
               <object class="GtkMenuButton" id="details-menu-send-key">
@@ -236,7 +271,16 @@
                 <property name="direction">none</property>
                 <property name="label" translatable="1">Send _Key</property>
                 <property name="use-underline">True</property>
-              <property name="popover"><object class="GtkPopover" id="details-menu-send-key-popover"><property name="child"><object class="GtkBox" id="details-menu-send-key-popover-items"><property name="orientation">vertical</property></object></property></object></property></object>
+                <property name="popover">
+                  <object class="GtkPopover" id="details-menu-send-key-popover">
+                    <property name="child">
+                      <object class="GtkBox" id="details-menu-send-key-popover-items">
+                        <property name="orientation">vertical</property>
+                      </object>
+                    </property>
+                  </object>
+                </property>
+              </object>
             </child>
           </object>
         </child>
@@ -299,7 +343,13 @@
                     <signal name="clicked" handler="on_control_shutdown_clicked" swapped="no"/>
                   </object>
                 </child>
-                <child><object class="GtkMenuButton" id="control-shutdown-menu"><property name="icon-name">pan-down-symbolic</property><property name="tooltip-text">Shut down options</property></object></child><child>
+                <child>
+                  <object class="GtkMenuButton" id="control-shutdown-menu">
+                    <property name="icon-name">pan-down-symbolic</property>
+                    <property name="tooltip-text">Shut down options</property>
+                  </object>
+                </child>
+                <child>
                   <object class="GtkSeparator" id="toolbutton7">
                     <property name="orientation">vertical</property>
                   </object>

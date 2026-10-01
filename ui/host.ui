@@ -25,39 +25,46 @@
                 <property name="direction">none</property>
                 <property name="label" translatable="1">_File</property>
                 <property name="use-underline">True</property>
-                <property name="popover"><object class="GtkPopover" id="menuitem4_menu">
-                    <property name="child"><object class="GtkBox" id="menuitem4_menu-items"><property name="orientation">vertical</property><child>
+                <property name="popover">
+                  <object class="GtkPopover" id="menuitem4_menu">
+                    <property name="child">
+                      <object class="GtkBox" id="menuitem4_menu-items">
+                        <property name="orientation">vertical</property>
+                        <child>
                           <object class="VmmMenuActionButton" id="menu-file-view-manager">
-                        <property name="visible">True</property>
-                        <property name="label" translatable="1">_View Manager</property>
-                        <property name="use-underline">True</property>
-                        <signal name="clicked" handler="on_menu_file_view_manager_activate" swapped="no"/>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkSeparator" id="menuitem1">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
-                      </object>
-                    </child>
-                    <child>
+                            <property name="visible">True</property>
+                            <property name="label" translatable="1">_View Manager</property>
+                            <property name="use-underline">True</property>
+                            <signal name="clicked" handler="on_menu_file_view_manager_activate" swapped="no"/>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkSeparator" id="menuitem1">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                          </object>
+                        </child>
+                        <child>
                           <object class="VmmMenuActionButton" id="menu-file-close">
-                        <property name="visible">True</property>
-                        <property name="label">_Close</property>
-                        <property name="use-underline">True</property>
-                        <signal name="clicked" handler="on_menu_file_close_activate" swapped="no"/>
-                        </object>
-                    </child>
-                    <child>
+                            <property name="visible">True</property>
+                            <property name="label">_Close</property>
+                            <property name="use-underline">True</property>
+                            <signal name="clicked" handler="on_menu_file_close_activate" swapped="no"/>
+                          </object>
+                        </child>
+                        <child>
                           <object class="VmmMenuActionButton" id="menu-file-quit">
-                        <property name="visible">True</property>
-                        <property name="label">_Quit</property>
-                        <property name="use-underline">True</property>
-                        <signal name="clicked" handler="on_menu_file_quit_activate" swapped="no"/>
-                        </object>
-                    </child>
-                  </object></property></object>
-                </property></object>
+                            <property name="visible">True</property>
+                            <property name="label">_Quit</property>
+                            <property name="use-underline">True</property>
+                            <signal name="clicked" handler="on_menu_file_quit_activate" swapped="no"/>
+                          </object>
+                        </child>
+                      </object>
+                    </property>
+                  </object>
+                </property>
+              </object>
             </child>
           </object>
         </child>
@@ -152,7 +159,10 @@
                                     </layout>
                                   </object>
                                 </child>
-                              <property name="margin-end">3</property><property name="margin-top">3</property><property name="margin-bottom">3</property></object>
+                                <property name="margin-end">3</property>
+                                <property name="margin-top">3</property>
+                                <property name="margin-bottom">3</property>
+                              </object>
                             </property>
                             <child type="label">
                               <object class="GtkLabel" id="label4">
@@ -232,7 +242,11 @@
                             </child>
                           </object>
                         </child>
-                      <property name="margin-start">6</property><property name="margin-end">6</property><property name="margin-top">6</property><property name="margin-bottom">6</property></object>
+                        <property name="margin-start">6</property>
+                        <property name="margin-end">6</property>
+                        <property name="margin-top">6</property>
+                        <property name="margin-bottom">6</property>
+                      </object>
                     </child>
                   </object>
                 </property>
@@ -280,7 +294,11 @@
                 </property>
               </object>
             </child>
-          <property name="margin-start">6</property><property name="margin-end">6</property><property name="margin-top">6</property><property name="margin-bottom">6</property></object>
+            <property name="margin-start">6</property>
+            <property name="margin-end">6</property>
+            <property name="margin-top">6</property>
+            <property name="margin-bottom">6</property>
+          </object>
         </child>
       </object>
     </property>
