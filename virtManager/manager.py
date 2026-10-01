@@ -803,7 +803,8 @@ class vmmManager(vmmGObjectUI):
 
     def popup_vm_menu_button(self, gesture, _n_press, x, y):
         vmlist = gesture.get_widget()
-        tup = vmlist.get_path_at_pos(int(x), int(y))
+        bin_x, bin_y = vmlist.convert_widget_to_bin_window_coords(int(x), int(y))
+        tup = vmlist.get_path_at_pos(bin_x, bin_y)
         if tup is None:
             return
         path = tup[0]

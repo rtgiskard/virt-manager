@@ -291,3 +291,57 @@ def test_real_close_shortcut_without_focused_child():
         owner.topwin.destroy()
         xlib.XCloseDisplay(display)
     """, x11=True)
+
+
+def test_storage_browser_embeds_storage_controls():
+    _run("""
+        from virtManager.connection import vmmConnection
+        from virtManager.storagebrowse import vmmStorageBrowser
+        conn = vmmConnection("test:///default")
+        browser = vmmStorageBrowser(conn)
+        browser.set_browse_reason(browser.REASON_ISO_MEDIA)
+        browser.show(None)
+        assert browser.storagelist.top_box.get_parent() == browser.widget("storage-align")
+        assert browser.storagelist.widget("browse-local").get_sensitive()
+        browser.cleanup()
+        conn.cleanup()
+    """)
+
+def test_context_menu_targets_clicked_row_with_headers():
+    _run("""
+        import time
+        from types import SimpleNamespace
+        from virtManager.manager import vmmManager
+        from virtManager.hoststorage import vmmHostStorage
+
+        model = Gtk.ListStore(str)
+        for name in ("alpha", "beta", "gamma"):
+            model.append([name])
+        tree = Gtk.TreeView(model=model)
+        column = Gtk.TreeViewColumn("Name", Gtk.CellRendererText(), text=0)
+        tree.append_column(column)
+        gesture = Gtk.GestureClick(button=3)
+        tree.add_controller(gesture)
+        window = Gtk.Window(child=tree, default_width=400, default_height=300)
+        window.present()
+        until = time.monotonic() + .25
+        while time.monotonic() < until:
+            GLib.MainContext.default().iteration(False)
+            time.sleep(.001)
+        targets = []
+        owner = SimpleNamespace(model=model,
+            popup_vm_menu=lambda m, it, x, y: targets.append(m[it][0]))
+        popover = Gtk.Popover(child=Gtk.Label(label="Copy Volume Path"))
+        storage = SimpleNamespace(_volmenu=popover)
+        for index, expected in ((0, "alpha"), (2, "gamma")):
+            rect = tree.get_background_area(Gtk.TreePath.new_from_indices([index]), column)
+            x, y = tree.convert_bin_window_to_widget_coords(30, rect.y + rect.height - 2)
+            vmmManager.popup_vm_menu_button(owner, gesture, 1, x, y)
+            assert targets[-1] == expected
+            vmmHostStorage._vol_popup_menu_cb(storage, gesture, 1, x, y)
+            selected_model, selected = tree.get_selection().get_selected()
+            assert selected_model[selected][0] == expected
+            popover.popdown()
+        popover.unparent()
+        window.destroy()
+    """)

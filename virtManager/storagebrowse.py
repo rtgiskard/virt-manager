@@ -109,7 +109,7 @@ class vmmStorageBrowser(vmmGObjectUI):
         self.storagelist.connect("volume-chosen", self._volume_chosen)
         self.storagelist.connect("cancel-clicked", self.close)
 
-        self.widget("storage-align").add(self.storagelist.top_box)
+        self.widget("storage-align").append(self.storagelist.top_box)
         self.err.set_modal_default(True)
         self.storagelist.err.set_modal_default(True)
 

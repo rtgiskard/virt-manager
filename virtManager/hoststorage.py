@@ -640,7 +640,8 @@ class vmmHostStorage(vmmGObjectUI):
 
     def _vol_popup_menu_cb(self, gesture, _press_count, x, y):
         widget = gesture.get_widget()
-        hit = widget.get_path_at_pos(int(x), int(y))
+        bin_x, bin_y = widget.convert_widget_to_bin_window_coords(int(x), int(y))
+        hit = widget.get_path_at_pos(bin_x, bin_y)
         if hit is None:
             return
         widget.get_selection().select_path(hit[0])

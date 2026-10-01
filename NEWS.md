@@ -1,6 +1,9 @@
 # Virtual Machine Manager News
 
 ## GTK4 fork (unreleased)
+- Convert context-menu hit tests to TreeView bin coordinates so VM and volume
+  actions target the clicked row, including lists with column headers.
+- Fix GTK4 storage-browser construction.
 - Use public GTK label children and theme-native check indicators in menus,
   removing guessed indicator spacing and private label-tree traversal. Preserve
   dynamic labels, mnemonics, RTL submenus, and nested action dismissal.
