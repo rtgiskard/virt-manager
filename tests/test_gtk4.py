@@ -293,6 +293,32 @@ def test_real_close_shortcut_without_focused_child():
     """, x11=True)
 
 
+def test_dialog_response_hide_and_destroy():
+    _run("""
+        from virtManager.error import run_dialog
+        for operation in ("response", "hide", "destroy", "immediate"):
+            dialog = Gtk.Dialog()
+            def finish():
+                if operation == "response":
+                    dialog.response(Gtk.ResponseType.OK)
+                    dialog.set_visible(False)
+                elif operation == "hide":
+                    dialog.set_visible(False)
+                else:
+                    dialog.destroy()
+                return False
+            if operation == "immediate":
+                dialog.connect("show", lambda _dialog: dialog.response(Gtk.ResponseType.OK))
+            else:
+                GLib.idle_add(finish)
+            result = run_dialog(dialog)
+            expected = (Gtk.ResponseType.OK if operation in ("response", "immediate")
+                        else Gtk.ResponseType.DELETE_EVENT)
+            assert result == expected, (operation, result)
+            dialog.destroy()
+    """)
+
+
 def test_storage_browser_embeds_storage_controls():
     _run("""
         from virtManager.connection import vmmConnection
@@ -306,6 +332,7 @@ def test_storage_browser_embeds_storage_controls():
         browser.cleanup()
         conn.cleanup()
     """)
+
 
 def test_tray_uses_current_text_direction():
     _run("""
@@ -321,6 +348,7 @@ def test_tray_uses_current_text_direction():
             assert value.unpack() == expected
         tray.close()
     """)
+
 
 def test_context_menu_targets_clicked_row_with_headers():
     _run("""

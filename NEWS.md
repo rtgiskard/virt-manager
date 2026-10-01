@@ -7,6 +7,8 @@
   Resize to VM on HiDPI displays when scaling and guest autoresize are disabled.
 - Restore native F10 menu activation in manager and connection windows, and
   expose the current text direction to D-Bus tray menu hosts.
+- End modal dialog waits when a dialog is hidden or destroyed, without losing
+  explicit responses or responses delivered during presentation.
 - Use public GTK label children and theme-native check indicators in menus,
   removing guessed indicator spacing and private label-tree traversal. Preserve
   dynamic labels, mnemonics, RTL submenus, and nested action dismissal.

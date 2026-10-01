@@ -17,20 +17,40 @@ from .baseclass import vmmGObject
 
 
 def run_dialog(dialog):
-    """Present a GTK4 dialog and wait for its response."""
+    """Wait for a response, or cancellation when the dialog is hidden."""
     loop = GLib.MainLoop()
     response = Gtk.ResponseType.DELETE_EVENT
+    finished = False
 
     def on_response(_dialog, result):
-        nonlocal response
+        nonlocal response, finished
         response = result
+        finished = True
         loop.quit()
 
+    def on_visible_changed(_dialog, _pspec):
+        if not finished and not dialog.get_visible():
+            on_response(dialog, Gtk.ResponseType.DELETE_EVENT)
+
+    def on_unrealize(_dialog):
+        if not finished:
+            on_response(dialog, Gtk.ResponseType.DELETE_EVENT)
+
     handler = dialog.connect("response", on_response)
-    dialog.set_modal(True)
-    dialog.show()
-    loop.run()
-    dialog.disconnect(handler)
+    visible_handler = dialog.connect("notify::visible", on_visible_changed)
+    unrealize_handler = None
+    if isinstance(dialog, Gtk.Widget):
+        unrealize_handler = dialog.connect("unrealize", on_unrealize)
+    try:
+        dialog.set_modal(True)
+        dialog.show()
+        if not finished:
+            loop.run()
+    finally:
+        dialog.disconnect(handler)
+        dialog.disconnect(visible_handler)
+        if unrealize_handler is not None:
+            dialog.disconnect(unrealize_handler)
     return response
 
 
